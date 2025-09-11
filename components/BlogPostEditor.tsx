@@ -29,6 +29,7 @@ interface BlogPost {
 
 interface BlogPostEditorProps {
   post?: BlogPost;
+  // eslint-disable-next-line no-unused-vars
   onSave: (post: BlogPost) => void;
   onCancel: () => void;
   mode: 'create' | 'edit';

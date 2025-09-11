@@ -115,7 +115,7 @@ export default function ResumeBuilderPage() {
   ]);
 
   // Additional Sections
-  const [sections] = useState<ResumeSection[]>([
+  const [sections, setSections] = useState<ResumeSection[]>([
     { id: '1', title: 'Summary', content: '', type: 'text' }
   ]);
 
@@ -176,8 +176,13 @@ export default function ResumeBuilderPage() {
       skill.id === id ? { ...skill, [field]: value } : skill
     ));
   };
-
-
+  const updateSection = (id: string, field: keyof ResumeSection, value: any) => {
+    setSections(prevSections => 
+      prevSections.map(section => 
+        section.id === id ? { ...section, [field]: value } : section
+      )
+    );
+  };
 
   const handleDownload = () => {
     // In a real app, this would generate and download a PDF

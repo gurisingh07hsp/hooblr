@@ -200,7 +200,7 @@ export default function PressPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Hero Section */}
           <div className="text-center mb-16">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">Press & Media</h1>
+            <h1 className="text-5xl font-bold text-gray-900 mb-6">Press &amp; Media</h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Stay updated with the latest news, press releases, and media resources from Hooblr. 
               For media inquiries, please contact our press team.
@@ -285,12 +285,12 @@ export default function PressPage() {
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">About Hooblr</h3>
                 <p className="text-gray-600 mb-4">
                   Hooblr is a revolutionary career platform that connects talented professionals with meaningful opportunities. 
-                  Founded in 2024, we\'re on a mission to democratize career opportunities and empower every individual 
+                  Founded in 2024, we&#39;re on a mission to democratize career opportunities and empower every individual 
                   to build fulfilling careers that align with their passions and potential.
                 </p>
                 <p className="text-gray-600">
                   Our AI-powered platform provides personalized job matching, comprehensive career resources, 
-                  and innovative tools to help both job seekers and employers succeed in today\'s dynamic job market.
+                  and innovative tools to help both job seekers and employers succeed in today&#39;s dynamic job market.
                 </p>
               </div>
               <div>

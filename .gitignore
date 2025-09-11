@@ -1,25 +1,41 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
 # Logs
-logs
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# OS / Editor
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.idea/
+.vscode/
+
+# Env files (keep secrets out of git)
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Typescript / tooling caches
+*.tsbuildinfo
+.eslintcache
+.cache/
+
+# Misc build artifacts
+coverage/
+dist/
+build/
+.vercel/
+.turbo/
+
+# Optional lockfile backups
+package-lock.json.*
+yarn.lock.*
+pnpm-lock.yaml.*

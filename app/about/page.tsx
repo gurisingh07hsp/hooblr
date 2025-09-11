@@ -141,7 +141,7 @@ export default function AboutPage() {
           <div className="text-center mb-16">
             <h1 className="text-5xl font-bold text-gray-900 mb-6">About Hooblr</h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We\'re revolutionizing the way people find jobs and companies find talent. 
+              We&#39;re revolutionizing the way people find jobs and companies find talent. 
               Our platform connects ambitious professionals with opportunities that matter.
             </p>
           </div>
@@ -180,7 +180,7 @@ export default function AboutPage() {
                   but also provide the tools and resources they need to succeed in their careers.
                 </p>
                 <p className="text-gray-600">
-                  Today, Hooblr is more than just a job board. We\'re a comprehensive career platform 
+                  Today, Hooblr is more than just a job board. We&#39;re a comprehensive career platform 
                   that empowers professionals to build meaningful careers and helps companies find the perfect talent.
                 </p>
               </div>
@@ -236,7 +236,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">Inclusivity</h3>
                 <p className="text-gray-600">
-                  We\'re committed to creating opportunities for people from all backgrounds and experiences.
+                  We&#39;re committed to creating opportunities for people from all backgrounds and experiences.
                 </p>
               </div>
             </div>
@@ -284,8 +284,8 @@ export default function AboutPage() {
             <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 text-white">
               <h2 className="text-3xl font-bold mb-4">Join Our Mission</h2>
               <p className="text-purple-100 mb-6 max-w-2xl mx-auto">
-                Whether you\'re looking for your next opportunity or seeking to hire great talent, 
-                we\'re here to help you succeed.
+                Whether you&#39;re looking for your next opportunity or seeking to hire great talent, 
+                we&#39;re here to help you succeed.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button

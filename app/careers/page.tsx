@@ -285,7 +285,7 @@ export default function CareersPage() {
             <h1 className="text-5xl font-bold text-gray-900 mb-6">Join Our Team</h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Help us revolutionize the way people find jobs and build careers. 
-              Join a team that's passionate about making a difference.
+              Join a team that&#39;s passionate about making a difference.
             </p>
           </div>
 
@@ -466,10 +466,10 @@ export default function CareersPage() {
           {/* CTA */}
           <div className="mt-16 text-center">
             <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 text-white">
-              <h2 className="text-3xl font-bold mb-4">Don\'t See the Right Fit?</h2>
+              <h2 className="text-3xl font-bold mb-4">Don&#39;t See the Right Fit?</h2>
               <p className="text-purple-100 mb-6 max-w-2xl mx-auto">
-                We\'re always looking for talented individuals to join our team. 
-                Send us your resume and we\'ll keep you in mind for future opportunities.
+                We&#39;re always looking for talented individuals to join our team. 
+                Send us your resume and we&#39;ll keep you in mind for future opportunities.
               </p>
               <button className="bg-white text-purple-600 px-6 py-3 rounded-xl hover:bg-gray-100 transition-all duration-300 font-semibold">
                 Send Your Resume

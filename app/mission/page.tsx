@@ -163,9 +163,9 @@ export default function MissionPage() {
                 meets opportunity in the most efficient, transparent, and human-centered way possible.
               </p>
               <p className="text-lg text-gray-700 leading-relaxed">
-                We\'re committed to building a future where career growth is accessible to everyone, 
+                We&#39;re committed to building a future where career growth is accessible to everyone, 
                 regardless of background, location, or experience level. Through innovative technology, 
-                comprehensive resources, and unwavering dedication to our users, we\'re transforming how 
+                comprehensive resources, and unwavering dedication to our users, we&#39;re transforming how 
                 people find and build their careers.
               </p>
             </div>
@@ -299,8 +299,8 @@ export default function MissionPage() {
             <div className="bg-white rounded-2xl shadow-lg p-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Join Our Mission</h2>
               <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-                Whether you\'re looking for your next opportunity or seeking to hire great talent, 
-                we\'re here to help you succeed in your career journey.
+                Whether you&#39;re looking for your next opportunity or seeking to hire great talent, 
+                we&#39;re here to help you succeed in your career journey.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
