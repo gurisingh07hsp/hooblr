@@ -32,7 +32,7 @@ interface Job {
   location: string;
   type: string;
   salary: string;
-  status: 'active' | 'inactive' | 'pending';
+  status: 'active' | 'inactive' | 'pending' | string;
   posted: string;
   applications: number;
   views: number;
@@ -44,7 +44,7 @@ interface Company {
   industry: string;
   size: string;
   location: string;
-  status: 'verified' | 'pending' | 'suspended';
+  status: 'verified' | 'pending' | 'suspended' | string;
   jobsCount: number;
   joined: string;
 }
@@ -54,7 +54,7 @@ interface BlogPost {
   title: string;
   author: string;
   category: string;
-  status: 'published' | 'draft' | 'archived';
+  status: 'published' | 'draft' | 'archived' | string;
   published: string;
   views: number;
   likes: number;
@@ -65,7 +65,7 @@ interface User {
   name: string;
   email: string;
   role: 'user' | 'company' | 'admin';
-  status: 'active' | 'inactive' | 'suspended';
+  status: 'active' | 'inactive' | 'suspended' | string;
   joined: string;
   lastLogin: string;
 }
@@ -227,13 +227,13 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
   // eslint-disable-next-line no-unused-vars
   const handleStatusChange = (type: string, id: string, newStatus: string) => {
     if (type === 'job') {
-      setJobs(jobs.map(job => job.id === id ? { ...job, status: newStatus as any } : job));
+      setJobs(jobs.map(job => job.id === id ? { ...job, status: newStatus as string } : job));
     } else if (type === 'company') {
-      setCompanies(companies.map(company => company.id === id ? { ...company, status: newStatus as any } : company));
+      setCompanies(companies.map(company => company.id === id ? { ...company, status: newStatus as string } : company));
     } else if (type === 'blog') {
-      setBlogPosts(blogPosts.map(post => post.id === id ? { ...post, status: newStatus as any } : post));
+      setBlogPosts(blogPosts.map(post => post.id === id ? { ...post, status: newStatus as string } : post));
     } else if (type === 'user') {
-      setUsers(users.map(user => user.id === id ? { ...user, status: newStatus as any } : user));
+      setUsers(users.map(user => user.id === id ? { ...user, status: newStatus as string } : user));
     }
   };
 

@@ -169,7 +169,7 @@ export default function ResourcesPage() {
             {resources.filter(resource => resource.featured).map((resource) => {
               const IconComponent = resource.icon;
               return (
-                <div key={resource.id} className="group bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-200 p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div key={resource.id} className="group bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 p-6 transition-all duration-300 transform hover:-translate-y-1">
                   <div className="flex items-start space-x-4">
                     <div className={`w-12 h-12 bg-gradient-to-br ${resource.color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                       <IconComponent className="w-6 h-6 text-white" />
@@ -201,7 +201,7 @@ export default function ResourcesPage() {
                             {resource.downloads.toLocaleString()}
                           </div>
                         </div>
-                        <button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold flex items-center shadow-md hover:shadow-lg transform hover:-translate-y-1 text-sm">
+                        <button className="bg-[#9333E9] text-white px-4 py-2 rounded-lg transition-all duration-300 font-semibold flex items-center transform hover:-translate-y-1 text-sm">
                           Access Now
                           <ArrowRight className="w-4 h-4 ml-2" />
                         </button>
@@ -218,7 +218,7 @@ export default function ResourcesPage() {
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Categories Sidebar */}
           <div className="lg:w-1/4">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-200 p-6 sticky top-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-purple-200 p-6 sticky top-6">
               <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
                 <BookOpen className="w-5 h-5 mr-2 text-purple-600" />
                 Categories
@@ -268,7 +268,7 @@ export default function ResourcesPage() {
               {filteredResources.map((resource) => {
                 const IconComponent = resource.icon;
                 return (
-                  <div key={resource.id} className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-purple-200 p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                  <div key={resource.id} className="group bg-white/80 backdrop-blur-sm rounded-2xl border border-purple-200 p-6 transition-all duration-300 transform hover:-translate-y-1">
                     <div className="flex items-start space-x-4">
                       <div className={`w-12 h-12 bg-gradient-to-br ${resource.color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                         <IconComponent className="w-6 h-6 text-white" />

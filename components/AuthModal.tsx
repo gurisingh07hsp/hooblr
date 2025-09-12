@@ -1,25 +1,29 @@
 'use client'
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useUser } from "@/context/UserContext";
 import { X, User, Building2, Mail, Lock, Eye, EyeOff, Briefcase, Users } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   // eslint-disable-next-line no-unused-vars
-  onAuth: (userData: any) => void;
+  // onAuth: (userData: any) => void;
 }
 
-export default function AuthModal({ isOpen, onClose, onAuth }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
+  const { setUser} = useUser();
   const [step, setStep] = useState<'role' | 'auth'>('role');
   const [selectedRole, setSelectedRole] = useState<'user' | 'company' | 'admin' | null>(null);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [showPassword, setShowPassword] = useState(false);
+  const [message, setMessage] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: '',
     name: '',
+    role: selectedRole,
     companyName: '',
     companySize: '',
     industry: ''
@@ -30,6 +34,11 @@ export default function AuthModal({ isOpen, onClose, onAuth }: AuthModalProps) {
     setStep('auth');
   };
 
+
+  useEffect(()=>{
+    setFormData((prev) => ({ ...prev, role: selectedRole }));
+  },[selectedRole]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -38,29 +47,67 @@ export default function AuthModal({ isOpen, onClose, onAuth }: AuthModalProps) {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
+    console.log(formData);
+
+    if(authMode == 'signup'){
+      try{
+        const response = await axios.post('http://localhost:5000/api/auth/register', formData, {withCredentials: true});
+        setUser(response.data.user);
+        setMessage('✅ Account Created successful!');
+        resetForm();
+        setTimeout(()=>{
+          onClose();
+        },1500);
+      }catch(error){
+        if (axios.isAxiosError(error)) {
+          const err = error.response?.data?.message || 'Failed to Signup';
+          setMessage(err);
+        } else {
+          setMessage('An unexpected error occurred');
+        }
+      } 
+    }
+    else{
+      try{
+        const response = await axios.post('http://localhost:5000/api/auth/login', formData, {withCredentials: true});
+        setUser(response.data.user);
+        setMessage('✅ Login successful!');
+        resetForm();
+        setTimeout(()=>{
+          onClose();
+        },1500);
+      }catch(error){
+        if (axios.isAxiosError(error)) {
+          const err = error.response?.data?.error || 'Failed to login';
+          setMessage(err);
+        } else {
+          setMessage('An unexpected error occurred');
+        }
+      } 
+    }
     
     // Mock authentication - in real app, this would call an API
-    const userData = {
-      id: Math.random().toString(36).substr(2, 9),
-      email: formData.email,
-      role: selectedRole,
-      name: selectedRole === 'company' ? formData.companyName : formData.name,
-      ...(selectedRole === 'company' && {
-        companySize: formData.companySize,
-        industry: formData.industry
-      })
-    };
+    // const userData = {
+    //   id: Math.random().toString(36).substr(2, 9),
+    //   email: formData.email,
+    //   role: selectedRole,
+    //   name: selectedRole === 'company' ? formData.companyName : formData.name,
+    //   ...(selectedRole === 'company' && {
+    //     companySize: formData.companySize,
+    //     industry: formData.industry
+    //   })
+    // };
 
-    // Add admin access for demo purposes
-    if (formData.email === 'admin@hooblr.com') {
-      userData.role = 'admin';
-    }
+    // // Add admin access for demo purposes
+    // if (formData.email === 'admin@hooblr.com') {
+    //   userData.role = 'admin'  ;
+    // }
 
-    onAuth(userData);
-    onClose();
-    resetForm();
+    // onAuth(userData);
+    // onClose();
+    // resetForm();
   };
 
   const resetForm = () => {
@@ -73,6 +120,7 @@ export default function AuthModal({ isOpen, onClose, onAuth }: AuthModalProps) {
       password: '',
       confirmPassword: '',
       name: '',
+      role: selectedRole,
       companyName: '',
       companySize: '',
       industry: ''
@@ -338,6 +386,8 @@ export default function AuthModal({ isOpen, onClose, onAuth }: AuthModalProps) {
                   </div>
                 </div>
               )}
+              
+              <p className='text-center'>{message}</p>
 
               {/* Submit Button */}
               <button

@@ -54,8 +54,8 @@ export default function JobDetailsPage() {
         if (!res.ok) throw new Error('Job not found');
         const data = await res.json();
         setJob(data.job);
-      } catch (e: any) {
-        setError(e?.message || 'Failed to load job');
+      } catch (e) {
+        setError('Failed to load job');
       } finally {
         setLoading(false);
       }
@@ -76,7 +76,7 @@ export default function JobDetailsPage() {
         body: JSON.stringify({ coverLetter, resume })
       });
       if (!res.ok) {
-        const j = await res.json().catch(() => ({} as any));
+        const j = await res.json().catch(() => ({}));
         throw new Error(j?.error || 'Failed to apply');
       }
       setSubmitted(true);
@@ -84,8 +84,8 @@ export default function JobDetailsPage() {
       // refresh stats (applications count)
       const refreshed = await fetch(`${API_BASE}/api/jobs/${id}`).then(r => r.json()).catch(() => null);
       if (refreshed?.job) setJob(refreshed.job);
-    } catch (e: any) {
-      setError(e?.message || 'Failed to apply');
+    } catch (e) {
+      setError('Failed to apply');
     } finally {
       setSubmitting(false);
     }
@@ -108,7 +108,7 @@ export default function JobDetailsPage() {
         <div className="text-center">
           <p className="text-xl font-semibold text-gray-900 mb-2">Job not found</p>
           <p className="text-gray-600 mb-6">{error || 'Please try again later.'}</p>
-          <button onClick={() => router.push('/jobs')} className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2 rounded-lg">Back to Jobs</button>
+          <button onClick={() => router.push('/jobs')} className="bg-[#9333E9] text-white px-5 py-2 rounded-lg">Back to Jobs</button>
         </div>
       </div>
     );

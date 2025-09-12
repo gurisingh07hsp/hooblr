@@ -97,7 +97,7 @@ export default function GovernmentJobsPage() {
               <Link href="/blog" className="text-gray-600 hover:text-gray-900 transition-colors">Blog</Link>
               <Link href="/admin" className="text-gray-600 hover:text-gray-900 transition-colors">Admin</Link>
               <Link href="/login" className="text-gray-600 hover:text-gray-900 transition-colors">Login</Link>
-              <Link href="/signup" className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">Sign Up</Link>
+              <Link href="/signup" className="bg-[#9333E9] text-white px-4 py-2 rounded-lg">Sign Up</Link>
             </nav>
           </div>
         </div>

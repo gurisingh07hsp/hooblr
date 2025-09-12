@@ -253,7 +253,7 @@ export default function CompaniesPage() {
                 
                 <button 
                   onClick={handleSearch}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-3 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  className="bg-[#9333E9] text-white px-4 py-3 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center transform hover:-translate-y-1"
                 >
                   <Search className="w-4 h-4 mr-2" />
                   Search
@@ -376,13 +376,13 @@ export default function CompaniesPage() {
               {filteredCompanies.map((company) => (
                 <div
                   key={company.id}
-                  className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-200 p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${
+                  className={`bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 p-6 transition-all duration-300 transform hover:-translate-y-1 ${
                     company.featured ? 'ring-2 ring-purple-500 ring-opacity-30 bg-gradient-to-r from-purple-50/50 to-indigo-50/50' : ''
                   }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-4 flex-1">
-                      <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                      <div className="w-16 h-16 bg-[#9333E9] rounded-xl flex items-center justify-center shadow-lg">
                         <Building2 className="w-8 h-8 text-white" />
                       </div>
                       
@@ -455,7 +455,7 @@ export default function CompaniesPage() {
                         
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
-                            <button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-sm">
+                            <button className="bg-[#9333E9] text-white px-4 py-2 rounded-lg transition-all duration-300 font-semibold transform hover:-translate-y-1 text-sm">
                               View Jobs
                             </button>
                             <button 

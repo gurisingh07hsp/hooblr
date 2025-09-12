@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Shield, LogOut, ArrowLeft, X, Save, Plus } from 'lucide-react';
 import BlogPostEditor from '../../components/BlogPostEditor';
 import Footer from '@/components/Footer';
+import { useUser } from '@/context/UserContext';
 
 interface Job {
   id: string;
@@ -55,18 +56,58 @@ interface User {
   lastLogin: string;
 }
 
+
+interface Admin {
+  name: string | undefined;
+  email: string;
+  role: string;
+}
+
+type Status = "active" | "inactive" | "draft" | "pending" | "archived";
+
+// ------------------- POST -------------------
+interface Item {
+  type: string;
+  title: string;
+  author: string;
+  category: string;
+  status: Status;
+  views?: number;
+  likes?: number;
+  published?: string;
+  featuredImage?: string;
+  excerpt?: string;
+  content: string;
+  tags?: string[];
+  company: string;
+  location: string;
+  salary?: string;
+  applications: number;
+  posted: string;
+  industry: string;
+  size: string; // could make this enum if you want
+  jobsCount: number;
+  name: string;
+  email: string;
+  role: "user" | "company" | "admin";
+  joined: string;
+  lastLogin?: string;
+}
+
+
+
 export default function AdminPage() {
   const router = useRouter();
+  const {user, logout} = useUser();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [adminUser, setAdminUser] = useState<any>(null);
-
+  const [adminUser, setAdminUser] = useState<Admin | null>(null);
   // Modal states
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [modalType, setModalType] = useState<'job' | 'company' | 'blog' | 'user'>('blog');
   
   // Blog editor states
@@ -222,23 +263,29 @@ export default function AdminPage() {
   useEffect(() => {
     // Check if user is authenticated as admin
     const checkAuth = () => {
-      // For demo purposes, auto-authenticate as admin
-      // In real app, check localStorage, cookies, or session
-      setIsAuthenticated(true);
-      setAdminUser({
-        name: 'System Administrator',
-        email: 'admin@hooblr.com',
-        role: 'admin'
-      });
+      
+      if(user?.role === 'admin'){
+        setIsAuthenticated(true);
+        setAdminUser({
+          name: user.profile?.name,
+          email: user.email,
+          role: user.role
+        });
+      }
+      else{
+        if(user?.role === 'company' || user?.role === 'user')
+        {
+          router.push('/');
+        }
+      }
     };
-
-    checkAuth();
-  }, []);
+      checkAuth();
+  }, [user]);
 
   const handleLogout = () => {
+    logout();
     setIsAuthenticated(false);
     setAdminUser(null);
-    router.push('/');
   };
 
   const handleDelete = (type: string, id: string) => {
@@ -253,13 +300,13 @@ export default function AdminPage() {
     }
   };
 
-  const handleView = (type: 'job' | 'company' | 'blog' | 'user', item: any) => {
+  const handleView = (type: 'job' | 'company' | 'blog' | 'user', item: Item) => {
     setModalType(type);
     setSelectedItem(item);
     setIsViewModalOpen(true);
   };
 
-  const handleEdit = (type: 'job' | 'company' | 'blog' | 'user', item: any) => {
+  const handleEdit = (type: 'job' | 'company' | 'blog' | 'user', item: Item) => {
     setModalType(type);
     setSelectedItem(item);
     setIsEditModalOpen(true);
@@ -329,7 +376,7 @@ export default function AdminPage() {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <h2 className="text-xl font-bold text-gray-900">
               View {modalType === 'job' ? 'Job' : modalType === 'company' ? 'Company' : modalType === 'blog' ? 'Blog Post' : 'User'}
@@ -831,20 +878,20 @@ export default function AdminPage() {
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-xl border border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-xl border border-blue-200 transition-all duration-300 transform hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-600 text-xs font-medium mb-1">Total Jobs</p>
               <p className="text-xl font-bold text-blue-900 mb-1">{jobs.length}</p>
               <p className="text-blue-600 text-xs">+12% from last month</p>
             </div>
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
               <span className="text-white text-sm font-bold">J</span>
             </div>
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-xl border border-green-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-xl border border-green-200 transition-all duration-300 transform hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-600 text-xs font-medium mb-1">Active Users</p>
@@ -857,7 +904,7 @@ export default function AdminPage() {
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-5 rounded-xl border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-5 rounded-xl border border-purple-200 transition-all duration-300 transform hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-purple-600 text-xs font-medium mb-1">Companies</p>
@@ -870,7 +917,7 @@ export default function AdminPage() {
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-5 rounded-xl border border-orange-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-5 rounded-xl border border-orange-200 transition-all duration-300 transform hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-orange-600 text-xs font-medium mb-1">Blog Posts</p>
@@ -886,7 +933,7 @@ export default function AdminPage() {
 
       {/* Recent Activities */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white/80 backdrop-blur-sm p-5 rounded-xl border border-purple-200 shadow-lg">
+        <div className="bg-white/80 backdrop-blur-sm p-5 rounded-xl border border-purple-200">
           <h3 className="text-lg font-semibold mb-4 text-gray-900">Recent Activities</h3>
           <div className="space-y-3">
             <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-purple-50 transition-colors">
@@ -908,19 +955,19 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-sm p-5 rounded-xl border border-purple-200 shadow-lg">
+        <div className="bg-white/80 backdrop-blur-sm p-5 rounded-xl border border-purple-200">
           <h3 className="text-lg font-semibold mb-4 text-gray-900">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-3">
-            <button className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1 shadow-lg">
+            <button className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1">
               Add Job
             </button>
-            <button className="p-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1 shadow-lg">
+            <button className="p-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1">
               Write Blog
             </button>
-            <button className="p-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1 shadow-lg">
+            <button className="p-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1">
               Manage Users
             </button>
-            <button className="p-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1 shadow-lg">
+            <button className="p-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1">
               View Analytics
             </button>
           </div>
@@ -1004,13 +1051,13 @@ export default function AdminPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <button 
-                        onClick={() => handleView('job', job)}
+                        // onClick={() => handleView('job', job)}
                         className="text-blue-600 hover:text-blue-900"
                       >
                         👁️
                       </button>
                       <button 
-                        onClick={() => handleEdit('job', job)}
+                        // onClick={() => handleEdit('job', job)}
                         className="text-green-600 hover:text-green-900"
                       >
                         ✏️
@@ -1045,7 +1092,7 @@ export default function AdminPage() {
       {/* Companies Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {companies.map((company) => (
-          <div key={company.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+          <div key={company.id} className="bg-white rounded-lg border border-gray-200 p-6 transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900 mb-1">{company.name}</h3>
@@ -1068,13 +1115,13 @@ export default function AdminPage() {
 
             <div className="flex items-center space-x-2">
               <button 
-                onClick={() => handleView('company', company)}
+                // onClick={() => handleView('company', company)}
                 className="flex-1 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
               >
                 👁️ View
               </button>
               <button 
-                onClick={() => handleEdit('company', company)}
+                // onClick={() => handleEdit('company', company)}
                 className="flex-1 bg-green-50 text-green-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors"
               >
                 ✏️ Edit
@@ -1108,7 +1155,7 @@ export default function AdminPage() {
       {/* Blog Posts */}
       <div className="space-y-4">
         {blogPosts.map((post) => (
-          <div key={post.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+          <div key={post.id} className="bg-white rounded-lg border border-gray-200 p-6 transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{post.title}</h3>
@@ -1155,7 +1202,7 @@ export default function AdminPage() {
 
             <div className="flex items-center space-x-2">
               <button 
-                onClick={() => handleView('blog', post)}
+                // onClick={() => handleView('blog', post)}
                 className="flex-1 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
               >
                 👁️ Preview
@@ -1234,13 +1281,13 @@ export default function AdminPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <button 
-                        onClick={() => handleView('user', user)}
+                        // onClick={() => handleView('user', user)}
                         className="text-blue-600 hover:text-blue-900"
                       >
                         👁️
                       </button>
                       <button 
-                        onClick={() => handleEdit('user', user)}
+                        // onClick={() => handleEdit('user', user)}
                         className="text-green-600 hover:text-green-900"
                       >
                         ✏️
@@ -1469,7 +1516,7 @@ export default function AdminPage() {
         <div className="flex gap-8">
           {/* Sidebar */}
           <div className="w-64 flex-shrink-0">
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-200 p-6 sticky top-6">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-purple-200 p-6 sticky top-6">
               <nav className="space-y-3">
                 <button
                   onClick={() => setActiveTab('dashboard')}
@@ -1542,7 +1589,7 @@ export default function AdminPage() {
 
           {/* Main Content */}
           <div className="flex-1">
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-200 p-6">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-purple-200 p-6">
               {activeTab === 'dashboard' && renderDashboard()}
               {activeTab === 'jobs' && renderJobsManagement()}
               {activeTab === 'companies' && renderCompaniesManagement()}

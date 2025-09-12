@@ -352,7 +352,7 @@ export default function CompanyProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm shadow-sm border-b border-purple-200 fixed w-full top-0 z-50">
+      <header className="bg-white backdrop-blur-sm shadow-sm border-b border-purple-200 fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div 
@@ -476,10 +476,10 @@ export default function CompanyProfilePage() {
           </button>
 
           {/* Company Header */}
-          <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+          <div className="bg-white rounded-2xl border p-8 mb-8">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
               <div className="flex items-start space-x-6 mb-6 lg:mb-0">
-                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                <div className="w-20 h-20 bg-[#9333E9] rounded-xl flex items-center justify-center shadow-lg">
                   <Building2 className="w-10 h-10 text-white" />
                 </div>
                 <div>
@@ -528,7 +528,7 @@ export default function CompanyProfilePage() {
               </div>
               
               <div className="flex flex-col space-y-3">
-                <button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold shadow-lg">
+                <button className="bg-[#9333E9] text-white px-6 py-3 rounded-xl transition-all duration-300 font-semibold">
                   View All Jobs
                 </button>
                 <div className="flex space-x-3">
@@ -550,14 +550,14 @@ export default function CompanyProfilePage() {
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* About Section */}
-              <div className="bg-white rounded-2xl shadow-lg p-8">
+              <div className="bg-white rounded-2xl border p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">About {company.name}</h2>
                 <p className="text-gray-700 leading-relaxed mb-6">{company.about}</p>
                 <p className="text-gray-700 leading-relaxed">{company.description}</p>
               </div>
 
               {/* Mission & Culture */}
-              <div className="bg-white rounded-2xl shadow-lg p-8">
+              <div className="bg-white rounded-2xl border p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Mission & Culture</h2>
                 <div className="space-y-6">
                   <div>
@@ -572,11 +572,11 @@ export default function CompanyProfilePage() {
               </div>
 
               {/* Open Jobs */}
-              <div className="bg-white rounded-2xl shadow-lg p-8">
+              <div className="bg-white rounded-2xl border p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Open Positions</h2>
                 <div className="space-y-4">
                   {company.jobs?.map((job) => (
-                    <div key={job.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                    <div key={job.id} className="border border-gray-200 rounded-xl p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <h3 className="text-lg font-semibold text-gray-900 mb-2">{job.title}</h3>
@@ -599,7 +599,7 @@ export default function CompanyProfilePage() {
                             Posted {job.posted}
                           </div>
                         </div>
-                        <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
+                        <button className="bg-[#9333E9] text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium">
                           Apply Now
                         </button>
                       </div>
@@ -612,7 +612,7 @@ export default function CompanyProfilePage() {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Company Info */}
-              <div className="bg-white rounded-2xl shadow-lg p-6">
+              <div className="bg-white rounded-2xl border p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Company Information</h3>
                 <div className="space-y-3">
                   <div className="flex items-center">
@@ -638,7 +638,7 @@ export default function CompanyProfilePage() {
               </div>
 
               {/* Benefits */}
-              <div className="bg-white rounded-2xl shadow-lg p-6">
+              <div className="bg-white rounded-2xl border p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Benefits & Perks</h3>
                 <div className="space-y-2">
                   {company.benefits.map((benefit, index) => (
@@ -652,7 +652,7 @@ export default function CompanyProfilePage() {
 
               {/* Contact */}
               {company.contact && (
-                <div className="bg-white rounded-2xl shadow-lg p-6">
+                <div className="bg-white rounded-2xl border p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h3>
                   <div className="space-y-3">
                     <div className="flex items-center">
@@ -687,11 +687,11 @@ export default function CompanyProfilePage() {
                 .map((relatedCompany) => (
                   <div 
                     key={relatedCompany.id}
-                    className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer border border-gray-100"
+                    className="bg-white rounded-xl p-6 transition-shadow cursor-pointer border"
                     onClick={() => router.push(`/companies/${nameToSlug(relatedCompany.name)}`)}
                   >
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
+                      <div className="w-12 h-12 bg-[#9333E9] rounded-lg flex items-center justify-center">
                         <Building2 className="w-6 h-6 text-white" />
                       </div>
                       <div className="flex-1">

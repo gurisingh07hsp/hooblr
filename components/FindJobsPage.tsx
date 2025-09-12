@@ -193,7 +193,7 @@ export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProp
                 </select>
               </div>
               
-              <button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg">
+              <button className="bg-[#9333E9] text-white px-6 py-3 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center">
                 <Search className="w-5 h-5 mr-2" />
                 Search Jobs
               </button>
@@ -362,7 +362,7 @@ export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProp
                         <div className="flex items-center space-x-4">
                           <button
                             onClick={() => router.push(`/jobs/${job.id}`)}
-                            className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-medium shadow-lg"
+                            className="bg-[#9333E9] text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-medium shadow-lg"
                           >
                             Apply Now
                           </button>

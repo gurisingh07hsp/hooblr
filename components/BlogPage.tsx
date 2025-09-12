@@ -127,7 +127,7 @@ export default function BlogPage({ posts }: BlogPageProps) {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {featuredPosts.map((post) => (
-                <article key={post.id} className="group bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-200 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <article key={post.id} className="group bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 overflow-hidden transition-all duration-300 transform hover:-translate-y-1">
                   {post.featuredImage && (
                     <div className="aspect-video overflow-hidden">
                       <img 
@@ -205,7 +205,7 @@ export default function BlogPage({ posts }: BlogPageProps) {
                     <div className="flex items-center justify-between">
                       <button 
                         onClick={() => router.push(`/blog/${post.id}`)}
-                        className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 text-sm font-semibold flex items-center space-x-2 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                        className="bg-[#9333E9] text-white px-4 py-2 rounded-lg transition-all duration-300 text-sm font-semibold flex items-center space-x-2 transform hover:-translate-y-1"
                       >
                         <span>Read Full Article</span>
                         <ArrowLeft className="w-3 h-3 transform rotate-180 group-hover:translate-x-1 transition-transform" />
@@ -261,7 +261,7 @@ export default function BlogPage({ posts }: BlogPageProps) {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {regularPosts.map((post) => (
-                <article key={post.id} className="group bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-200 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <article key={post.id} className="group bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 overflow-hidden transition-all duration-300 transform hover:-translate-y-1">
                   {post.featuredImage && (
                     <div className="aspect-video overflow-hidden">
                       <img 
@@ -335,7 +335,7 @@ export default function BlogPage({ posts }: BlogPageProps) {
                     <div className="flex items-center justify-between">
                       <button 
                         onClick={() => router.push(`/blog/${post.id}`)}
-                        className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1.5 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 text-xs font-semibold shadow-md"
+                        className="bg-[#9333E9] text-white px-3 py-1.5 rounded-lg transition-all duration-300 text-xs font-semibold"
                       >
                         Read More
                       </button>

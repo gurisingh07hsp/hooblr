@@ -199,7 +199,7 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
           <p className="text-gray-600 mb-6">The blog post you&apos;re looking for doesn&apos;t exist.</p>
           <button
             onClick={() => router.push('/blog')}
-            className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold"
+            className="bg-[#9333E9] text-white px-6 py-3 rounded-xl transition-all duration-300 font-semibold"
           >
             Back to Blog
           </button>
@@ -211,7 +211,7 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm shadow-sm border-b border-purple-200 fixed w-full top-0 z-50">
+      <header className="bg-white backdrop-blur-sm shadow-sm border-b border-purple-200 fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div 

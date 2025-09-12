@@ -20,11 +20,7 @@ const userSchema = new mongoose.Schema({
     default: 'user'
   },
   profile: {
-    firstName: {
-      type: String,
-      required: function() { return this.role === 'user'; }
-    },
-    lastName: {
+    name: {
       type: String,
       required: function() { return this.role === 'user'; }
     },

@@ -1,7 +1,8 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
-const { auth, generateToken } = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
+const sendToken = require('../utils/jwtToken');
 
 const router = express.Router();
 
@@ -10,11 +11,10 @@ const signupValidation = [
   body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
   body('role').isIn(['user', 'company']).withMessage('Invalid role'),
-  body('firstName').if(body('role').equals('user')).notEmpty().withMessage('First name is required for users'),
-  body('lastName').if(body('role').equals('user')).notEmpty().withMessage('Last name is required for users'),
-  body('company.name').if(body('role').equals('company')).notEmpty().withMessage('Company name is required for companies'),
-  body('company.size').if(body('role').equals('company')).isIn(['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+']).withMessage('Invalid company size'),
-  body('company.industry').if(body('role').equals('company')).notEmpty().withMessage('Industry is required for companies')
+  body('name').if(body('role').equals('user')).notEmpty().withMessage('Name is required for users'),
+  body('companyName').if(body('role').equals('company')).notEmpty().withMessage('Company name is required for companies'),
+  body('companySize').if(body('role').equals('company')).isIn(['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+']).withMessage('Invalid company size'),
+  body('industry').if(body('role').equals('company')).notEmpty().withMessage('Industry is required for companies')
 ];
 
 const loginValidation = [
@@ -32,7 +32,7 @@ router.post('/register', signupValidation, async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password, role, firstName, lastName, company } = req.body;
+    const { email, password, role, name, companyName, companySize, industry} = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -47,26 +47,25 @@ router.post('/register', signupValidation, async (req, res) => {
       role
     };
 
+
     if (role === 'user') {
       userData.profile = {
-        firstName,
-        lastName
+        name
       };
     } else if (role === 'company') {
+      const company = {
+        name: companyName,
+        size: companySize,
+        industry
+      }
       userData.company = company;
     }
 
     const user = new User(userData);
     await user.save();
 
-    // Generate token
-    const token = generateToken(user._id);
+    sendToken(user, 200, res);
 
-    res.status(201).json({
-      message: 'User registered successfully',
-      token,
-      user: user.getPublicProfile()
-    });
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -106,14 +105,7 @@ router.post('/login', loginValidation, async (req, res) => {
     user.lastLogin = new Date();
     await user.save();
 
-    // Generate token
-    const token = generateToken(user._id);
-
-    res.json({
-      message: 'Login successful',
-      token,
-      user: user.getPublicProfile()
-    });
+    sendToken(user, 200, res);
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -125,7 +117,8 @@ router.post('/login', loginValidation, async (req, res) => {
 // @access  Private
 router.get('/me', auth, async (req, res) => {
   try {
-    res.json({
+    res.status(200).json({
+      success: true,
       user: req.user.getPublicProfile()
     });
   } catch (error) {
@@ -137,10 +130,21 @@ router.get('/me', auth, async (req, res) => {
 // @route   POST /api/auth/logout
 // @desc    Logout user (client-side token removal)
 // @access  Private
-router.post('/logout', auth, async (req, res) => {
+router.get('/logout', async (req, res) => {
   try {
     // In a real app, you might want to blacklist the token
-    res.json({ message: 'Logged out successfully' });
+    res.cookie('token', null, {
+    expires: new Date(0),
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // match login
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // match login
+  });
+
+    res.status(200).json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+
   } catch (error) {
     console.error('Logout error:', error);
     res.status(500).json({ error: 'Server error' });

@@ -20,7 +20,7 @@ const verifyToken = (token) => {
 // Authentication middleware
 const auth = async (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const { token } = req.cookies;
     
     if (!token) {
       return res.status(401).json({ error: 'Access denied. No token provided.' });

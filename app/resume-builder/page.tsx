@@ -135,11 +135,21 @@ export default function ResumeBuilderPage() {
     setExperiences(experiences.filter(exp => exp.id !== id));
   };
 
-  const updateExperience = (id: string, field: keyof Experience, value: any) => {
-    setExperiences(experiences.map(exp => 
-      exp.id === id ? { ...exp, [field]: value } : exp
-    ));
-  };
+  // const updateExperience = (id: string, field: keyof Experience, value: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  //   setExperiences(experiences.map(exp => 
+  //     exp.id === id ? { ...exp, [field]: value } : exp
+  //   ));
+  // };
+
+  const updateExperience = (
+  id: string,
+  field: keyof Experience,
+  value: string | boolean
+) => {
+  setExperiences(experiences.map(exp =>
+    exp.id === id ? { ...exp, [field]: value } : exp
+  ));
+};
 
   const addEducation = () => {
     setEducation([...education, {
@@ -157,11 +167,21 @@ export default function ResumeBuilderPage() {
     setEducation(education.filter(edu => edu.id !== id));
   };
 
-  const updateEducation = (id: string, field: keyof Education, value: any) => {
-    setEducation(education.map(edu => 
-      edu.id === id ? { ...edu, [field]: value } : edu
-    ));
-  };
+  // const updateEducation = (id: string, field: keyof Education, value: any) => {
+  //   setEducation(education.map(edu => 
+  //     edu.id === id ? { ...edu, [field]: value } : edu
+  //   ));
+  // };
+
+  const updateEducation = (
+  id: string,
+  field: keyof Education,
+  value: string | boolean
+) => {
+  setEducation(education.map(edu =>
+    edu.id === id ? { ...edu, [field]: value } : edu
+  ));
+};
 
   const addSkill = () => {
     setSkills([...skills, { id: Date.now().toString(), name: '', level: 'intermediate' }]);
@@ -171,18 +191,34 @@ export default function ResumeBuilderPage() {
     setSkills(skills.filter(skill => skill.id !== id));
   };
 
-  const updateSkill = (id: string, field: keyof Skill, value: any) => {
-    setSkills(skills.map(skill => 
-      skill.id === id ? { ...skill, [field]: value } : skill
-    ));
-  };
-  const updateSection = (id: string, field: keyof ResumeSection, value: any) => {
-    setSections(prevSections => 
-      prevSections.map(section => 
-        section.id === id ? { ...section, [field]: value } : section
-      )
-    );
-  };
+  // const updateSkill = (id: string, field: keyof Skill, value: any) => {
+  //   setSkills(skills.map(skill => 
+  //     skill.id === id ? { ...skill, [field]: value } : skill
+  //   ));
+  // };
+  // const updateSection = (id: string, field: keyof ResumeSection, value: any) => {
+  //   setSections(prevSections => 
+  //     prevSections.map(section => 
+  //       section.id === id ? { ...section, [field]: value } : section
+  //     )
+  //   );
+  // };
+
+
+const updateSkill = <K extends keyof Skill>(id: string, field: K, value: Skill[K]) => {
+  setSkills(skills.map(skill =>
+    skill.id === id ? { ...skill, [field]: value } : skill
+  ));
+};
+
+const updateSection = <K extends keyof ResumeSection>(id: string, field: K, value: ResumeSection[K]) => {
+  setSections(prevSections =>
+    prevSections.map(section =>
+      section.id === id ? { ...section, [field]: value } : section
+    )
+  );
+};
+
 
   const handleDownload = () => {
     // In a real app, this would generate and download a PDF
@@ -720,16 +756,17 @@ export default function ResumeBuilderPage() {
                           placeholder="Skill name"
                         />
                       </div>
-                      <select
-                        value={skill.level}
-                        onChange={(e) => updateSkill(skill.id, 'level', e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      >
-                        <option value="beginner">Beginner</option>
-                        <option value="intermediate">Intermediate</option>
-                        <option value="advanced">Advanced</option>
-                        <option value="expert">Expert</option>
-                      </select>
+                     <select
+  value={skill.level}
+  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+    updateSkill(skill.id, "level", e.target.value as Skill["level"])
+  }
+>
+  <option value="beginner">Beginner</option>
+  <option value="intermediate">Intermediate</option>
+  <option value="advanced">Advanced</option>
+  <option value="expert">Expert</option>
+</select>
                       {skills.length > 1 && (
                         <button
                           onClick={() => removeSkill(skill.id)}

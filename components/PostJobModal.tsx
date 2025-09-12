@@ -7,7 +7,7 @@ interface PostJobModalProps {
   isOpen: boolean;
   onClose: () => void;
   // eslint-disable-next-line no-unused-vars
-  onSubmit: (jobData: any) => void;
+  onSubmit: () => void;
 }
 
 export default function PostJobModal({ isOpen, onClose, onSubmit }: PostJobModalProps) {
@@ -66,7 +66,7 @@ export default function PostJobModal({ isOpen, onClose, onSubmit }: PostJobModal
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    // onSubmit(formData);
     onClose();
     // Reset form
     setFormData({
