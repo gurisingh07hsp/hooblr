@@ -108,7 +108,7 @@ export default function AdminPage() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-  const [modalType, setModalType] = useState<'job' | 'company' | 'blog' | 'user'>('blog');
+  const [modalType] = useState<'job' | 'company' | 'blog' | 'user'>('blog');
   
   // Blog editor states
   const [isBlogEditorOpen, setIsBlogEditorOpen] = useState(false);
@@ -300,17 +300,17 @@ export default function AdminPage() {
     }
   };
 
-  const handleView = (type: 'job' | 'company' | 'blog' | 'user', item: Item) => {
-    setModalType(type);
-    setSelectedItem(item);
-    setIsViewModalOpen(true);
-  };
+  // const handleView = (type: 'job' | 'company' | 'blog' | 'user', item: Item) => {
+  //   setModalType(type);
+  //   setSelectedItem(item);
+  //   setIsViewModalOpen(true);
+  // };
 
-  const handleEdit = (type: 'job' | 'company' | 'blog' | 'user', item: Item) => {
-    setModalType(type);
-    setSelectedItem(item);
-    setIsEditModalOpen(true);
-  };
+  // const handleEdit = (type: 'job' | 'company' | 'blog' | 'user', item: Item) => {
+  //   setModalType(type);
+  //   setSelectedItem(item);
+  //   setIsEditModalOpen(true);
+  // };
 
   const handleSaveEdit = (updatedItem: any) => {
     if (modalType === 'job') {

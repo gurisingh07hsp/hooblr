@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React from 'react';
 // import { useRouter } from 'next/navigation';
 // import { Menu, X } from 'lucide-react';
 import FindJobsPage from '@/components/FindJobsPage';

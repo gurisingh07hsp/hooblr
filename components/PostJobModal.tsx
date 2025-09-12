@@ -10,7 +10,7 @@ interface PostJobModalProps {
   onSubmit: () => void;
 }
 
-export default function PostJobModal({ isOpen, onClose, onSubmit }: PostJobModalProps) {
+export default function PostJobModal({ isOpen, onClose, }: PostJobModalProps) {
   const [formData, setFormData] = useState({
     title: '',
     company: '',
