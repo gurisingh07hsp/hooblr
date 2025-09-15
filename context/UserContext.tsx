@@ -23,7 +23,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const getProfile = async() =>{
     try{
-        const response = await axios.get('http://localhost:5000/api/auth/me', {withCredentials: true});
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`, {withCredentials: true});
         if(response.status == 200){
             setUser(response.data.user);
             console.log(response.data);
@@ -41,7 +41,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async() => {
     try{
-        const response = await axios.get(`http://localhost:5000/api/auth/logout`, {withCredentials: true});
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/logout`, {withCredentials: true});
         console.log(response.data);
         if(response.status == 200){
             setUser(null);

@@ -53,7 +53,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
     if(authMode == 'signup'){
       try{
-        const response = await axios.post('http://localhost:5000/api/auth/register', formData, {withCredentials: true});
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`, formData, {withCredentials: true});
         setUser(response.data.user);
         setMessage('✅ Account Created successful!');
         resetForm();
@@ -71,7 +71,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
     else{
       try{
-        const response = await axios.post('http://localhost:5000/api/auth/login', formData, {withCredentials: true});
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, formData, {withCredentials: true});
         setUser(response.data.user);
         setMessage('✅ Login successful!');
         resetForm();
