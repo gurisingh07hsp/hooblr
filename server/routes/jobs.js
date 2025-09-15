@@ -13,86 +13,180 @@ const jobValidation = [
   body('requirements').notEmpty().withMessage('Job requirements are required'),
   body('responsibilities').notEmpty().withMessage('Job responsibilities are required'),
   body('location').notEmpty().trim().withMessage('Job location is required'),
-  body('type').isIn(['full-time', 'part-time', 'contract', 'internship', 'remote']).withMessage('Invalid job type'),
-  body('category').isIn(['government', 'law-enforcement', 'administration', 'healthcare', 'education', 'technology', 'finance', 'engineering', 'marketing', 'sales', 'customer-service', 'other']).withMessage('Invalid category'),
+  body('type').isIn(['Full-time', 'Part-time', 'Contract', 'Temporary', 'Internship',]).withMessage('Invalid job type'),
+  // body('category').isIn(['government', 'law-enforcement', 'administration', 'healthcare', 'education', 'technology', 'finance', 'engineering', 'marketing', 'sales', 'customer-service', 'other']).withMessage('Invalid category'),
   body('department').notEmpty().trim().withMessage('Department is required'),
   body('salary.min').isNumeric().withMessage('Minimum salary must be a number'),
   body('salary.max').isNumeric().withMessage('Maximum salary must be a number'),
-  body('experience').isIn(['entry', 'mid', 'senior', 'executive']).withMessage('Invalid experience level'),
+  body('experience').isIn(['Entry-level', 'Mid-level', 'Senior-level', 'Executive']).withMessage('Invalid experience level'),
   body('education').isIn(['high-school', 'associate', 'bachelor', 'master', 'phd']).withMessage('Invalid education level')
 ];
 
 // @route   GET /api/jobs
 // @desc    Get all jobs with filters
 // @access  Public
-router.get('/', optionalAuth, [
-  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-  query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('Limit must be between 1 and 50'),
-  query('category').optional().isString().withMessage('Category must be a string'),
-  query('location').optional().isString().withMessage('Location must be a string'),
-  query('type').optional().isIn(['full-time', 'part-time', 'contract', 'internship', 'remote']).withMessage('Invalid job type'),
-  query('experience').optional().isIn(['entry', 'mid', 'senior', 'executive']).withMessage('Invalid experience level'),
-  query('search').optional().isString().withMessage('Search must be a string')
-], async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+// router.get('/', optionalAuth, [
+//   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+//   query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('Limit must be between 1 and 50'),
+//   query('category').optional().isString().withMessage('Category must be a string'),
+//   query('location').optional().isString().withMessage('Location must be a string'),
+//   query('type').optional().isIn(['Full-time', 'Part-time', 'Contract', 'Temporary', 'Internship',]).withMessage('Invalid job type'),
+//   query('experience').optional().isIn(['Entry-level', 'Mid-level', 'Senior-level', 'Executive']).withMessage('Invalid experience level'),
+//   query('search').optional().isString().withMessage('Search must be a string')
+// ], async (req, res) => {
+//   try {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({ errors: errors.array() });
+//     }
 
-    const {
-      page = 1,
-      limit = 10,
-      category,
-      location,
-      type,
-      experience,
-      search,
-      sort = 'createdAt',
-      order = 'desc'
-    } = req.query;
+//     const {
+//       page = 1,
+//       limit = 10,
+//       category,
+//       location,
+//       type,
+//       experience,
+//       search,
+//       sort = 'createdAt',
+//       order = 'desc'
+//     } = req.query;
 
-    // Build filter object
-    const filter = { status: 'active' };
+//     // Build filter object
+//     const filter = { status: 'active' };
 
-    if (category) filter.category = category;
-    if (location) filter.location = { $regex: location, $options: 'i' };
-    if (type) filter.type = type;
-    if (experience) filter.experience = experience;
+//     if (category) filter.category = category;
+//     if (location) filter.location = { $regex: location, $options: 'i' };
+//     if (type) filter.type = type;
+//     if (experience) filter.experience = experience;
 
-    // Text search
-    if (search) {
-      filter.$text = { $search: search };
-    }
+//     // Text search
+//     if (search) {
+//       filter.$text = { $search: search };
+//     }
 
-    // Build sort object
-    const sortObj = {};
-    sortObj[sort] = order === 'desc' ? -1 : 1;
+//     // Build sort object
+//     const sortObj = {};
+//     sortObj[sort] = order === 'desc' ? -1 : 1;
 
-    const skip = (page - 1) * limit;
+//     const skip = (page - 1) * limit;
 
-    const jobs = await Job.find(filter)
-      .populate('company', 'company.name company.logo company.location')
-      .sort(sortObj)
-      .skip(skip)
-      .limit(parseInt(limit));
+//     const jobs = await Job.find(filter)
+//       .populate('company', 'company.name company.logo company.location')
+//       .sort(sortObj)
+//       .skip(skip)
+//       .limit(parseInt(limit));
 
-    const total = await Job.countDocuments(filter);
+//     const total = await Job.countDocuments(filter);
 
-    res.json({
-      jobs,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        pages: Math.ceil(total / limit)
+//     res.json({
+//       jobs,
+//       pagination: {
+//         page: parseInt(page),
+//         limit: parseInt(limit),
+//         total,
+//         pages: Math.ceil(total / limit)
+//       }
+//     });
+//   } catch (error) {
+//     console.error('Get jobs error:', error);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
+
+
+
+router.get(
+  "/",
+  [
+    query("page").optional().isInt({ min: 1 }),
+    query("limit").optional().isInt({ min: 1, max: 50 }),
+    query("category").optional().isString(),
+    query("location").optional().isString(),
+    query("type").optional().isIn([
+      "Full-time",
+      "Part-time",
+      "Contract",
+      "Temporary",
+      "Internship",
+    ]),
+    query("experience").optional().isIn([
+      "Entry-level",
+      "Mid-level",
+      "Senior-level",
+      "Executive",
+    ]),
+    query("search").optional().isString(),
+    query("minSalary").optional().isInt(),
+    query("maxSalary").optional().isInt(),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
       }
-    });
-  } catch (error) {
-    console.error('Get jobs error:', error);
-    res.status(500).json({ error: 'Server error' });
+
+      const {
+        page = 1,
+        limit = 20,
+        category,
+        location,
+        type,
+        experience,
+        search,
+        sort = "createdAt",
+        order = "desc",
+        minSalary,
+        maxSalary,
+      } = req.query;
+
+      const filter = { status: "active" };
+
+      if (category) filter.category = category;
+      if (location) filter.location = { $regex: location, $options: "i" };
+      if (type) filter.type = type;
+      if (experience) filter.experience = experience;
+      if (search) filter.$text = { $search: search };
+
+      // Salary filter
+      if (minSalary || maxSalary) {
+        filter["salary.min"] = minSalary ? { $gte: parseInt(minSalary) } : {};
+        filter["salary.max"] = maxSalary ? { $lte: parseInt(maxSalary) } : {};
+      }
+
+      const sortObj = {};
+      sortObj[sort] = order === "desc" ? -1 : 1;
+
+      const skip = (page - 1) * limit;
+
+      const jobs = await Job.find(filter)
+        .populate("company", "name logo location")
+        .sort(sortObj)
+        .skip(skip)
+        .limit(parseInt(limit));
+
+      const total = await Job.countDocuments(filter);
+
+      res.json({
+        jobs,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          pages: Math.ceil(total / limit),
+        },
+      });
+    } catch (error) {
+      console.error("Get jobs error:", error);
+      res.status(500).json({ error: "Server error" });
+    }
   }
-});
+);
+
+
+
 
 // @route   GET /api/jobs/:id
 // @desc    Get job by ID
@@ -124,6 +218,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
 // @desc    Create a new job
 // @access  Private (Company only)
 router.post('/', auth, authorize('company', 'admin'), jobValidation, async (req, res) => {
+  console.log("Hello");
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -141,7 +236,7 @@ router.post('/', auth, authorize('company', 'admin'), jobValidation, async (req,
     const populatedJob = await Job.findById(job._id)
       .populate('company', 'company.name company.logo company.location');
 
-    res.status(201).json({
+    res.status(200).json({
       message: 'Job created successfully',
       job: populatedJob
     });

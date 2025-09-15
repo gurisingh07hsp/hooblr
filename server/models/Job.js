@@ -29,17 +29,12 @@ const jobSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['full-time', 'part-time', 'contract', 'internship', 'remote'],
+    enum: ['Full-time', 'Part-time', 'Contract', 'Temporary', 'Internship',],
     required: true
   },
   category: {
     type: String,
     required: true,
-    enum: [
-      'government', 'law-enforcement', 'administration', 'healthcare', 
-      'education', 'technology', 'finance', 'engineering', 'marketing',
-      'sales', 'customer-service', 'other'
-    ]
   },
   department: {
     type: String,
@@ -68,7 +63,7 @@ const jobSchema = new mongoose.Schema({
   skills: [String],
   experience: {
     type: String,
-    enum: ['entry', 'mid', 'senior', 'executive'],
+    enum: ['Entry-level', 'Mid-level', 'Senior-level', 'Executive'],
     required: true
   },
   education: {
@@ -87,7 +82,7 @@ const jobSchema = new mongoose.Schema({
   },
   isGovernment: {
     type: Boolean,
-    default: true
+    default: false
   },
   applicationDeadline: Date,
   views: {

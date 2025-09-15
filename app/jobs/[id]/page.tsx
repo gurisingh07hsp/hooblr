@@ -10,7 +10,7 @@ type Salary = { min: number; max: number; currency: string; period: string };
 type Job = {
   _id: string;
   title: string;
-  company: { _id: string; name: string; location?: string };
+  company: {company: { _id: string; name: string; location?: string }};
   description: string;
   requirements: string;
   responsibilities?: string;
@@ -29,7 +29,7 @@ type Job = {
   applications: Array<any>;
 };
 
-const API_BASE = 'http://localhost:5001';
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export default function JobDetailsPage() {
   const router = useRouter();
@@ -136,7 +136,7 @@ export default function JobDetailsPage() {
             <div className="mb-4">
               <h1 className="text-3xl font-bold text-gray-900">{job.title}</h1>
               <div className="mt-3 flex flex-wrap items-center gap-4 text-gray-700">
-                <span className="flex items-center"><Building2 className="w-4 h-4 mr-2 text-purple-500" />{job.company.name}</span>
+                <span className="flex items-center"><Building2 className="w-4 h-4 mr-2 text-purple-500" />{job.company.company.name}</span>
                 <span className="flex items-center"><MapPin className="w-4 h-4 mr-2 text-purple-500" />{job.location}</span>
                 <span className="flex items-center"><Clock className="w-4 h-4 mr-2 text-purple-500" />{job.type.replace('-', ' ')}</span>
                 <span className="flex items-center"><DollarSign className="w-4 h-4 mr-1 text-purple-500" />{formatSalary(job.salary)}</span>

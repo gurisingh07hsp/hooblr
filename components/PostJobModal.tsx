@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, {useState } from 'react';
 import { X, Building2, MapPin, Clock, DollarSign, Users, FileText, Tag } from 'lucide-react';
+import axios from 'axios';
 
 interface PostJobModalProps {
   isOpen: boolean;
@@ -16,24 +17,26 @@ export default function PostJobModal({ isOpen, onClose, }: PostJobModalProps) {
     company: '',
     category: '',
     location: '',
-    workType: 'Full-time',
+    type: 'Full-time',
     workplaceType: 'Remote',
-    experienceLevel: 'Mid-level',
+    experience: 'Mid-level',
     salary: {
-      min: '',
-      max: '',
+      min: '10000',
+      max: '20000',
       currency: 'USD',
       type: 'yearly'
     },
     description: '',
     responsibilities: '',
     requirements: '',
-    skills: '',
-    benefits: '',
+    skills: [''],
+    education: '',
+    isGovernment: false,
+    benefits: [''],
     applicationDeadline: '',
     contactEmail: '',
     department: '',
-    jobType: 'permanent',
+    jobType: '',
     urgentHiring: false,
     promoted: false
   });
@@ -56,7 +59,21 @@ export default function PostJobModal({ isOpen, onClose, }: PostJobModalProps) {
         ...prev,
         [name]: checked
       }));
-    } else {
+    }else if (name === "skills") {
+      // Convert comma-separated string to array
+      const arr = value.split(",").map((s) => s.trim()).filter(Boolean);
+      setFormData((prev) => ({
+        ...prev,
+        skills: arr,
+      }));
+    }else if (name === "benefits") {
+      // Convert comma-separated string to array
+      const arr = value.split(",").map((s) => s.trim()).filter(Boolean);
+      setFormData((prev) => ({
+        ...prev,
+        benefits: arr,
+      }));
+    }else {
       setFormData(prev => ({
         ...prev,
         [name]: value
@@ -64,37 +81,48 @@ export default function PostJobModal({ isOpen, onClose, }: PostJobModalProps) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-    // onSubmit(formData);
-    onClose();
-    // Reset form
-    setFormData({
-      title: '',
-      company: '',
-      category: '',
-      location: '',
-      workType: 'Full-time',
-      workplaceType: 'Remote',
-      experienceLevel: 'Mid-level',
-      salary: {
-        min: '',
-        max: '',
-        currency: 'USD',
-        type: 'yearly'
-      },
-      description: '',
-      responsibilities: '',
-      requirements: '',
-      skills: '',
-      benefits: '',
-      applicationDeadline: '',
-      contactEmail: '',
-      department: '',
-      jobType: 'permanent',
-      urgentHiring: false,
-      promoted: false
-    });
+    // console.log("job : ", formData);
+    try{
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs/`, formData, {withCredentials: true});
+      if(response.status === 200){
+        onClose();
+        // Reset form
+        setFormData({
+          title: '',
+          company: '',
+          category: '',
+          location: '',
+          type: 'Full-time',
+          workplaceType: 'Remote',
+          experience: 'Mid-level',
+          salary: {
+            min: '',
+            max: '',
+            currency: 'USD',
+            type: 'yearly'
+          },
+          description: '',
+          responsibilities: '',
+          requirements: '',
+          skills: [],
+          education: '',
+          isGovernment: false,
+          benefits: [],
+          applicationDeadline: '',
+          contactEmail: '',
+          department: '',
+          jobType: 'permanent',
+          urgentHiring: false,
+          promoted: false
+        });
+      }
+      console.log(response.data);
+    }catch(error){
+      console.log(error);
+    }
   };
 
   if (!isOpen) return null;
@@ -211,7 +239,7 @@ export default function PostJobModal({ isOpen, onClose, }: PostJobModalProps) {
               </label>
               <select
                 name="workType"
-                value={formData.workType}
+                value={formData.type}
                 onChange={handleInputChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -224,7 +252,7 @@ export default function PostJobModal({ isOpen, onClose, }: PostJobModalProps) {
               </select>
             </div>
 
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Workplace Type *
               </label>
@@ -239,7 +267,7 @@ export default function PostJobModal({ isOpen, onClose, }: PostJobModalProps) {
                 <option value="On-site">On-site</option>
                 <option value="Hybrid">Hybrid</option>
               </select>
-            </div>
+            </div> */}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -248,7 +276,7 @@ export default function PostJobModal({ isOpen, onClose, }: PostJobModalProps) {
               </label>
               <select
                 name="experienceLevel"
-                value={formData.experienceLevel}
+                value={formData.experience}
                 onChange={handleInputChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -323,6 +351,157 @@ export default function PostJobModal({ isOpen, onClose, }: PostJobModalProps) {
               placeholder="Provide a detailed description of the role, company culture, and what makes this opportunity unique..."
             />
           </div>
+
+            <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Requirements *
+    </label>
+    <textarea
+      name="requirements"
+      value={formData.requirements}
+      onChange={handleInputChange}
+      required
+      rows={3}
+      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      placeholder="List required skills, qualifications..."
+    />
+  </div>
+
+  {/* Responsibilities */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Responsibilities *
+    </label>
+    <textarea
+      name="responsibilities"
+      value={formData.responsibilities}
+      onChange={handleInputChange}
+      required
+      rows={3}
+      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      placeholder="List job responsibilities..."
+    />
+  </div>
+
+  {/* Department */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Department *
+    </label>
+    <input
+      type="text"
+      name="department"
+      value={formData.department}
+      onChange={handleInputChange}
+      required
+      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      placeholder="e.g. Engineering, Marketing"
+    />
+  </div>
+
+  {/* Benefits */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Benefits
+    </label>
+    <input
+      type="text"
+      name="benefits"
+      // value={formData.benefits}
+      onChange={handleInputChange}
+      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      placeholder="Comma-separated (e.g. Health insurance, Paid time off)"
+    />
+  </div>
+
+  {/* Skills */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Skills
+    </label>
+    <input
+      type="text"
+      name="skills"
+      // value={formData.skills}
+      onChange={handleInputChange}
+      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      placeholder="Comma-separated (e.g. JavaScript, React, Node.js)"
+    />
+  </div>
+
+  {/* Education */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Education *
+    </label>
+    <select
+      name="education"
+      value={formData.education}
+      onChange={handleInputChange}
+      required
+      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      <option value="">Select</option>
+      <option value="high-school">High School</option>
+      <option value="associate">Associate</option>
+      <option value="bachelor">Bachelor</option>
+      <option value="master">Master</option>
+      <option value="phd">PhD</option>
+    </select>
+  </div>
+
+  {/* Application Deadline */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Application Deadline
+    </label>
+    <input
+      type="date"
+      name="applicationDeadline"
+      value={formData.applicationDeadline}
+      onChange={handleInputChange}
+      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+
+  {/* Tags */}
+  {/* <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Tags
+    </label>
+    <input
+      type="text"
+      name="tags"
+      value={formData.tags}
+      onChange={handleInputChange}
+      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      placeholder="Comma-separated (e.g. urgent, remote, AI)"
+    />
+  </div> */}
+
+  {/* Remote & Government */}
+  <div className="flex space-x-4">
+    {/* <label className="flex items-center space-x-2">
+      <input
+        type="checkbox"
+        name="isRemote"
+        checked={formData.isRemote}
+        onChange={handleInputChange}
+        className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+      />
+      <span>Remote</span>
+    </label> */}
+    <label className="flex items-center space-x-2">
+      <input
+        type="checkbox"
+        name="isGovernment"
+        checked={formData.isGovernment}
+        onChange={handleInputChange}
+        className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+      />
+      <span>Government</span>
+    </label>
+  </div>
 
           {/* Contact Email */}
           <div>

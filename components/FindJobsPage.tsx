@@ -7,21 +7,25 @@ import {
   MapPin, 
   Briefcase, 
   Clock, 
-  DollarSign, 
+  DollarSign,
+  IndianRupee,
+  Euro,
   Building2, 
   Filter, 
   Heart, 
   Share2, 
-  ChevronRight
+  ChevronRight,
+  // Currency
 } from 'lucide-react';
+import axios from 'axios';
 
 interface Job {
-  id: number;
+  _id: number;
   title: string;
-  company: string;
+  company: {company: {name: string}};
   location: string;
   type: string;
-  salary: string;
+  salary: {min: string, max: string, currency: string, period: string};
   description: string;
   requirements: string[];
   benefits: string[];
@@ -34,19 +38,29 @@ interface Job {
 }
 
 interface FindJobsPageProps {
-  jobs: Job[];
   initialCategory?: string;
 }
 
-export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProps) {
+export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
   const router = useRouter();
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>(jobs);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  // const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(initialCategory || '');
   const [selectedLocation, setSelectedLocation] = useState('');
-  const [selectedType, setSelectedType] = useState('');
-  const [selectedSalaryRange, setSelectedSalaryRange] = useState('');
+  // const [selectedType, setSelectedType] = useState('');
+  // const [selectedSalaryRange, setSelectedSalaryRange] = useState('');
   const [sortBy, setSortBy] = useState('recent');
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const [filters, setFilters] = useState({
+    type: "",
+    experience: "",
+    minSalary: "",
+    maxSalary: "",
+    search: "",
+  });
 
   const categories = [
     'Law Enforcement',
@@ -88,58 +102,160 @@ export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProp
     'Remote'
   ];
 
-  const jobTypes = ['Full-time', 'Part-time', 'Contract', 'Temporary', 'Internship'];
-  const salaryRanges = ['$0-50k', '$50k-100k', '$100k-150k', '$150k+'];
+  // const jobTypes = ['Full-time', 'Part-time', 'Contract', 'Temporary', 'Internship'];
+  // const salaryRanges = ['$0-50k', '$50k-100k', '$100k-150k', '$150k+'];
+
+
+
+
+
+  // Fetch jobs with filters
+  const fetchJobs = async (pageNumber: number, filters: any) => {
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      const params = new URLSearchParams({
+        page: String(pageNumber),
+        limit: "20",
+        ...(filters.type && { type: filters.type }),
+        ...(filters.experience && { experience: filters.experience }),
+        ...(filters.minSalary && { minSalary: filters.minSalary }),
+        ...(filters.maxSalary && { maxSalary: filters.maxSalary }),
+        ...(filters.search && { search: filters.search }),
+      });
+
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs?${params.toString()}`
+      );
+
+      const newJobs = res.data.jobs;
+      setFilteredJobs((prev) => (pageNumber === 1 ? newJobs : [...prev, ...newJobs]));
+      setHasMore(pageNumber < res.data.pagination.pages);
+    } catch (err) {
+      console.error("Error fetching jobs:", err);
+    }
+
+    setLoading(false);
+  };
+
+  // Reload jobs when filters change
+  useEffect(() => {
+    setPage(1);
+    fetchJobs(1, filters);
+  }, [filters]);
+
+  // Infinite scroll
+  useEffect(() => {
+    if (!hasMore || loading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      { threshold: 1 }
+    );
+
+    const el = document.getElementById("load-more");
+    if (el) observer.observe(el);
+
+    return () => {
+      const el = document.getElementById("load-more");
+      if (el) observer.unobserve(el);
+    };
+  }, [hasMore, loading]);
 
   useEffect(() => {
-    let filtered = jobs;
-
-    if (searchTerm) {
-      filtered = filtered.filter(job =>
-        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    if (page > 1) {
+      fetchJobs(page, filters);
     }
+  }, [page]);
 
-    if (selectedCategory) {
-      filtered = filtered.filter(job => job.category === selectedCategory);
-    }
 
-    if (selectedLocation) {
-      filtered = filtered.filter(job => job.location === selectedLocation);
-    }
 
-    if (selectedType) {
-      filtered = filtered.filter(job => job.type === selectedType);
-    }
 
-    // Sort jobs
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'recent':
-          return new Date(b.posted).getTime() - new Date(a.posted).getTime();
-        case 'salary-high':
-          return parseInt(b.salary.replace(/[^0-9]/g, '')) - parseInt(a.salary.replace(/[^0-9]/g, ''));
-        case 'salary-low':
-          return parseInt(a.salary.replace(/[^0-9]/g, '')) - parseInt(b.salary.replace(/[^0-9]/g, ''));
-        case 'company':
-          return a.company.localeCompare(b.company);
-        default:
-          return 0;
-      }
-    });
+    // console.log("jobs : ", jobs);
+    // const getjobs = async() => {
+    //   const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs/`);
+    //   // console.log(response.data);
+    //   setFilteredJobs(response.data.jobs);
+    // }
 
-    setFilteredJobs(filtered);
-  }, [searchTerm, selectedCategory, selectedLocation, selectedType, selectedSalaryRange, sortBy, jobs]);
+    // useEffect(()=>{
+    //   getjobs();
+    // },[])
 
-  const clearFilters = () => {
-    setSearchTerm('');
-    setSelectedCategory('');
-    setSelectedLocation('');
-    setSelectedType('');
-    setSelectedSalaryRange('');
-  };
+
+
+
+
+
+
+
+  // useEffect(() => {
+  //   let filtered = jobs;
+
+  //   if (searchTerm) {
+  //     filtered = filtered.filter(job =>
+  //       job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       job.company.company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       job.description.toLowerCase().includes(searchTerm.toLowerCase())
+  //     );
+  //   }
+
+  //   if (selectedCategory) {
+  //     filtered = filtered.filter(job => job.category === selectedCategory);
+  //   }
+
+  //   if (selectedLocation) {
+  //     filtered = filtered.filter(job => job.location === selectedLocation);
+  //   }
+
+  //   if (selectedType) {
+  //     filtered = filtered.filter(job => job.type === selectedType);
+  //   }
+
+  //   // Sort jobs
+  //   filtered.sort((a, b) => {
+  //     switch (sortBy) {
+  //       case 'recent':
+  //         return new Date(b.posted).getTime() - new Date(a.posted).getTime();
+  //       case 'salary-high':
+  //         return parseInt(b.salary.max.replace(/[^0-9]/g, '')) - parseInt(a.salary.max.replace(/[^0-9]/g, ''));
+  //       case 'salary-low':
+  //         return parseInt(a.salary.max.replace(/[^0-9]/g, '')) - parseInt(b.salary.max.replace(/[^0-9]/g, ''));
+  //       case 'company':
+  //         return a.company.company.name.localeCompare(b.company.company.name);
+  //       default:
+  //         return 0;
+  //     }
+  //   });
+
+  //   setFilteredJobs(filtered);
+  // }, [searchTerm, selectedCategory, selectedLocation, selectedType, selectedSalaryRange, sortBy, jobs]);
+
+  // const clearFilters = () => {
+  //   setSearchTerm('');
+  //   setSelectedCategory('');
+  //   setSelectedLocation('');
+  //   setSelectedType('');
+  //   setSelectedSalaryRange('');
+  // };
+
+  const getCurrencyIcon = (currency: string) => {
+  switch (currency) {
+    case "USD":
+      return <DollarSign className="w-4 h-4 mr-1 text-purple-500" />;
+    case "INR":
+      return <IndianRupee className="w-4 h-4 mr-1 text-purple-500" />;
+    case "EUR":
+      return <Euro className="w-4 h-4 mr-1 text-purple-500" />;
+    default:
+      return <DollarSign className="w-4 h-4 mr-1 text-purple-500" />; // fallback
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
@@ -159,8 +275,8 @@ export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProp
                 <input
                   type="text"
                   placeholder="Job title, keywords, or company"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={filters.search}
+                  onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                   className="w-full pl-10 pr-4 py-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white/50"
                 />
               </div>
@@ -214,14 +330,105 @@ export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProp
                   Filters
                 </h3>
                 <button
-                  onClick={clearFilters}
+                  // onClick={clearFilters}
                   className="text-purple-600 hover:text-purple-700 text-sm font-medium"
                 >
                   Clear All
                 </button>
               </div>
+
+
+                          <div>
+          <h3 className="font-semibold">Job Type</h3>
+          {["Full-time", "Part-time", "Contract", "Temporary", "Internship"].map(
+            (t) => (
+              <label key={t} className="block">
+                <input
+                  type="radio"
+                  name="jobType"
+                  value={t}
+                  checked={filters.type === t}
+                  onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+                />
+                {t}
+              </label>
+            )
+          )}
+        </div>
+
+
+                <div className="mt-4">
+          <h3 className="font-semibold">Salary Range</h3>
+          <label className="block">
+            <input
+              type="radio"
+              name="salary"
+              onChange={() =>
+                setFilters({ ...filters, minSalary: "0", maxSalary: "50000" })
+              }
+            />
+            $0–50k
+          </label>
+          <label className="block">
+            <input
+              type="radio"
+              name="salary"
+              onChange={() =>
+                setFilters({ ...filters, minSalary: "50000", maxSalary: "100000" })
+              }
+            />
+            $50k–100k
+          </label>
+          <label className="block">
+            <input
+              type="radio"
+              name="salary"
+              onChange={() =>
+                setFilters({ ...filters, minSalary: "100000", maxSalary: "150000" })
+              }
+            />
+            $100k–150k
+          </label>
+          <label className="block">
+            <input
+              type="radio"
+              name="salary"
+              onChange={() =>
+                setFilters({ ...filters, minSalary: "150000", maxSalary: "9999999" })
+              }
+            />
+            $150k+
+          </label>
+        </div>
+
+              <div className="mt-4">
+          <h3 className="font-semibold">Experience</h3>
+          {["Entry-level", "Mid-level", "Senior-level", "Executive"].map((exp) => (
+            <label key={exp} className="block">
+              <input
+                type="radio"
+                name="experience"
+                checked={filters.experience === exp}
+                onChange={() => setFilters({ ...filters, experience: exp })}
+              />
+              {exp}
+            </label>
+          ))}
+        </div>
+
+        {/* <div className="mt-4">
+          <input
+            type="text"
+            placeholder="Search..."
+            className="border p-2 w-full rounded"
+            value={filters.search}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+          />
+        </div> */}
+
+
               
-              <div className="space-y-6">
+              {/* <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">Job Type</label>
                   <div className="space-y-2">
@@ -274,7 +481,7 @@ export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProp
                     ))}
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -302,8 +509,8 @@ export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProp
             <div className="space-y-6">
               {filteredJobs.map((job) => (
                 <div
-                  key={job.id}
-                  className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-200 p-6 hover:shadow-xl transition-all duration-300 ${
+                  key={job._id}
+                  className={`bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 p-6 transition-all duration-300 ${
                     job.featured ? 'ring-2 ring-purple-500 ring-opacity-20' : ''
                   }`}
                 >
@@ -311,7 +518,7 @@ export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProp
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
                         <h3
-                          onClick={() => router.push(`/jobs/${job.id}`)}
+                          onClick={() => router.push(`/jobs/${job._id}`)}
                           className="text-xl font-semibold text-gray-900 hover:text-purple-600 cursor-pointer transition-colors"
                         >
                           {job.title}
@@ -331,7 +538,7 @@ export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProp
                       <div className="flex items-center space-x-4 text-gray-600 mb-3">
                         <div className="flex items-center">
                           <Building2 className="w-4 h-4 mr-1 text-purple-500" />
-                          <span>{job.company}</span>
+                          <span>{job.company?.company?.name}</span>
                         </div>
                         <div className="flex items-center">
                           <MapPin className="w-4 h-4 mr-1 text-purple-500" />
@@ -342,8 +549,8 @@ export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProp
                           <span>{job.type}</span>
                         </div>
                         <div className="flex items-center">
-                          <DollarSign className="w-4 h-4 mr-1 text-purple-500" />
-                          <span>{job.salary}</span>
+                          {getCurrencyIcon(job.salary.currency)}
+                          <span>{`${job.salary.min} - ${job.salary.max} ${job.salary.period}`}</span>
                         </div>
                       </div>
                       
@@ -351,7 +558,7 @@ export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProp
                         <span className="bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full">
                           {job.category}
                         </span>
-                        <span className="text-sm text-gray-500">• Posted {job.posted}</span>
+                        {/* <span className="text-sm text-gray-500">• Posted {job.posted}</span> */}
                       </div>
                       
                       <p className="text-gray-700 mb-4 line-clamp-2">
@@ -361,13 +568,13 @@ export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProp
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                           <button
-                            onClick={() => router.push(`/jobs/${job.id}`)}
+                            onClick={() => router.push(`/jobs/${job._id}`)}
                             className="bg-[#9333E9] text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-medium shadow-lg"
                           >
                             Apply Now
                           </button>
                           <button
-                            onClick={() => router.push(`/jobs/${job.id}`)}
+                            onClick={() => router.push(`/jobs/${job._id}`)}
                             className="text-purple-600 hover:text-purple-700 font-medium flex items-center transition-colors"
                           >
                             View Details
@@ -388,6 +595,9 @@ export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProp
                   </div>
                 </div>
               ))}
+              {loading && <p>Loading...</p>}
+              <div id="load-more" className="h-10"></div>
+              {!hasMore && <p className="text-gray-500">No more jobs</p>}
             </div>
 
             {filteredJobs.length === 0 && (
@@ -398,7 +608,7 @@ export default function FindJobsPage({ jobs, initialCategory }: FindJobsPageProp
                   Try adjusting your search criteria or clearing the filters.
                 </p>
                 <button
-                  onClick={clearFilters}
+                  // onClick={clearFilters}
                   className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 shadow-lg"
                 >
                   Clear Filters
