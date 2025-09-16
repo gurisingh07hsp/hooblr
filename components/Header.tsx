@@ -3,26 +3,23 @@
 import React, { useEffect } from 'react'
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import AuthModal from '@/components/AuthModal';
 import { useUser } from '@/context/UserContext';
 import { 
   Menu, 
   X,  
   Shield,
 } from 'lucide-react';
-import AdminLoginModal from './AdminLoginModal';
 import PostJobModal from './PostJobModal';
 const Header = () => {
       const router = useRouter();
       const {user,isLoggedIn, setIsLoggedIn,logout} = useUser();
       const [isMenuOpen, setIsMenuOpen] = useState(false);
-      const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-      const [isAdminLoginModalOpen, setIsAdminLoginModalOpen] = useState(false);
+      // const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
       const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
 
     const handleAuth = () => {
     setIsLoggedIn(true);
-    setIsAuthModalOpen(false);
+    // setIsAuthModalOpen(false);
   };
 
   useEffect(()=>{
@@ -118,13 +115,13 @@ const Header = () => {
                     Admin
                   </button> */}
                   <button
-                    onClick={() => setIsAuthModalOpen(true)}
+                    onClick={() => router.push('/login')  }
                     className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
                   >
                     Login
                   </button>
                   <button
-                    onClick={() => setIsAuthModalOpen(true)}
+                    onClick={() => router.push('/login')}
                     className="bg-[#9333E9] text-white px-6 py-2 rounded-xl font-semibold"
                   >
                     Sign Up
@@ -234,7 +231,7 @@ const Header = () => {
                   </button> */}
                   <button
                     onClick={() => {
-                      setIsAuthModalOpen(true);
+                      router.push('/login');
                       setIsMenuOpen(false);
                     }}
                     className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors w-full text-left font-medium"
@@ -243,7 +240,7 @@ const Header = () => {
                   </button>
                   <button
                     onClick={() => {
-                      setIsAuthModalOpen(true);
+                      router.push('/login');
                       setIsMenuOpen(false);
                     }}
                     className="block px-3 py-2 bg-[#9333E9] text-white rounded-lg mx-3 my-2 text-center font-semibold"
@@ -256,17 +253,6 @@ const Header = () => {
           </div>
         )}
       </nav>
-
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        />
-
-        <AdminLoginModal
-        isOpen={isAdminLoginModalOpen}
-        onClose={() => setIsAdminLoginModalOpen(false)}
-        onAuth={handleAuth}
-        />
 
         <PostJobModal
         isOpen={isPostJobModalOpen}

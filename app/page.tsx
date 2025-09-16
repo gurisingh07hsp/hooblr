@@ -233,10 +233,10 @@ export default function Home() {
                   <category.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors">{category.title}</h3>
-                <p className="text-gray-600 mb-4 text-sm">{category.desc}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-purple-600 font-semibold">{category.count}</span>
-                  <ArrowUpRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
+                {/* <p className="text-gray-600 mb-4 text-sm">{category.desc}</p> */}
+                <div className="flex bg-purple-600 p-2 rounded-lg items-center justify-center">
+                  <span className="text-white font-semibold">{category.count}</span>
+                  <ArrowUpRight className="w-5 h-5 text-white transition-colors" />
                 </div>
               </div>
             ))}

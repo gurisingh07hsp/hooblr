@@ -3,7 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Building2, MapPin, Clock, DollarSign, ArrowLeft, Heart, Share2, X, CheckCircle } from 'lucide-react';
+import { useUser } from '@/context/UserContext';
 import Footer from '@/components/Footer';
+import axios from 'axios';
 
 type Salary = { min: number; max: number; currency: string; period: string };
 
@@ -36,6 +38,8 @@ export default function JobDetailsPage() {
   const params = useParams();
   const id = params?.id as string;
 
+  const {user} = useUser();
+
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,24 +48,38 @@ export default function JobDetailsPage() {
   const [coverLetter, setCoverLetter] = useState('');
   const [resume, setResume] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [isApplied, setIsApplied] = useState(false); 
 
+   const fetchJob = async () => {
+     try {
+       setLoading(true);
+       const res = await fetch(`${API_BASE}/api/jobs/${id}`);
+       if (!res.ok) throw new Error('Job not found');
+       const data = await res.json();
+       setJob(data.job);
+     } catch (e) {
+       setError('Failed to load job');
+     } finally {
+       setLoading(false);
+     }
+   };
   useEffect(() => {
     if (!id) return;
-    const fetchJob = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`${API_BASE}/api/jobs/${id}`);
-        if (!res.ok) throw new Error('Job not found');
-        const data = await res.json();
-        setJob(data.job);
-      } catch (e) {
-        setError('Failed to load job');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchJob();
   }, [id]);
+
+
+  useEffect(()=>{
+    console.log("job : ", job);
+    if(job && user){
+      job.applications.forEach(app => {
+        if(app.user._id == user._id){
+          setIsApplied(true);
+        }
+      });
+    }
+  },[job, user])
 
   const formatSalary = (s: Salary) => `$${Math.round(s.min/1000)}k - $${Math.round(s.max/1000)}k ${s.period}`;
 
@@ -70,26 +88,43 @@ export default function JobDetailsPage() {
     if (!id) return;
     try {
       setSubmitting(true);
-      const res = await fetch(`${API_BASE}/api/jobs/${id}/apply`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ coverLetter, resume })
-      });
-      if (!res.ok) {
-        const j = await res.json().catch(() => ({}));
-        throw new Error(j?.error || 'Failed to apply');
+      const res = await axios.post(`${API_BASE}/api/jobs/${id}/apply`, { coverLetter, resume }, {withCredentials:true});
+      if(res.status === 200){
+        setCoverLetter('');
+        setResume('');
+        setSubmitted(true);
+        setShowApply(false);
       }
-      setSubmitted(true);
-      setShowApply(false);
       // refresh stats (applications count)
-      const refreshed = await fetch(`${API_BASE}/api/jobs/${id}`).then(r => r.json()).catch(() => null);
-      if (refreshed?.job) setJob(refreshed.job);
-    } catch (e) {
-      setError('Failed to apply');
+      fetchJob();
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+      setError(error.response?.data?.error);
+    }
     } finally {
       setSubmitting(false);
     }
   };
+
+  const isLoggedIn = async() => {
+      if(user && user.email){
+        setShowApply(true);
+      }
+      else{
+        setShowLoginPrompt(true);
+      }
+  }
+
+  // if(showLoginPrompt){
+  //   return (
+  //     <div className="h-[40vh] w-[50vw] bg-white flex items-center justify-center">
+  //         <div className="text-center">
+  //           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto" />
+  //           <p className="mt-4 text-gray-600">Please Login to Apply the Job</p>
+  //         </div>
+  //     </div>
+  //   )
+  // }
 
   if (loading) {
     return (
@@ -102,12 +137,11 @@ export default function JobDetailsPage() {
     );
   }
 
-  if (error || !job) {
+  if (!job) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-xl font-semibold text-gray-900 mb-2">Job not found</p>
-          <p className="text-gray-600 mb-6">{error || 'Please try again later.'}</p>
           <button onClick={() => router.push('/jobs')} className="bg-[#9333E9] text-white px-5 py-2 rounded-lg">Back to Jobs</button>
         </div>
       </div>
@@ -116,7 +150,7 @@ export default function JobDetailsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
-      <header className="bg-white/90 backdrop-blur-sm shadow-sm border-b border-purple-200 fixed w-full top-0 z-50">
+      <header className="bg-white backdrop-blur-sm shadow-sm border-b border-purple-200 fixed w-full top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <button onClick={() => router.push('/jobs')} className="flex items-center text-gray-600 hover:text-purple-600">
@@ -129,6 +163,46 @@ export default function JobDetailsPage() {
           </div>
         </div>
       </header>
+
+      {showLoginPrompt && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="w-[40vw] bg-white rounded-2xl shadow-2xl overflow-hidden">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <h2 className="text-2xl font-bold text-gray-900">Login Required</h2>
+              <button
+                onClick={() => setShowLoginPrompt(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 space-y-6 text-center">
+              <p className="text-gray-600 text-lg">
+                To apply for this job, please login to your account and unlock thousands of opportunities.
+              </p>
+
+              {/* Login Button */}
+              <button
+                onClick={() => router.push("/login")}
+                className="p-5 mx-auto bg-purple-600 rounded-xl transition-all duration-200 group flex items-center space-x-4"
+              >
+                <div className="text-center">
+                  <h4 className="text-lg font-semibold text-white">
+                    Login
+                  </h4>
+                  <p className="text-white text-sm">
+                    Login and start your career journey today.
+                  </p>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className="pt-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -143,7 +217,10 @@ export default function JobDetailsPage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <button onClick={() => setShowApply(true)} className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-2 rounded-lg">Apply Now</button>
+              <button onClick={isLoggedIn} disabled={isApplied} className={`${isApplied ? 'bg-green-600' : 'bg-purple-600'} flex justify-center items-center text-white px-5 py-2 rounded-lg`}>
+              {isApplied ? 'Applied' : 'Apply Now'}
+              {isApplied && <CheckCircle className='ms-1 w-4 h-4'/>}
+              </button>
               <span className="text-sm text-gray-500">Views: {job.views} • Applications: {job.applications.length}</span>
             </div>
           </div>
@@ -196,6 +273,7 @@ export default function JobDetailsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Resume / Summary</label>
                 <textarea value={resume} onChange={(e) => setResume(e.target.value)} rows={4} className="w-full border rounded-lg px-3 py-2" placeholder="Paste resume or short experience summary" required />
               </div>
+              <p className='text-center text-red-600 font-semibold'>{error}</p>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setShowApply(false)} className="px-4 py-2 border rounded-lg">Cancel</button>
                 <button type="submit" disabled={submitting} className="px-5 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white disabled:opacity-60">{submitting ? 'Submitting…' : 'Submit Application'}</button>

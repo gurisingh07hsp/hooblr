@@ -15,12 +15,14 @@ import {
   Heart, 
   Share2, 
   ChevronRight,
+  CheckCircle,
   // Currency
 } from 'lucide-react';
 import axios from 'axios';
+import { useUser } from '@/context/UserContext';
 
 interface Job {
-  _id: number;
+  _id: string;
   title: string;
   company: {company: {name: string}};
   location: string;
@@ -35,6 +37,7 @@ interface Job {
   featured?: boolean;
   companyLogo?: string;
   rating?: number;
+  applications: [];
 }
 
 interface FindJobsPageProps {
@@ -43,16 +46,17 @@ interface FindJobsPageProps {
 
 export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
   const router = useRouter();
+  const {user} = useUser();
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-  // const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(initialCategory || '');
   const [selectedLocation, setSelectedLocation] = useState('');
-  // const [selectedType, setSelectedType] = useState('');
-  // const [selectedSalaryRange, setSelectedSalaryRange] = useState('');
+  const [selectedType, setSelectedType] = useState('');
+  const [selectedSalaryRange, setSelectedSalaryRange] = useState('');
   const [sortBy, setSortBy] = useState('recent');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [isApplied, setIsApplied] = useState<string[]>([]); 
 
   const [filters, setFilters] = useState({
     type: "",
@@ -118,6 +122,8 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
       const params = new URLSearchParams({
         page: String(pageNumber),
         limit: "20",
+        location: selectedLocation,
+        category: selectedCategory,
         ...(filters.type && { type: filters.type }),
         ...(filters.experience && { experience: filters.experience }),
         ...(filters.minSalary && { minSalary: filters.minSalary }),
@@ -143,7 +149,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
   useEffect(() => {
     setPage(1);
     fetchJobs(1, filters);
-  }, [filters]);
+  }, [filters,selectedCategory, selectedLocation]);
 
   // Infinite scroll
   useEffect(() => {
@@ -173,76 +179,51 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
     }
   }, [page]);
 
+  useEffect(() => {
+    const filtered = filteredJobs;
 
+    // Sort jobs
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'recent':
+          return new Date(b.posted).getTime() - new Date(a.posted).getTime();
+        case 'salary-high':
+          return parseInt(b.salary.max) - parseInt(a.salary.max);
+        case 'salary-low':
+          return parseInt(a.salary.max) - parseInt(b.salary.max);
+        case 'company':
+          return a.company.company?.name.localeCompare(b.company.company.name);
+        default:
+          return 0;
+      }
+    });
 
+    setFilteredJobs(filtered);
+  }, [selectedType, selectedSalaryRange, sortBy]);
 
-    // console.log("jobs : ", jobs);
-    // const getjobs = async() => {
-    //   const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs/`);
-    //   // console.log(response.data);
-    //   setFilteredJobs(response.data.jobs);
-    // }
+  useEffect(()=>{
+    if(user && filteredJobs){
+      filteredJobs.forEach(job => job.applications.forEach((app: {user: string}) => {
+        if(app.user == user._id){
+         setIsApplied(prev => [...prev, job._id]);
+        } 
+      }))
+    }
+  },[user, filteredJobs])
 
-    // useEffect(()=>{
-    //   getjobs();
-    // },[])
-
-
-
-
-
-
-
-
-  // useEffect(() => {
-  //   let filtered = jobs;
-
-  //   if (searchTerm) {
-  //     filtered = filtered.filter(job =>
-  //       job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       job.company.company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       job.description.toLowerCase().includes(searchTerm.toLowerCase())
-  //     );
-  //   }
-
-  //   if (selectedCategory) {
-  //     filtered = filtered.filter(job => job.category === selectedCategory);
-  //   }
-
-  //   if (selectedLocation) {
-  //     filtered = filtered.filter(job => job.location === selectedLocation);
-  //   }
-
-  //   if (selectedType) {
-  //     filtered = filtered.filter(job => job.type === selectedType);
-  //   }
-
-  //   // Sort jobs
-  //   filtered.sort((a, b) => {
-  //     switch (sortBy) {
-  //       case 'recent':
-  //         return new Date(b.posted).getTime() - new Date(a.posted).getTime();
-  //       case 'salary-high':
-  //         return parseInt(b.salary.max.replace(/[^0-9]/g, '')) - parseInt(a.salary.max.replace(/[^0-9]/g, ''));
-  //       case 'salary-low':
-  //         return parseInt(a.salary.max.replace(/[^0-9]/g, '')) - parseInt(b.salary.max.replace(/[^0-9]/g, ''));
-  //       case 'company':
-  //         return a.company.company.name.localeCompare(b.company.company.name);
-  //       default:
-  //         return 0;
-  //     }
-  //   });
-
-  //   setFilteredJobs(filtered);
-  // }, [searchTerm, selectedCategory, selectedLocation, selectedType, selectedSalaryRange, sortBy, jobs]);
-
-  // const clearFilters = () => {
-  //   setSearchTerm('');
-  //   setSelectedCategory('');
-  //   setSelectedLocation('');
-  //   setSelectedType('');
-  //   setSelectedSalaryRange('');
-  // };
+  const clearFilters = () => {
+    setSelectedCategory('');
+    setSelectedLocation('');
+    setSelectedType('');
+    setSelectedSalaryRange('');
+    setFilters({
+      type: "",
+      experience: "",
+      minSalary: "",
+      maxSalary: "",
+      search: "",
+    });
+  };
 
   const getCurrencyIcon = (currency: string) => {
   switch (currency) {
@@ -269,7 +250,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
           
           {/* Advanced Search */}
           <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-purple-200 shadow-lg">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-purple-400" />
                 <input
@@ -309,10 +290,10 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
                 </select>
               </div>
               
-              <button className="bg-[#9333E9] text-white px-6 py-3 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center">
+              {/* <button className="bg-[#9333E9] text-white px-6 py-3 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center">
                 <Search className="w-5 h-5 mr-2" />
                 Search Jobs
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
@@ -330,7 +311,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
                   Filters
                 </h3>
                 <button
-                  // onClick={clearFilters}
+                  onClick={clearFilters}
                   className="text-purple-600 hover:text-purple-700 text-sm font-medium"
                 >
                   Clear All
@@ -338,8 +319,8 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
               </div>
 
 
-                          <div>
-          <h3 className="font-semibold">Job Type</h3>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">Job Type</label>
           {["Full-time", "Part-time", "Contract", "Temporary", "Internship"].map(
             (t) => (
               <label key={t} className="block">
@@ -349,16 +330,17 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
                   value={t}
                   checked={filters.type === t}
                   onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                 />
-                {t}
+                <span className="ml-2 text-sm text-gray-700">{t}</span>
               </label>
             )
           )}
         </div>
 
 
-                <div className="mt-4">
-          <h3 className="font-semibold">Salary Range</h3>
+        <div className="mt-4">
+          <label className="block text-sm font-medium text-gray-700 mb-3">Salary Range</label>
           <label className="block">
             <input
               type="radio"
@@ -366,8 +348,9 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
               onChange={() =>
                 setFilters({ ...filters, minSalary: "0", maxSalary: "50000" })
               }
+              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
             />
-            $0–50k
+            <span className="ml-2 text-sm text-gray-700">$0–50k</span>
           </label>
           <label className="block">
             <input
@@ -376,8 +359,9 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
               onChange={() =>
                 setFilters({ ...filters, minSalary: "50000", maxSalary: "100000" })
               }
+              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
             />
-            $50k–100k
+            <span className="ml-2 text-sm text-gray-700">$50k–100k</span>
           </label>
           <label className="block">
             <input
@@ -386,8 +370,9 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
               onChange={() =>
                 setFilters({ ...filters, minSalary: "100000", maxSalary: "150000" })
               }
+              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
             />
-            $100k–150k
+            <span className="ml-2 text-sm text-gray-700">$100k–150k</span>
           </label>
           <label className="block">
             <input
@@ -396,13 +381,14 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
               onChange={() =>
                 setFilters({ ...filters, minSalary: "150000", maxSalary: "9999999" })
               }
+              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
             />
-            $150k+
+            <span className="ml-2 text-sm text-gray-700">$150k+</span>
           </label>
         </div>
 
-              <div className="mt-4">
-          <h3 className="font-semibold">Experience</h3>
+        <div className="mt-4">
+          <label className="block text-sm font-medium text-gray-700 mb-3">Experience</label>
           {["Entry-level", "Mid-level", "Senior-level", "Executive"].map((exp) => (
             <label key={exp} className="block">
               <input
@@ -410,80 +396,14 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
                 name="experience"
                 checked={filters.experience === exp}
                 onChange={() => setFilters({ ...filters, experience: exp })}
+                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
               />
-              {exp}
+               <span className="ml-2 text-sm text-gray-700">{exp}</span>
             </label>
           ))}
         </div>
-
-        {/* <div className="mt-4">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="border p-2 w-full rounded"
-            value={filters.search}
-            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-          />
-        </div> */}
-
-
-              
-              {/* <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Job Type</label>
-                  <div className="space-y-2">
-                    {jobTypes.map(type => (
-                      <label key={type} className="flex items-center">
-                        <input
-                          type="radio"
-                          name="jobType"
-                          value={type}
-                          checked={selectedType === type}
-                          onChange={(e) => setSelectedType(e.target.value)}
-                          className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">{type}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Salary Range</label>
-                  <div className="space-y-2">
-                    {salaryRanges.map(range => (
-                      <label key={range} className="flex items-center">
-                        <input
-                          type="radio"
-                          name="salaryRange"
-                          value={range}
-                          checked={selectedSalaryRange === range}
-                          onChange={(e) => setSelectedSalaryRange(e.target.value)}
-                          className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">{range}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Experience Level</label>
-                  <div className="space-y-2">
-                    {['Entry Level', 'Mid Level', 'Senior Level', 'Executive'].map(level => (
-                      <label key={level} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">{level}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div> */}
-            </div>
-          </div>
+      </div>
+    </div>
 
           {/* Job Listings */}
           <div className="lg:w-3/4">
@@ -567,12 +487,16 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
                       
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                          <button
+                           <button onClick={() => router.push(`/jobs/${job._id}`)} className={`${isApplied.includes(job._id) ? 'bg-green-600' : 'bg-purple-600'} flex justify-center items-center text-white px-5 py-2 rounded-lg`}>
+                            {isApplied.includes(job._id) ? 'Applied' : 'Apply Now'}
+                            {isApplied.includes(job._id) && <CheckCircle className='ms-1 w-4 h-4'/>}
+                            </button>
+                          {/* <button
                             onClick={() => router.push(`/jobs/${job._id}`)}
                             className="bg-[#9333E9] text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-medium shadow-lg"
                           >
                             Apply Now
-                          </button>
+                          </button> */}
                           <button
                             onClick={() => router.push(`/jobs/${job._id}`)}
                             className="text-purple-600 hover:text-purple-700 font-medium flex items-center transition-colors"

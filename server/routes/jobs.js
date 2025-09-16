@@ -218,7 +218,6 @@ router.get('/:id', optionalAuth, async (req, res) => {
 // @desc    Create a new job
 // @access  Private (Company only)
 router.post('/', auth, authorize('company', 'admin'), jobValidation, async (req, res) => {
-  console.log("Hello");
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -346,7 +345,7 @@ router.post('/:id/apply', auth, authorize('user'), [
 
     await job.save();
 
-    res.json({ message: 'Application submitted successfully' });
+    res.status(200).json({ message: 'Application submitted successfully' });
   } catch (error) {
     console.error('Apply for job error:', error);
     res.status(500).json({ error: 'Server error' });
