@@ -90,14 +90,21 @@ const Header = () => {
                   </button>
                   }
 
-                  {user?.role === 'company' &&
+                  <button
+                    onClick={() => router.push('/dashboard')}
+                    className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
+                  >
+                    Dashboard
+                  </button>
+
+                  {/* {user?.role === 'company' &&
                   <button
                     onClick={() => setIsPostJobModalOpen(true)}
                     className="bg-[#9333E9] text-white px-6 py-2 rounded-xl transition-all duration-300 font-semibold"
                   >
                     Post Job
                   </button> 
-                  }
+                  } */}
                   
                   <button
                     onClick={handleLogout}
@@ -196,7 +203,14 @@ const Header = () => {
                     Admin
                   </button>
                 }
-                  {user?.role === 'company' &&
+
+                <button
+                    onClick={() => router.push('/dashboard')}
+                    className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
+                  >
+                    Dashboard
+                  </button>
+                  {/* {user?.role === 'company' &&
                                     <button
                     onClick={() => {
                       setIsPostJobModalOpen(true);
@@ -206,7 +220,7 @@ const Header = () => {
                   >
                     Post Job
                   </button> 
-                  }
+                  } */}
 
                   <button
                     onClick={() => {

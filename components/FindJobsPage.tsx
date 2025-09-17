@@ -323,7 +323,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
           <label className="block text-sm font-medium text-gray-700 mb-3">Job Type</label>
           {["Full-time", "Part-time", "Contract", "Temporary", "Internship"].map(
             (t) => (
-              <label key={t} className="block">
+              <label key={t} className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
                 <input
                   type="radio"
                   name="jobType"
@@ -341,7 +341,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
 
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700 mb-3">Salary Range</label>
-          <label className="block">
+          <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
             <input
               type="radio"
               name="salary"
@@ -352,7 +352,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
             />
             <span className="ml-2 text-sm text-gray-700">$0–50k</span>
           </label>
-          <label className="block">
+          <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
             <input
               type="radio"
               name="salary"
@@ -363,7 +363,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
             />
             <span className="ml-2 text-sm text-gray-700">$50k–100k</span>
           </label>
-          <label className="block">
+          <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
             <input
               type="radio"
               name="salary"
@@ -374,7 +374,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
             />
             <span className="ml-2 text-sm text-gray-700">$100k–150k</span>
           </label>
-          <label className="block">
+          <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
             <input
               type="radio"
               name="salary"
@@ -390,7 +390,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700 mb-3">Experience</label>
           {["Entry-level", "Mid-level", "Senior-level", "Executive"].map((exp) => (
-            <label key={exp} className="block">
+            <label key={exp} className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
               <input
                 type="radio"
                 name="experience"
@@ -521,7 +521,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
               ))}
               {loading && <p>Loading...</p>}
               <div id="load-more" className="h-10"></div>
-              {!hasMore && <p className="text-gray-500">No more jobs</p>}
+              {!hasMore && <p className="text-gray-500 ms-4">No more jobs</p>}
             </div>
 
             {filteredJobs.length === 0 && (

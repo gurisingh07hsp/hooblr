@@ -355,31 +355,30 @@ router.post('/:id/apply', auth, authorize('user'), [
 // @route   GET /api/jobs/my-applications
 // @desc    Get user's job applications
 // @access  Private (User only)
-router.get('/my-applications', auth, authorize('user'), async (req, res) => {
+router.get('/user/my-applications', auth, authorize('user'), async (req, res) => {
   try {
     const jobs = await Job.find({
       'applications.user': req.user._id
     })
     .populate('company', 'company.name company.logo')
-    .select('title location type applications');
+    .select('title location type applications salary')
+    .sort({ 'applications.appliedAt': -1 });
 
-    const applications = jobs.map(job => {
-      const application = job.applications.find(
-        app => app.user.toString() === req.user._id.toString()
-      );
-      return {
-        job: {
-          _id: job._id,
-          title: job.title,
-          location: job.location,
-          type: job.type,
-          company: job.company
-        },
-        application
-      };
-    });
+         const appliedJobs = jobs.map(job => {
+        const userApplication = job.applications.find(
+          app => app.user.toString() === req.user._id.toString()
+        );
+        
+        return {
+          ...job.toObject(),
+          applicationStatus: userApplication?.status || 'pending',
+          appliedAt: userApplication?.appliedAt
+        };
+      });
 
-    res.json({ applications });
+      res.status(200).json(appliedJobs);
+
+    // res.status(200).json({ appliedJobs });
   } catch (error) {
     console.error('Get applications error:', error);
     res.status(500).json({ error: 'Server error' });

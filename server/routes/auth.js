@@ -177,7 +177,7 @@ router.put('/profile', auth, async (req, res) => {
       { new: true, runValidators: true }
     ).select('-password');
 
-    res.json({
+    res.status(200).json({
       message: 'Profile updated successfully',
       user: user.getPublicProfile()
     });
@@ -201,9 +201,11 @@ router.post('/change-password', auth, [
     }
 
     const { currentPassword, newPassword } = req.body;
+    console.log(currentPassword, newPassword);
 
     // Verify current password
-    const isMatch = await req.user.comparePassword(currentPassword);
+    const user = await User.findById(req.user._id).select('+password');
+    const isMatch = await user.comparePassword(currentPassword);
     if (!isMatch) {
       return res.status(400).json({ error: 'Current password is incorrect' });
     }
@@ -212,7 +214,7 @@ router.post('/change-password', auth, [
     req.user.password = newPassword;
     await req.user.save();
 
-    res.json({ message: 'Password changed successfully' });
+    res.status(200).json({ message: 'Password changed successfully' });
   } catch (error) {
     console.error('Password change error:', error);
     res.status(500).json({ error: 'Server error' });

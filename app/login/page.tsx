@@ -189,7 +189,7 @@ export default function AuthModal() {
               {selectedRole === 'company' ? (
                 <Building2 className="w-5 h-5 text-purple-600" />
               ) : (
-                <User className="w-5 h-5 text-blue-600" />
+                <User className="w-5 h-5 text-purple-600" />
               )}
               <span className="text-sm font-medium text-gray-700">
                 {selectedRole === 'company' ? 'Company Account' : 'Job Seeker Account'}
@@ -363,7 +363,7 @@ export default function AuthModal() {
                 className={`w-full py-3 px-4 rounded-lg text-white font-medium transition-colors ${
                   selectedRole === 'company'
                     ? 'bg-purple-600 hover:bg-purple-700'
-                    : 'bg-blue-600 hover:bg-blue-700'
+                    : 'bg-purple-600 hover:bg-purple-700'
                 }`}
               >
                 {authMode === 'signin' ? 'Sign In' : 'Create Account'}

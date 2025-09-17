@@ -89,6 +89,43 @@ export interface IUser {
   updatedAt?: Date;
 }
 
+export interface Company {
+  name: string;
+  size: "1-10" | "11-50" | "51-200" | "201-500" | "501-1000" | "1000+";
+  industry: string;
+  website?: string;
+  description?: string;
+  logo?: string;
+  location?: string;
+}
+
+export interface Job {
+  _id?: string;
+  title: string;
+  location: string;
+  type: "full-time" | "part-time" | "contract" | "internship" | "remote";
+  description: string;
+}
+
+export interface User {
+  _id: string;
+  email: string;
+  role: "user" | "company" | "admin";
+  profile?: {
+    name: string;
+    phone?: string;
+    location?: string;
+    bio?: string;
+    skills?: string[];
+    experience?: string;
+    education?: string;
+    resume?: string;
+    avatar?: string;
+  };
+  company?: Company;
+  savedJobs: string[],
+}
+
 // Common status type helper
 
 
