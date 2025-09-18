@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'company', 'admin'],
+    enum: ['user','admin'],
     default: 'user'
   },
   profile: {
@@ -36,16 +36,16 @@ const userSchema = new mongoose.Schema({
   company: {
     name: {
       type: String,
-      required: function() { return this.role === 'company'; }
+    },
+    companyemail: {
+      type: String,
     },
     size: {
       type: String,
       enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'],
-      required: function() { return this.role === 'company'; }
     },
     industry: {
       type: String,
-      required: function() { return this.role === 'company'; }
     },
     website: String,
     description: String,

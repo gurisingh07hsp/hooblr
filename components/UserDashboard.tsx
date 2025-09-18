@@ -7,14 +7,18 @@ import {
   HomeIcon, 
   UserIcon, 
   BriefcaseIcon, 
-  BellIcon, 
+  // BellIcon, 
   Cog6ToothIcon,
   QuestionMarkCircleIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  BuildingOfficeIcon
 } from '@heroicons/react/24/outline';
 import UserProfile from './UserProfile';
 import UserJobs from './UserJobs';
+import CompanyProfile from './CompanyProfile';
+import CompanyJobs from './CompanyJobs';
 import axios from 'axios';
+import { ChartBarIcon } from 'lucide-react';
 
 interface SidebarItem {
   id: string;
@@ -30,8 +34,11 @@ const UserDashboard = () => {
   const sidebarItems: SidebarItem[] = [
     { id: 'dashboard', name: 'Dashboard', icon: HomeIcon },
     { id: 'profile', name: 'Profile', icon: UserIcon },
-    { id: 'jobs', name: 'Applied Jobs', icon: BriefcaseIcon },
-    { id: 'notifications', name: 'Notifications', icon: BellIcon, count: 12 },
+    { id: 'Applied jobs', name: 'Applied Jobs', icon: BriefcaseIcon },
+    { id: 'Company profile', name: 'Company Profile', icon: BuildingOfficeIcon },
+    { id: 'job Management', name: 'Job Management', icon: BriefcaseIcon },
+    { id: 'Company analytics', name: 'Company Analytics', icon: ChartBarIcon },
+    // { id: 'notifications', name: 'Notifications', icon: BellIcon },
     { id: 'settings', name: 'Settings', icon: Cog6ToothIcon },
     { id: 'help', name: 'Help & Support', icon: QuestionMarkCircleIcon },
   ];
@@ -40,8 +47,12 @@ const UserDashboard = () => {
     switch (activeTab) {
       case 'profile':
         return <UserProfile />;
-      case 'jobs':
+      case 'Applied jobs':
         return <UserJobs />;
+      case 'Company profile':
+        return <CompanyProfile />;
+      case 'job Management':
+        return <CompanyJobs />;
       case 'dashboard':
         return <DashboardOverview />;
       default:
@@ -122,7 +133,7 @@ const UserDashboard = () => {
               <div className="text-sm font-medium text-gray-900">
                 {user?.profile?.name || 'User'}
               </div>
-              <div className="text-xs text-gray-500">Job Seeker</div>
+              <div className="text-xs text-gray-500">{user?.email}</div>
             </div>
             <div className="w-2 h-2 bg-green-400 rounded-full"></div>
           </div>

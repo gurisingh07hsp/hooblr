@@ -8,8 +8,7 @@ import {User, Building2, Mail, Lock, Eye, EyeOff, Briefcase, Users } from 'lucid
 export default function AuthModal() {
   const { setUser} = useUser();
   const router = useRouter();
-  const [step, setStep] = useState<'role' | 'auth'>('role');
-  const [selectedRole, setSelectedRole] = useState<'user' | 'company' | 'admin' | null>(null);
+  // const [selectedRole, setSelectedRole] = useState<'user' | 'company' | 'admin' | null>(null);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
@@ -18,21 +17,16 @@ export default function AuthModal() {
     password: '',
     confirmPassword: '',
     name: '',
-    role: selectedRole,
+    role: 'user',
     companyName: '',
     companySize: '',
     industry: ''
   });
 
-  const handleRoleSelect = (role: 'user' | 'company' | 'admin') => {
-    setSelectedRole(role);
-    setStep('auth');
-  };
 
-
-  useEffect(()=>{
-    setFormData((prev) => ({ ...prev, role: selectedRole }));
-  },[selectedRole]);
+  // useEffect(()=>{
+  //   setFormData((prev) => ({ ...prev, role: selectedRole }));
+  // },[selectedRole]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -83,8 +77,6 @@ export default function AuthModal() {
   };
 
   const resetForm = () => {
-    setStep('role');
-    setSelectedRole(null);
     setAuthMode('signin');
     setMessage('');
     setShowPassword(false);
@@ -93,16 +85,12 @@ export default function AuthModal() {
       password: '',
       confirmPassword: '',
       name: '',
-      role: selectedRole,
+      role: 'user',
       companyName: '',
       companySize: '',
       industry: ''
     });
   };
-
-//   if (!isOpen) {
-//     return null;
-//   }
 
   return (
     <div className="fixed inset-0 bg-zinc-200 flex items-center justify-center z-50 p-4" style={{ zIndex: 9999 }}>
@@ -110,91 +98,13 @@ export default function AuthModal() {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-2xl font-semibold text-gray-900">
-            {step === 'role' ? 'Welcome to Hooblr' : 
-             selectedRole === 'company' ? 'Company Account' : 'Job Seeker Account'}
+            Welcome to Hooblr
           </h2>
-          {/* <button
-            onClick={handleClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button> */}
         </div>
 
-        {/* Role Selection Step */}
-        {step === 'role' && (
-          <div className="p-6">
-            <div className="text-center mb-8">
-              <h3 className="text-xl font-medium text-gray-900 mb-2">
-                What brings you here today?
-              </h3>
-              <p className="text-gray-600">
-                Choose your path to get started with the right experience
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              {/* Job Seeker Option */}
-              <button
-                onClick={() => handleRoleSelect('user')}
-                className="w-full p-6 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                    <Briefcase className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div className="text-left">
-                    <h4 className="text-lg font-medium text-gray-900">I&apos;m looking for a job</h4>
-                    <p className="text-gray-600 text-sm">
-                      Find your dream job from thousands of opportunities
-                    </p>
-                  </div>
-                </div>
-              </button>
-
-              {/* Company Option */}
-              <button
-                onClick={() => handleRoleSelect('company')}
-                className="w-full p-6 border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all duration-200 group"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-                    <Users className="w-6 h-6 text-purple-600" />
-                  </div>
-                  <div className="text-left">
-                    <h4 className="text-lg font-medium text-gray-900">I&apos;m hiring talent</h4>
-                    <p className="text-gray-600 text-sm">
-                      Post jobs and find the perfect candidates for your team
-                    </p>
-                  </div>
-                </div>
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Authentication Step */}
-        {step === 'auth' && (
+        
           <div className={`${authMode == 'signin' ? 'p-6' : 'px-6'}`}>
-            {/* Back Button */}
-            <button
-              onClick={() => setStep('role')}
-              className="mb-4 text-blue-600 hover:text-blue-700 text-sm font-medium"
-            >
-              ← Back to role selection
-            </button>
-
-            {/* Role Indicator */}
-            <div className="flex items-center space-x-3 mb-6 p-3 bg-gray-50 rounded-lg">
-              {selectedRole === 'company' ? (
-                <Building2 className="w-5 h-5 text-purple-600" />
-              ) : (
-                <User className="w-5 h-5 text-purple-600" />
-              )}
-              <span className="text-sm font-medium text-gray-700">
-                {selectedRole === 'company' ? 'Company Account' : 'Job Seeker Account'}
-              </span>
-            </div>
 
             {/* Auth Mode Toggle */}
             <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
@@ -225,75 +135,20 @@ export default function AuthModal() {
               {/* Name Field (Sign Up Only) */}
               {authMode === 'signup' && (
                 <div>
-                  {/* <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {selectedRole === 'company' ? 'Company Name' : 'Full Name'} *
-                  </label> */}
                   <input
                     type="text"
-                    name={selectedRole === 'company' ? 'companyName' : 'name'}
-                    value={selectedRole === 'company' ? formData.companyName : formData.name}
+                    name={'name'}
+                    value={formData.name}
                     onChange={handleInputChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder={selectedRole === 'company' ? 'Enter company name' : 'Enter your full name'}
+                    placeholder={'Enter your full name'}
                   />
                 </div>
               )}
 
-              {/* Company-specific fields */}
-              {authMode === 'signup' && selectedRole === 'company' && (
-                <>
-                  <div>
-                    {/* <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Company Size *
-                    </label> */}
-                    <select
-                      name="companySize"
-                      value={formData.companySize}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Select company size</option>
-                      <option value="1-10">1-10 employees</option>
-                      <option value="11-50">11-50 employees</option>
-                      <option value="51-200">51-200 employees</option>
-                      <option value="201-500">201-500 employees</option>
-                      <option value="501-1000">501-1000 employees</option>
-                      <option value="1000+">1000+ employees</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    {/* <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Industry *
-                    </label> */}
-                    <select
-                      name="industry"
-                      value={formData.industry}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Select industry</option>
-                      <option value="technology">Technology</option>
-                      <option value="healthcare">Healthcare</option>
-                      <option value="finance">Finance</option>
-                      <option value="education">Education</option>
-                      <option value="retail">Retail</option>
-                      <option value="manufacturing">Manufacturing</option>
-                      <option value="consulting">Consulting</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                </>
-              )}
-
               {/* Email Field */}
               <div>
-                {/* <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address *
-                </label> */}
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
@@ -310,9 +165,6 @@ export default function AuthModal() {
 
               {/* Password Field */}
               <div>
-                {/* <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password *
-                </label> */}
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
@@ -337,9 +189,6 @@ export default function AuthModal() {
               {/* Confirm Password (Sign Up Only) */}
               {authMode === 'signup' && (
                 <div>
-                  {/* <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Confirm Password *
-                  </label> */}
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
@@ -360,11 +209,7 @@ export default function AuthModal() {
               {/* Submit Button */}
               <button
                 type="submit"
-                className={`w-full py-3 px-4 rounded-lg text-white font-medium transition-colors ${
-                  selectedRole === 'company'
-                    ? 'bg-purple-600 hover:bg-purple-700'
-                    : 'bg-purple-600 hover:bg-purple-700'
-                }`}
+                className={`w-full py-3 px-4 rounded-lg text-white font-medium transition-colors bg-purple-600 hover:bg-purple-700`}
               >
                 {authMode === 'signin' ? 'Sign In' : 'Create Account'}
               </button>
@@ -380,7 +225,7 @@ export default function AuthModal() {
               )}
             </form>
           </div>
-        )}
+
       </div>
     </div>
   );

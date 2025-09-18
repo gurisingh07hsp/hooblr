@@ -3,10 +3,11 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@/context/UserContext';
+import axios from 'axios';
 
 interface CompanyProfileData {
   name: string;
-  email: string;
+  companyemail: string;
   size: string;
   industry: string;
   website: string;
@@ -18,13 +19,13 @@ interface CompanyProfileData {
 }
 
 const CompanyProfile = () => {
-  const { user} = useUser();
+  const { user, setUser} = useUser();
   const [activeSection, setActiveSection] = useState('company');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [profileData, setProfileData] = useState<CompanyProfileData>({
     name: '',
-    email: '',
+    companyemail: '',
     size: '',
     industry: '',
     website: '',
@@ -62,7 +63,7 @@ const CompanyProfile = () => {
     if (user) {
       setProfileData({
         name: user.company?.name || '',
-        email: user.email || '',
+        companyemail: user.company?.companyemail || '',
         size: user.company?.size || '',
         industry: user.company?.industry || '',
         website: user.company?.website || '',
@@ -86,29 +87,23 @@ const CompanyProfile = () => {
     setMessage('');
 
     try {
-      const response = await fetch('/api/company/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies/profile`, {
           company: {
             name: profileData.name,
+            companyemail: profileData.companyemail,
             size: profileData.size,
             industry: profileData.industry,
             website: profileData.website,
             description: profileData.description,
             location: profileData.location
           }
-        }),
-      });
+        }, {withCredentials:true});
 
-      if (response.ok) {
-        // const updatedUser = await response.json();
-        // updateUser(updatedUser);
+      if (response.status == 200) {
+        setUser(response.data);
         setMessage('Company profile updated successfully!');
       } else {
-        const errorData = await response.json();
+        const errorData = await response.data
         setMessage(errorData.message || 'Failed to update company profile');
       }
     } catch (error) {
@@ -167,8 +162,7 @@ const CompanyProfile = () => {
   };
 
   const sections = [
-    { id: 'company', name: 'Company Information' },
-    { id: 'security', name: 'Security' },
+    { id: 'company', name: 'Company Information' }
   ];
 
   return (
@@ -234,10 +228,10 @@ const CompanyProfile = () => {
                   <input
                     type="email"
                     id="email"
-                    name="email"
-                    value={profileData.email}
-                    disabled
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                    name="companyemail"
+                    value={profileData.companyemail}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -341,7 +335,7 @@ const CompanyProfile = () => {
             </form>
           )}
 
-          {activeSection === 'security' && (
+          {/* {activeSection === 'security' && (
             <form onSubmit={handlePasswordSubmit} className="space-y-6">
               <div className="max-w-md">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Change Password</h3>
@@ -406,7 +400,7 @@ const CompanyProfile = () => {
                 </div>
               </div>
             </form>
-          )}
+          )} */}
         </div>
       </div>
     </div>

@@ -276,7 +276,7 @@ export default function JobDetailsPage() {
               <p className='text-center text-red-600 font-semibold'>{error}</p>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setShowApply(false)} className="px-4 py-2 border rounded-lg">Cancel</button>
-                <button type="submit" disabled={submitting} className="px-5 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white disabled:opacity-60">{submitting ? 'Submitting…' : 'Submit Application'}</button>
+                <button type="submit" disabled={submitting} className="px-5 py-2 rounded-lg bg-purple-600 text-white disabled:opacity-60">{submitting ? 'Submitting…' : 'Submit Application'}</button>
               </div>
             </form>
           </div>
@@ -289,7 +289,7 @@ export default function JobDetailsPage() {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"><CheckCircle className="w-8 h-8 text-green-600" /></div>
             <p className="text-lg font-semibold mb-2">Application submitted!</p>
             <p className="text-gray-600 mb-4">We’ll review and get back to you soon.</p>
-            <button onClick={() => setSubmitted(false)} className="px-5 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white">Close</button>
+            <button onClick={() => setSubmitted(false)} className="px-5 py-2 rounded-lg bg-purple-600 text-white">Close</button>
           </div>
         </div>
       )}

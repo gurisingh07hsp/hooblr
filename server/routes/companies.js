@@ -2,7 +2,7 @@ const express = require('express');
 const { query, validationResult } = require('express-validator');
 const User = require('../models/User');
 const Job = require('../models/Job');
-const { optionalAuth } = require('../middleware/auth');
+const { auth,optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -104,6 +104,28 @@ router.get('/:id', optionalAuth, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+router.put('/profile', auth, async(req, res) => {
+  try {
+      const userId = req.user._id;
+      const { company } = req.body;
+
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { $set: { company } },
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'Company not found' });
+      }
+
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      console.error('Error updating company profile:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+})
 
 // @route   GET /api/companies/:id/jobs
 // @desc    Get company's jobs

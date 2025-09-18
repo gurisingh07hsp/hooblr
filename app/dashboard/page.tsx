@@ -44,7 +44,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {user.role === 'company' ? <CompanyDashboard /> : <UserDashboard />}
+    <UserDashboard />
     </div>
   );
 };

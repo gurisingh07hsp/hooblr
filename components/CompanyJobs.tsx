@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 // import { useUser } from '@/context/UserContext';
 import JobForm from './JobForm';
+import axios from 'axios';
 
 interface Job {
   _id: string;
@@ -31,6 +32,8 @@ interface Job {
         name: string;
       };
     };
+    coverLetter: string;
+    resume: string;
     status: 'pending' | 'reviewed' | 'shortlisted' | 'rejected' | 'hired';
     appliedAt: string;
   }>;
@@ -55,6 +58,7 @@ const CompanyJobs = () => {
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [showApplications, setShowApplications] = useState(false);
 
   useEffect(() => {
     fetchJobs();
@@ -62,10 +66,10 @@ const CompanyJobs = () => {
 
   const fetchJobs = async () => {
     try {
-      const response = await fetch('/api/company/jobs');
-      if (response.ok) {
-        const jobsData = await response.json();
-        setJobs(jobsData);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs/company/my-jobs`, {withCredentials:true});
+      if (response.status == 200) {
+        console.log(response.data.jobs);
+        setJobs(response.data.jobs);
       }
     } catch (error) {
       console.error('Failed to fetch jobs:', error);
@@ -74,11 +78,11 @@ const CompanyJobs = () => {
     }
   };
 
-//   const handleJobSaved = () => {
-//     setShowJobForm(false);
-//     setEditingJob(null);
-//     fetchJobs();
-//   };
+  // const handleJobSaved = () => {
+  //   setShowJobForm(false);
+  //   setEditingJob(null);
+  //   fetchJobs();
+  // };
 
   const handleEditJob = (job: Job) => {
     setEditingJob(job);
@@ -91,11 +95,9 @@ const CompanyJobs = () => {
     }
 
     try {
-      const response = await fetch(`/api/company/jobs/${jobId}`, {
-        method: 'DELETE',
-      });
+      const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs/${jobId}`, {withCredentials:true});
 
-      if (response.ok) {
+      if (response.status === 200) {
         setJobs(jobs.filter(job => job._id !== jobId));
         if (selectedJob?._id === jobId) {
           setSelectedJob(null);
@@ -164,6 +166,79 @@ const CompanyJobs = () => {
         }}
       />
     );
+  }
+
+  console.log("selected : ", selectedJob);
+
+  if(showApplications){
+    return (
+      <div className="">
+  {/* Close Button */}
+  <div className="flex justify-end mb-4">
+    <button
+      onClick={() => setShowApplications(false)}
+      className="px-3 py-1 text-white bg-red-600 rounded-lg hover:bg-red-700 transition"
+    >
+      ✕
+    </button>
+  </div>
+
+  {/* Applications List */}
+  <div className="space-y-6">
+    {selectedJob?.applications.map((app, index) => (
+      <div
+        key={index}
+        className="p-6 border rounded-xl bg-gray-50 shadow-md hover:shadow-lg transition"
+      >
+        {/* Header */}
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold text-gray-800">
+            {app.user.profile.name}
+          </h3>
+          <span
+            className={`px-3 py-1 rounded-full text-sm font-medium ${
+              app.status === "shortlisted"
+                ? "bg-green-100 text-green-700"
+                : app.status === "rejected"
+                ? "bg-red-100 text-red-700"
+                : "bg-yellow-100 text-yellow-700"
+            }`}
+          >
+            {app.status}
+          </span>
+        </div>
+
+        {/* Meta Info */}
+        <p className="text-sm text-gray-500 mb-6">
+          Applied on: {new Date(app.appliedAt).toLocaleDateString()}
+        </p>
+
+        {/* Grid Layout for Documents */}
+        <div className="grid grid-cols-2 gap-6">
+          {/* Cover Letter */}
+          <div className="p-4 border rounded-lg bg-white shadow-sm overflow-auto">
+            <h2 className="text-lg font-semibold mb-2 text-gray-700">
+              Cover Letter
+            </h2>
+            <pre className="whitespace-pre-wrap text-sm leading-relaxed text-gray-600">
+              {app.coverLetter}
+            </pre>
+          </div>
+
+          {/* Resume */}
+          <div className="p-4 border rounded-lg bg-white shadow-sm overflow-auto">
+            <h2 className="text-lg font-semibold mb-2 text-gray-700">Resume</h2>
+            <pre className="whitespace-pre-wrap text-sm leading-relaxed text-gray-600">
+              {app.resume}
+            </pre>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+    )
   }
 
   if (loading) {
@@ -410,7 +485,7 @@ const CompanyJobs = () => {
                     Edit Job
                   </button>
                   
-                  <button className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
+                  <button onClick={()=> setShowApplications(true)} className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
                     View Applications
                   </button>
                 </div>

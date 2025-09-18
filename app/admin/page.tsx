@@ -273,7 +273,7 @@ export default function AdminPage() {
         });
       }
       else{
-        if(user?.role === 'company' || user?.role === 'user')
+        if(user?.role === 'user')
         {
           router.push('/');
         }

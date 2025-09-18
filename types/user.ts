@@ -2,7 +2,7 @@ export interface IUser {
   _id?: string;
   email: string;
   password?: string;
-  role: 'user' | 'company' | 'admin';
+  role: 'user' | 'admin';
   profile?: {
     name?: string;
     phone?: string;
@@ -16,6 +16,7 @@ export interface IUser {
   };
   company?: {
     name?: string;
+    companyemail: string,
     size?: '1-10' | '11-50' | '51-200' | '201-500' | '501-1000' | '1000+';
     industry?: string;
     website?: string;
@@ -47,7 +48,7 @@ export interface IUser {
   _id?: string;
   email: string;
   password?: string;
-  role: 'user' | 'company' | 'admin';
+  role: 'user' | 'admin';
   profile?: {
     name?: string;
     phone?: string;
@@ -61,6 +62,7 @@ export interface IUser {
   };
   company?: {
     name?: string;
+    companyemail: string,
     size?: '1-10' | '11-50' | '51-200' | '201-500' | '501-1000' | '1000+';
     industry?: string;
     website?: string;
