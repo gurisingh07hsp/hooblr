@@ -1,7 +1,8 @@
 const express = require('express');
 const { body, validationResult, query } = require('express-validator');
 const Job = require('../models/Job');
-const User = require('../models/User');
+// const User = require('../models/User');
+const Company = require('../models/Company')
 const { auth, authorize, optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -224,9 +225,9 @@ router.post('/', auth, authorize('user', 'admin'), async (req, res) => {
     //   return res.status(400).json({ errors: errors.array() });
     // }
   //  console.log(req.body);
+  // const {submitData} = req.body;
     const jobData = {
-      ...req.body,
-      company: req.user._id
+      ...req.body
     };
 
     const job = new Job(jobData);
@@ -390,10 +391,18 @@ router.get('/user/my-applications', auth, authorize('user'), async (req, res) =>
 // @access  Private (Company only)
 router.get('/company/my-jobs', auth, authorize('user', 'admin'), async (req, res) => {
   try {
-    const jobs = await Job.find({ company: req.user._id })
-      .populate('applications.user', 'profile.name profile.avatar')
-      .sort({ createdAt: -1 });
+    const companies = await Company.find({ companyowner: req.user._id })
+    .sort({ createdAt: -1 });
 
+    let jobs = [];
+    for(let i=0; i<companies.length; i++){
+      const job = await Job.find({company: companies[i]})
+      .populate('applications.user', 'profile.name profile.avatar')
+      jobs.push(job);
+    }
+
+    console.log("jobs : ", jobs);
+    
     res.status(200).json({ jobs });
   } catch (error) {
     console.error('Get my jobs error:', error);

@@ -9,9 +9,16 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     trim: true
   },
+   authProvider: {
+    type: String,
+    enum: ["credentials", "google"],
+    default: "credentials",
+  },
   password: {
     type: String,
-    required: true,
+   required: function() {
+    return this.authProvider === "credentials";
+  },
     minlength: 6
   },
   role: {
@@ -32,25 +39,6 @@ const userSchema = new mongoose.Schema({
     education: String,
     resume: String,
     avatar: String
-  },
-  company: {
-    name: {
-      type: String,
-    },
-    companyemail: {
-      type: String,
-    },
-    size: {
-      type: String,
-      enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'],
-    },
-    industry: {
-      type: String,
-    },
-    website: String,
-    description: String,
-    logo: String,
-    location: String
   },
   isVerified: {
     type: Boolean,
@@ -125,5 +113,14 @@ userSchema.methods.getPublicProfile = function() {
   delete userObject.password;
   return userObject;
 };
+
+userSchema.virtual("companies", {
+  ref: "Company",
+  localField: "_id",        // User _id
+  foreignField: "companyowner", // Match with Company.companyowner
+});
+
+userSchema.set("toObject", { virtuals: true });
+userSchema.set("toJSON", { virtuals: true });
 
 module.exports = mongoose.model('User', userSchema); 

@@ -31,7 +31,7 @@ const auth = async (req, res, next) => {
       return res.status(401).json({ error: 'Invalid token.' });
     }
 
-    const user = await User.findById(decoded.userId).select('-password');
+    const user = await User.findById(decoded.userId).select('-password').populate("companies");
     if (!user) {
       return res.status(401).json({ error: 'User not found.' });
     }

@@ -557,7 +557,7 @@ export default function CompanyProfilePage() {
               </div>
 
               {/* Mission & Culture */}
-              <div className="bg-white rounded-2xl border p-8">
+              {/* <div className="bg-white rounded-2xl border p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Mission & Culture</h2>
                 <div className="space-y-6">
                   <div>
@@ -569,7 +569,7 @@ export default function CompanyProfilePage() {
                     <p className="text-gray-700 leading-relaxed">{company.culture}</p>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Open Jobs */}
               <div className="bg-white rounded-2xl border p-8">
@@ -638,7 +638,7 @@ export default function CompanyProfilePage() {
               </div>
 
               {/* Benefits */}
-              <div className="bg-white rounded-2xl border p-6">
+              {/* <div className="bg-white rounded-2xl border p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Benefits & Perks</h3>
                 <div className="space-y-2">
                   {company.benefits.map((benefit, index) => (
@@ -648,7 +648,7 @@ export default function CompanyProfilePage() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </div> */}
 
               {/* Contact */}
               {company.contact && (

@@ -3,7 +3,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useUser } from "@/context/UserContext";
 import { useRouter } from 'next/navigation';
-import {User, Building2, Mail, Lock, Eye, EyeOff, Briefcase, Users } from 'lucide-react';
+import { signIn} from "next-auth/react";
+import { FcGoogle } from "react-icons/fc";
+import {Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 export default function AuthModal() {
   const { setUser} = useUser();
@@ -213,17 +215,20 @@ export default function AuthModal() {
               >
                 {authMode === 'signin' ? 'Sign In' : 'Create Account'}
               </button>
-
-              {/* Terms and Privacy (Sign Up Only) */}
-              {authMode === 'signup' && (
-                <p className="text-xs text-gray-600 text-center pb-2">
+            </form>
+             <button onClick={() => signIn("google", { callbackUrl: "/" })} className="w-full mt-2 flex items-center justify-center py-2 font-semibold mx-auto border rounded-lg">
+                <FcGoogle className="mr-2 size-5" />
+                {authMode === 'signin' ? 'Continue with Google' : 'Sign up with Google'}
+              </button>
+            {/* Terms and Privacy (Sign Up Only) */}
+            {authMode === 'signup' && (
+                <p className="text-xs text-gray-600 text-center mt-3 pb-2">
                   By creating an account, you agree to our{' '}
                   <a href="#" className="text-blue-600 hover:underline">Terms of Service</a>{' '}
                   and{' '}
                   <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>
                 </p>
               )}
-            </form>
           </div>
 
       </div>

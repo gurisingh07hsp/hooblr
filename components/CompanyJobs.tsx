@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-// import { useUser } from '@/context/UserContext';
+import { useUser } from '@/context/UserContext';
 import JobForm from './JobForm';
 import axios from 'axios';
 
@@ -51,7 +51,7 @@ interface Job {
 }
 
 const CompanyJobs = () => {
-//   const { user } = useUser();
+  const { user } = useUser();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [showJobForm, setShowJobForm] = useState(false);
@@ -69,7 +69,7 @@ const CompanyJobs = () => {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs/company/my-jobs`, {withCredentials:true});
       if (response.status == 200) {
         console.log(response.data.jobs);
-        setJobs(response.data.jobs);
+        setJobs(response.data.jobs[1]);
       }
     } catch (error) {
       console.error('Failed to fetch jobs:', error);
@@ -78,11 +78,11 @@ const CompanyJobs = () => {
     }
   };
 
-  // const handleJobSaved = () => {
-  //   setShowJobForm(false);
-  //   setEditingJob(null);
-  //   fetchJobs();
-  // };
+  const handleJobSaved = () => {
+    setShowJobForm(false);
+    setEditingJob(null);
+    fetchJobs();
+  };
 
   const handleEditJob = (job: Job) => {
     setEditingJob(job);
@@ -157,14 +157,23 @@ const CompanyJobs = () => {
 
   if (showJobForm) {
     return (
-      <JobForm
-        job={editingJob}
-        // onSave={handleJobSaved}
-        onCancel={() => {
-          setShowJobForm(false);
-          setEditingJob(null);
-        }}
-      />
+      <>
+      {user?.companies && user.companies.length > 0 ? (
+        <JobForm
+          job={editingJob}
+          onSave={handleJobSaved}
+          onCancel={() => {
+            setShowJobForm(false);
+            setEditingJob(null);
+          }}
+        />
+      ) : (
+        <div>
+          Create company before Posting the Job
+        </div>
+      )}
+
+      </>
     );
   }
 

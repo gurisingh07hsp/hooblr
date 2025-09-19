@@ -1,6 +1,7 @@
 const express = require('express');
 const { query, validationResult } = require('express-validator');
 const User = require('../models/User');
+const Company = require('../models/Company')
 const Job = require('../models/Job');
 const { auth,optionalAuth } = require('../middleware/auth');
 
@@ -105,27 +106,63 @@ router.get('/:id', optionalAuth, async (req, res) => {
   }
 });
 
-router.put('/profile', auth, async(req, res) => {
-  try {
-      const userId = req.user._id;
-      const { company } = req.body;
+// router.put('/profile', auth, async(req, res) => {
+//   try {
+//       const { company } = req.body;
 
-      const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { $set: { company } },
+//       const updatedUser = await Company.findByIdAndUpdate(
+//         company._id,
+//         { $set: { company } },
+//         { new: true, runValidators: true }
+//       );
+
+//       if (!updatedUser) {
+//         return res.status(404).json({ message: 'Company not found' });
+//       }
+
+//       res.status(200).json(updatedUser);
+//     } catch (error) {
+//       console.error('Error updating company profile:', error);
+//       res.status(500).json({ message: 'Internal server error' });
+//     }
+// })
+
+
+router.put('/profile', auth, async (req, res) => {
+  try {
+    const { company, id } = req.body;
+    const userId = req.user._id;
+
+    let updatedCompany;
+
+    if (id && id !== '') {
+      // ✅ Update existing company
+      updatedCompany = await Company.findByIdAndUpdate(
+        id,
+        { $set: company }, // update fields
         { new: true, runValidators: true }
       );
-
-      if (!updatedUser) {
-        return res.status(404).json({ message: 'Company not found' });
-      }
-
-      res.status(200).json(updatedUser);
-    } catch (error) {
-      console.error('Error updating company profile:', error);
-      res.status(500).json({ message: 'Internal server error' });
+    } else {
+      // ✅ Create new company with current user as owner
+      updatedCompany = new Company({
+        ...company,
+        companyowner: userId
+      });
+      await updatedCompany.save();
     }
-})
+
+    if (!updatedCompany) {
+      return res.status(404).json({ message: 'Company not found' });
+    }
+
+    res.status(200).json(updatedCompany);
+
+  } catch (error) {
+    console.error('Error updating company profile:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 
 // @route   GET /api/companies/:id/jobs
 // @desc    Get company's jobs

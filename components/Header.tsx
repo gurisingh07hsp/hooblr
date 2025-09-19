@@ -14,12 +14,10 @@ const Header = () => {
       const router = useRouter();
       const {user,isLoggedIn, setIsLoggedIn,logout} = useUser();
       const [isMenuOpen, setIsMenuOpen] = useState(false);
-      // const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
       const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
 
     const handleAuth = () => {
     setIsLoggedIn(true);
-    // setIsAuthModalOpen(false);
   };
 
   useEffect(()=>{

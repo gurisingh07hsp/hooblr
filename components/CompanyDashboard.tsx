@@ -66,11 +66,11 @@ const CompanyDashboard = () => {
           <div className="flex items-center">
             <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
               <span className="text-white font-bold text-sm">
-                {user?.company?.name?.charAt(0)?.toUpperCase() || 'C'}
+                {/* {user?.company?.name?.charAt(0)?.toUpperCase() || 'C'} */}
               </span>
             </div>
             <span className="ml-2 text-lg font-semibold text-gray-900">
-              {user?.company?.name || 'Company'}
+              {/* {user?.company?.name || 'Company'} */}
             </span>
           </div>
         </div>
@@ -116,7 +116,7 @@ const CompanyDashboardOverview = () => {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">
-          Welcome back to {user?.company?.name || 'Your Company'}!
+          {/* Welcome back to {user?.company?.name || 'Your Company'}! */}
         </h1>
         <p className="text-gray-600">Here&apos;s your recruitment overview for today.</p>
       </div>

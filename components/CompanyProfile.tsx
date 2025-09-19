@@ -4,26 +4,26 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@/context/UserContext';
 import axios from 'axios';
+import { Award, Building2, MapPin, Users } from 'lucide-react';
 
 interface CompanyProfileData {
+  _id?: string;
   name: string;
   companyemail: string;
   size: string;
   industry: string;
-  website: string;
-  description: string;
-  location: string;
-  currentPassword: string;
-  newPassword: string;
-  confirmPassword: string;
+  website?: string;
+  description?: string;
+  location?: string;
 }
 
 const CompanyProfile = () => {
   const { user, setUser} = useUser();
-  const [activeSection, setActiveSection] = useState('company');
+  const [activeSection, setActiveSection] = useState('companies');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [profileData, setProfileData] = useState<CompanyProfileData>({
+    _id: '',
     name: '',
     companyemail: '',
     size: '',
@@ -31,9 +31,6 @@ const CompanyProfile = () => {
     website: '',
     description: '',
     location: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
   });
 
   const companySizes = [
@@ -60,21 +57,19 @@ const CompanyProfile = () => {
   ];
 
   useEffect(() => {
-    if (user) {
+    if (activeSection == 'companies') {
       setProfileData({
-        name: user.company?.name || '',
-        companyemail: user.company?.companyemail || '',
-        size: user.company?.size || '',
-        industry: user.company?.industry || '',
-        website: user.company?.website || '',
-        description: user.company?.description || '',
-        location: user.company?.location || '',
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
+        _id: '',
+        name: '',
+        companyemail: '',
+        size: '',
+        industry: '',
+        website: '',
+        description: '',
+        location: ''
       });
     }
-  }, [user]);
+  }, [activeSection]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -96,12 +91,21 @@ const CompanyProfile = () => {
             website: profileData.website,
             description: profileData.description,
             location: profileData.location
-          }
+          }, id: profileData._id
         }, {withCredentials:true});
 
       if (response.status == 200) {
-        setUser(response.data);
         setMessage('Company profile updated successfully!');
+        setProfileData({
+        _id: '',
+        name: '',
+        companyemail: '',
+        size: '',
+        industry: '',
+        website: '',
+        description: '',
+        location: ''
+      });
       } else {
         const errorData = await response.data
         setMessage(errorData.message || 'Failed to update company profile');
@@ -113,56 +117,25 @@ const CompanyProfile = () => {
     }
   };
 
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage('');
-
-    if (profileData.newPassword !== profileData.confirmPassword) {
-      setMessage('New passwords do not match');
-      setLoading(false);
-      return;
-    }
-
-    if (profileData.newPassword.length < 6) {
-      setMessage('New password must be at least 6 characters long');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/company/password', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          currentPassword: profileData.currentPassword,
-          newPassword: profileData.newPassword,
-        }),
+  const handleEditCompany = async(company: CompanyProfileData) => {
+    if (user) {
+      setProfileData({
+        _id: company._id,
+        name: company.name || '',
+        companyemail: company.companyemail || '',
+        size: company.size || '',
+        industry: company.industry || '',
+        website: company?.website || '',
+        description: company?.description || '',
+        location: company.location || '',
       });
-
-      if (response.ok) {
-        setMessage('Password updated successfully!');
-        setProfileData(prev => ({
-          ...prev,
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: ''
-        }));
-      } else {
-        const errorData = await response.json();
-        setMessage(errorData.message || 'Failed to update password');
-      }
-    } catch (error) {
-      setMessage('An error occurred while updating password');
-    } finally {
-      setLoading(false);
+      setActiveSection('company');
     }
-  };
+  }
 
   const sections = [
-    { id: 'company', name: 'Company Information' }
+    { id: 'companies', name: 'Companies' },
+    { id: 'company', name: 'Create & Update' }
   ];
 
   return (
@@ -333,6 +306,78 @@ const CompanyProfile = () => {
                 </button>
               </div>
             </form>
+          )}
+
+
+          {activeSection === 'companies' && (
+            <div className="space-y-6">
+              {user?.companies && user?.companies?.length > 0 ? ( user?.companies?.map((company,index) => (
+                <div
+                  key={index}
+                  className={`bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 p-6 transition-all duration-300 transform hover:-translate-y-1`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start space-x-4 flex-1">
+                      <div className="w-16 h-16 bg-[#9333E9] rounded-xl flex items-center justify-center shadow-lg">
+                        <Building2 className="w-8 h-8 text-white" />
+                      </div>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <h3 className="text-xl font-bold text-gray-900 hover:text-purple-600 cursor-pointer transition-colors">
+                            {company?.name}
+                          </h3>
+                        </div>
+                        
+                        <div className="flex items-center space-x-4 text-gray-600 mb-3">
+                          <div className="flex items-center">
+                            <Award className="w-4 h-4 mr-1 text-purple-600" />
+                            <span className="font-medium text-sm">{company?.industry}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <MapPin className="w-4 h-4 mr-1 text-purple-600" />
+                            <span className="font-medium text-sm">{company?.location}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <Users className="w-4 h-4 mr-1 text-purple-600" />
+                            <span className="font-medium text-sm">{company?.size} employees</span>
+                          </div>
+                        </div>
+                        <p className="text-gray-700 mb-4 text-sm leading-relaxed">
+                          {company?.description}
+                        </p>
+                           <div className="flex gap-1">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditCompany(company);
+                        }}
+                        className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // handleDeleteJob(job._id);
+                        }}
+                        className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))) : (
+                <button onClick={()=> setActiveSection('company')} className='bg-purple-600 p-2 mx-auto'>Create Company</button>
+              )}
+            </div>
           )}
 
           {/* {activeSection === 'security' && (

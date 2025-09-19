@@ -52,13 +52,6 @@ router.post('/register', signupValidation, async (req, res) => {
       userData.profile = {
         name
       };
-    } else if (role === 'company') {
-      const company = {
-        name: companyName,
-        size: companySize,
-        industry
-      }
-      userData.company = company;
     }
 
     const user = new User(userData);
@@ -71,6 +64,33 @@ router.post('/register', signupValidation, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+router.post('/googlelogin', async(req,res) => {
+      try {
+    const { name, email,image } = req.body;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+       const userData = {
+        email,
+        avatar: image,
+        role: 'user',
+        authProvider: "google", // <-- new field
+      };
+      userData.profile = {
+        name
+      };
+      const user = new User(userData);
+      await user.save();
+    }
+    sendToken(user, 200, res);
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ err: 'Server error' });
+  }
+})
+
 
 // @route   POST /api/auth/login
 // @desc    Login user

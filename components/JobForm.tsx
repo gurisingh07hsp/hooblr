@@ -2,12 +2,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-// import { useUser } from '@/context/UserContext';
+import { useUser } from '@/context/UserContext';
 import { XMarkIcon, EyeIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 
 interface Job {
   _id?: string;
+  company?: string;
   title: string;
   description: string;
   requirements: string;
@@ -37,7 +38,7 @@ interface Job {
 
 interface JobFormProps {
   job?: Job | null;
-  // onSave: () => void;
+  onSave: (job: Job) => void;
   onCancel: () => void;
   className?: string;
 }
@@ -61,8 +62,8 @@ type InputProps = {
   onRemove: (index: number) => void;
 }
 
-const JobForm: React.FC<JobFormProps> = ({ job, onCancel, className = '' }) => {
-  // const { user } = useUser();
+const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = '' }) => {
+  const { user } = useUser();
   // const [loading, setLoading] = useState(false);
   // const [message, setMessage] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -70,6 +71,8 @@ const JobForm: React.FC<JobFormProps> = ({ job, onCancel, className = '' }) => {
   const [previewMode, setPreviewMode] = useState(false);
 
   const [formData, setFormData] = useState<Job>({
+    // _id: '',
+    company: '',
     title: '',
     description: '',
     requirements: '',
@@ -115,7 +118,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, onCancel, className = '' }) => {
   ];
 
   const formSteps = [
-    { id: 1, name: 'Basic Info', fields: ['title', 'department', 'category', 'type', 'location'] },
+    { id: 1, name: 'Basic Info', fields: ['company','title', 'department', 'category', 'type', 'location'] },
     { id: 2, name: 'Job Details', fields: ['description', 'responsibilities', 'requirements'] },
     { id: 3, name: 'Qualifications', fields: ['experience', 'education', 'skills'] },
     { id: 4, name: 'Compensation', fields: ['salary', 'benefits'] },
@@ -139,6 +142,9 @@ const JobForm: React.FC<JobFormProps> = ({ job, onCancel, className = '' }) => {
 
     stepFields.forEach(field => {
       switch (field) {
+        case 'company':
+          if(!formData.company?.trim()) newErrors.company = 'Company is required';
+          break;
         case 'title':
           if (!formData.title.trim()) newErrors.title = 'Job title is required';
           else if (formData.title.length < 3) newErrors.title = 'Job title must be at least 3 characters';
@@ -338,6 +344,26 @@ const JobForm: React.FC<JobFormProps> = ({ job, onCancel, className = '' }) => {
           <div className="space-y-6">
             <h3 className="text-lg font-medium text-gray-900">Basic Information</h3>
             
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Company*
+              </label>
+              <select
+                value={formData.company}
+                name='company'
+                onChange={handleInputChange}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.company ? 'border-red-300' : 'border-gray-300'
+                }`}
+              >
+                <option>Select Company</option>
+                {user?.companies?.map((company)=>(
+                  <option key={company._id} value={company._id}>{company.name}</option>
+                ))}
+              </select>
+              {errors.company && <p className="mt-1 text-sm text-red-600">{errors.company}</p>}
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Job Title *

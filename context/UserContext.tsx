@@ -4,6 +4,8 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { useRouter } from "next/navigation";
 import { IUser } from "@/types/user";
 import axios from "axios";
+import { signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 interface IUserContext {
   user: IUser | null;
@@ -20,6 +22,28 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);  
 
   const router = useRouter();
+  const { data: session } = useSession();
+
+  const googleRegister = async(session: any) => {
+    try{
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/googlelogin`, {
+          name: session.user.name,
+          email: session.user.email,
+          image: session.user.image,
+        }, {withCredentials: true});
+        if(res.status === 200){
+          setUser(res.data.user);
+        }
+    }catch{
+      console.log("Google Signin Error");
+    }
+  }
+
+    useEffect(() => {
+    if (session?.user) {
+      googleRegister(session);
+    }
+  }, [session]);
 
   const getProfile = async() =>{
     try{
@@ -51,6 +75,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }catch(error){
         console.log(error);
     }
+    signOut({ callbackUrl: "/" })
     
   };
 
