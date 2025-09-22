@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Building2, MapPin, Clock, DollarSign, ArrowLeft, Heart, Share2, X, CheckCircle } from 'lucide-react';
+import { Building2, MapPin, Clock, DollarSign, ArrowLeft, Heart, Share2, X, CheckCircle, IndianRupee, Euro } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import Footer from '@/components/Footer';
 import axios from 'axios';
@@ -12,7 +12,7 @@ type Salary = { min: number; max: number; currency: string; period: string };
 type Job = {
   _id: string;
   title: string;
-  company: {company: { _id: string; name: string; location?: string }};
+  company: { _id: string; name: string; location?: string };
   description: string;
   requirements: string;
   responsibilities?: string;
@@ -57,6 +57,7 @@ export default function JobDetailsPage() {
        const res = await fetch(`${API_BASE}/api/jobs/${id}`);
        if (!res.ok) throw new Error('Job not found');
        const data = await res.json();
+       console.log(data);
        setJob(data.job);
      } catch (e) {
        setError('Failed to load job');
@@ -81,7 +82,7 @@ export default function JobDetailsPage() {
     }
   },[job, user])
 
-  const formatSalary = (s: Salary) => `$${Math.round(s.min/1000)}k - $${Math.round(s.max/1000)}k ${s.period}`;
+  const formatSalary = (s: Salary) => `${Math.round(s.min/1000)}k - ${Math.round(s.max/1000)}k ${s.period}`;
 
   const submitApplication = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,6 +95,7 @@ export default function JobDetailsPage() {
         setResume('');
         setSubmitted(true);
         setShowApply(false);
+        fetchJob();
       }
       // refresh stats (applications count)
       fetchJob();
@@ -114,6 +116,19 @@ export default function JobDetailsPage() {
         setShowLoginPrompt(true);
       }
   }
+
+    const getCurrencyIcon = (currency: string) => {
+  switch (currency) {
+    case "USD":
+      return <DollarSign className="w-4 h-4 mr-1 text-purple-500" />;
+    case "INR":
+      return <IndianRupee className="w-4 h-4 mr-1 text-purple-500" />;
+    case "EUR":
+      return <Euro className="w-4 h-4 mr-1 text-purple-500" />;
+    default:
+      return <DollarSign className="w-4 h-4 mr-1 text-purple-500" />; // fallback
+  }
+};
 
   // if(showLoginPrompt){
   //   return (
@@ -210,10 +225,10 @@ export default function JobDetailsPage() {
             <div className="mb-4">
               <h1 className="text-3xl font-bold text-gray-900">{job.title}</h1>
               <div className="mt-3 flex flex-wrap items-center gap-4 text-gray-700">
-                <span className="flex items-center"><Building2 className="w-4 h-4 mr-2 text-purple-500" />{job.company.company.name}</span>
+                <span className="flex items-center"><Building2 className="w-4 h-4 mr-2 text-purple-500" />{job.company.name}</span>
                 <span className="flex items-center"><MapPin className="w-4 h-4 mr-2 text-purple-500" />{job.location}</span>
                 <span className="flex items-center"><Clock className="w-4 h-4 mr-2 text-purple-500" />{job.type.replace('-', ' ')}</span>
-                <span className="flex items-center"><DollarSign className="w-4 h-4 mr-1 text-purple-500" />{formatSalary(job.salary)}</span>
+                <span className="flex items-center">{getCurrencyIcon(job.salary.currency)}{formatSalary(job.salary)}</span>
               </div>
             </div>
             <div className="flex items-center gap-4">

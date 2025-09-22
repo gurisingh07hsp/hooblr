@@ -34,14 +34,14 @@ router.get('/', optionalAuth, [
     } = req.query;
 
     // Build filter object
-    const filter = { role: 'company', isActive: true };
+    const filter = {};
 
-    if (industry) filter['company.industry'] = industry;
-    if (size) filter['company.size'] = size;
+    if (industry) filter['industry'] = industry;
+    if (size) filter['size'] = size;
     if (search) {
       filter.$or = [
-        { 'company.name': { $regex: search, $options: 'i' } },
-        { 'company.description': { $regex: search, $options: 'i' } }
+        { 'name': { $regex: search, $options: 'i' } },
+        { 'description': { $regex: search, $options: 'i' } }
       ];
     }
 
@@ -51,15 +51,15 @@ router.get('/', optionalAuth, [
 
     const skip = (page - 1) * limit;
 
-    const companies = await User.find(filter)
-      .select('company email createdAt')
+    const companies = await Company.find(filter)
+      .populate('jobs')
       .sort(sortObj)
       .skip(skip)
       .limit(parseInt(limit));
 
-    const total = await User.countDocuments(filter);
+    const total = await Company.countDocuments(filter);
 
-    res.json({
+    res.status(200).json({
       companies,
       pagination: {
         page: parseInt(page),
@@ -79,9 +79,8 @@ router.get('/', optionalAuth, [
 // @access  Public
 router.get('/:id', optionalAuth, async (req, res) => {
   try {
-    const company = await User.findById(req.params.id)
-      .select('company email createdAt')
-      .where({ role: 'company', isActive: true });
+    const company = await Company.findById(req.params.id)
+
 
     if (!company) {
       return res.status(404).json({ error: 'Company not found' });
@@ -92,13 +91,15 @@ router.get('/:id', optionalAuth, async (req, res) => {
       company: req.params.id,
       status: 'active'
     })
-    .select('title location type category createdAt')
+    .select('title location type salary category createdAt')
     .sort({ createdAt: -1 })
     .limit(10);
 
+    console.log(jobs);
+
     res.json({
       company,
-      recentJobs: jobs
+      jobs
     });
   } catch (error) {
     console.error('Get company error:', error);

@@ -968,14 +968,14 @@ const JobPreview = ({
         </div>
         
         <div className="flex items-center gap-3">
-          <button
+          {/* <button
             type="button"
             onClick={() => setPreviewMode(true)}
             className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-900 transition-colors"
           >
             <EyeIcon className="w-5 h-5 mr-2" />
             Preview
-          </button>
+          </button> */}
           <button
             type="button"
             onClick={onCancel}
@@ -1003,7 +1003,7 @@ const JobPreview = ({
           {step.id}
         </div>
         {index < formSteps.length - 1 && (
-          <div className="w-16 h-1 bg-gray-300 mx-2">
+          <div className="lg:w-16 w-4 h-1 bg-gray-300 mx-2">
             <div
               className={`h-1 ${
                 index < currentStep - 1 ? 'bg-green-500' : 'bg-gray-300'

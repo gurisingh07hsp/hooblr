@@ -23,7 +23,7 @@ const DashboardLayout: React.FC<Props> = ({ children }) => {
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md flex flex-col justify-between">
+      <aside className="w-64 hidden bg-white shadow-md lg:flex flex-col justify-between">
         <div>
           <div className="p-4 font-bold text-xl">DemoOne</div>
           <nav className="flex flex-col space-y-2">

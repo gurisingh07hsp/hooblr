@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Search, 
@@ -17,9 +17,10 @@ import {
   Eye,
   Share2
 } from 'lucide-react';
+import axios from 'axios';
 
 interface Company {
-  id: number;
+  _id: number;
   name: string;
   logo?: string;
   industry: string;
@@ -28,109 +29,115 @@ interface Company {
   description: string;
   rating: number;
   reviewCount: number;
-  openJobs: number;
-  founded: string;
+  jobs: [];
+  // founded: string;
   website: string;
-  benefits: string[];
   featured?: boolean;
 }
 
 export default function CompaniesPage() {
   const router = useRouter();
-  const [companies] = useState<Company[]>([
-    {
-      id: 1,
-      name: "TechCorp Inc.",
-      industry: "Technology & IT",
-      location: "San Francisco, CA",
-      size: "1000-5000",
-      description: "Leading technology company specializing in cloud solutions and AI development. We're committed to innovation and creating products that make a difference.",
-      rating: 4.5,
-      reviewCount: 234,
-      openJobs: 15,
-      founded: "2010",
-      website: "techcorp.com",
-      benefits: ["Health Insurance", "401k Matching", "Flexible Hours", "Remote Work"],
-      featured: true
-    },
-    {
-      id: 2,
-      name: "Ministry of Finance",
-      industry: "Government & Public Sector",
-      location: "Washington, DC",
-      size: "5000+",
-      description: "Federal government agency responsible for economic policy, tax collection, and financial regulation. Offering stable careers in public service.",
-      rating: 4.2,
-      reviewCount: 156,
-      openJobs: 8,
-      founded: "1789",
-      website: "treasury.gov",
-      benefits: ["Federal Benefits", "Pension Plan", "Job Security", "Professional Development"]
-    },
-    {
-      id: 3,
-      name: "Creative Solutions",
-      industry: "Design & Creative",
-      location: "New York, NY",
-      size: "50-200",
-      description: "Award-winning creative agency helping brands tell their stories through innovative design and marketing campaigns.",
-      rating: 4.7,
-      reviewCount: 89,
-      openJobs: 6,
-      founded: "2015",
-      website: "creativesolutions.com",
-      benefits: ["Creative Freedom", "Health Insurance", "Bonus Structure", "Learning Budget"]
-    },
-    {
-      id: 4,
-      name: "DataTech Solutions",
-      industry: "Technology & IT",
-      location: "Seattle, WA",
-      size: "200-1000",
-      description: "Data analytics and machine learning company helping businesses make data-driven decisions with cutting-edge AI technology.",
-      rating: 4.4,
-      reviewCount: 178,
-      openJobs: 12,
-      founded: "2018",
-      website: "datatech.com",
-      benefits: ["Stock Options", "Health Insurance", "Learning Budget", "Flexible PTO"],
-      featured: true
-    },
-    {
-      id: 5,
-      name: "City General Hospital",
-      industry: "Healthcare & Medical",
-      location: "Chicago, IL",
-      size: "1000-5000",
-      description: "Leading healthcare provider committed to delivering exceptional patient care and advancing medical research.",
-      rating: 4.3,
-      reviewCount: 267,
-      openJobs: 22,
-      founded: "1965",
-      website: "citygeneralhospital.org",
-      benefits: ["Medical Benefits", "Retirement Plan", "Continuing Education", "Paid Time Off"]
-    },
-    {
-      id: 6,
-      name: "Department of Education",
-      industry: "Government & Public Sector",
-      location: "Austin, TX",
-      size: "1000-5000",
-      description: "State government agency focused on improving educational outcomes and supporting teachers and students across the state.",
-      rating: 4.1,
-      reviewCount: 134,
-      openJobs: 11,
-      founded: "1949",
-      website: "education.state.tx.us",
-      benefits: ["Government Benefits", "Pension", "Professional Development", "Work-Life Balance"]
-    }
-  ]);
+  const [companies, setCompanies] = useState<Company[]>([])
+  // const [companies] = useState<Company[]>([
+  //   {
+  //     id: 1,
+  //     name: "TechCorp Inc.",
+  //     industry: "Technology & IT",
+  //     location: "San Francisco, CA",
+  //     size: "1000-5000",
+  //     description: "Leading technology company specializing in cloud solutions and AI development. We're committed to innovation and creating products that make a difference.",
+  //     rating: 4.5,
+  //     reviewCount: 234,
+  //     openJobs: 15,
+  //     founded: "2010",
+  //     website: "techcorp.com",
+  //     benefits: ["Health Insurance", "401k Matching", "Flexible Hours", "Remote Work"],
+  //     featured: true
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Ministry of Finance",
+  //     industry: "Government & Public Sector",
+  //     location: "Washington, DC",
+  //     size: "5000+",
+  //     description: "Federal government agency responsible for economic policy, tax collection, and financial regulation. Offering stable careers in public service.",
+  //     rating: 4.2,
+  //     reviewCount: 156,
+  //     openJobs: 8,
+  //     founded: "1789",
+  //     website: "treasury.gov",
+  //     benefits: ["Federal Benefits", "Pension Plan", "Job Security", "Professional Development"]
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Creative Solutions",
+  //     industry: "Design & Creative",
+  //     location: "New York, NY",
+  //     size: "50-200",
+  //     description: "Award-winning creative agency helping brands tell their stories through innovative design and marketing campaigns.",
+  //     rating: 4.7,
+  //     reviewCount: 89,
+  //     openJobs: 6,
+  //     founded: "2015",
+  //     website: "creativesolutions.com",
+  //     benefits: ["Creative Freedom", "Health Insurance", "Bonus Structure", "Learning Budget"]
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "DataTech Solutions",
+  //     industry: "Technology & IT",
+  //     location: "Seattle, WA",
+  //     size: "200-1000",
+  //     description: "Data analytics and machine learning company helping businesses make data-driven decisions with cutting-edge AI technology.",
+  //     rating: 4.4,
+  //     reviewCount: 178,
+  //     openJobs: 12,
+  //     founded: "2018",
+  //     website: "datatech.com",
+  //     benefits: ["Stock Options", "Health Insurance", "Learning Budget", "Flexible PTO"],
+  //     featured: true
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "City General Hospital",
+  //     industry: "Healthcare & Medical",
+  //     location: "Chicago, IL",
+  //     size: "1000-5000",
+  //     description: "Leading healthcare provider committed to delivering exceptional patient care and advancing medical research.",
+  //     rating: 4.3,
+  //     reviewCount: 267,
+  //     openJobs: 22,
+  //     founded: "1965",
+  //     website: "citygeneralhospital.org",
+  //     benefits: ["Medical Benefits", "Retirement Plan", "Continuing Education", "Paid Time Off"]
+  //   },
+  //   {
+  //     id: 6,
+  //     name: "Department of Education",
+  //     industry: "Government & Public Sector",
+  //     location: "Austin, TX",
+  //     size: "1000-5000",
+  //     description: "State government agency focused on improving educational outcomes and supporting teachers and students across the state.",
+  //     rating: 4.1,
+  //     reviewCount: 134,
+  //     openJobs: 11,
+  //     founded: "1949",
+  //     website: "education.state.tx.us",
+  //     benefits: ["Government Benefits", "Pension", "Professional Development", "Work-Life Balance"]
+  //   }
+  // ]);
 
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>(companies);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIndustry, setSelectedIndustry] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
+
+  
+    // const [filters, setFilters] = useState({
+    //   size: '',
+    //   search: "",
+    // });
 
   const industries = [
     'Technology & IT',
@@ -161,6 +168,26 @@ export default function CompaniesPage() {
     '5000+'
   ];
 
+  const getCompanies = async() => {
+    try{
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies/`);
+      if(response.status == 200){
+        setCompanies(response.data.companies);
+        setFilteredCompanies(response.data.companies);
+      }
+    }catch(error){
+      console.log(error);
+    }
+  }
+
+  useEffect(()=>{
+    getCompanies();
+  },[])
+
+  useEffect(()=> {
+    console.log("companies : ", companies);
+  },[companies])
+
   const handleSearch = () => {
     let filtered = companies;
 
@@ -183,7 +210,7 @@ export default function CompaniesPage() {
       filtered = filtered.filter(company => company.size === selectedSize);
     }
 
-    setFilteredCompanies(filtered);
+      setFilteredCompanies(filtered);
   };
 
   React.useEffect(() => {
@@ -222,10 +249,10 @@ export default function CompaniesPage() {
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Company name or keyword"
+                    placeholder="Company name"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/90 backdrop-blur-sm"
+                    className="w-full pl-2 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/90 backdrop-blur-sm"
                   />
                 </div>
                 
@@ -267,7 +294,7 @@ export default function CompaniesPage() {
       {/* Stats Section */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-600 mb-1">{companies.length}</div>
               <div className="text-sm text-gray-600">Total Companies</div>
@@ -277,12 +304,8 @@ export default function CompaniesPage() {
               <div className="text-sm text-gray-600">Featured Companies</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600 mb-1">{companies.reduce((sum, c) => sum + c.openJobs, 0)}</div>
+              <div className="text-2xl font-bold text-purple-600 mb-1">{companies.reduce((sum, c) => sum + c.jobs?.length, 0)}</div>
               <div className="text-sm text-gray-600">Open Positions</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600 mb-1">4.3</div>
-              <div className="text-sm text-gray-600">Avg. Rating</div>
             </div>
           </div>
         </div>
@@ -327,7 +350,7 @@ export default function CompaniesPage() {
                   </div>
                 </div>
 
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">Rating</label>
                   <div className="space-y-2">
                     {[4, 3, 2, 1].map(rating => (
@@ -350,7 +373,7 @@ export default function CompaniesPage() {
                       </label>
                     ))}
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -361,7 +384,7 @@ export default function CompaniesPage() {
               <h2 className="text-xl font-bold text-gray-900">
                 {filteredCompanies.length} Companies Found
               </h2>
-              <div className="flex items-center space-x-4">
+              {/* <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-600">Sort by:</span>
                 <select className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white/80 backdrop-blur-sm">
                   <option>Most Popular</option>
@@ -369,13 +392,13 @@ export default function CompaniesPage() {
                   <option>Most Jobs</option>
                   <option>Company Name A-Z</option>
                 </select>
-              </div>
+              </div> */}
             </div>
 
             <div className="space-y-6">
               {filteredCompanies.map((company) => (
                 <div
-                  key={company.id}
+                  key={company._id}
                   className={`bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 p-6 transition-all duration-300 transform hover:-translate-y-1 ${
                     company.featured ? 'ring-2 ring-purple-500 ring-opacity-30 bg-gradient-to-r from-purple-50/50 to-indigo-50/50' : ''
                   }`}
@@ -414,22 +437,9 @@ export default function CompaniesPage() {
                         </div>
                         
                         <div className="flex items-center space-x-4 mb-3">
-                          <div className="flex items-center">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-4 h-4 ${
-                                  i < Math.floor(company.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                                }`}
-                              />
-                            ))}
-                            <span className="ml-2 text-sm text-gray-600 font-medium">
-                              {company.rating} ({company.reviewCount} reviews)
-                            </span>
-                          </div>
                           <div className="flex items-center text-green-600 font-medium">
                             <Briefcase className="w-4 h-4 mr-1" />
-                            <span className="text-sm">{company.openJobs} open jobs</span>
+                            <span className="text-sm">{company.jobs?.length} open jobs</span>
                           </div>
                         </div>
                         
@@ -437,29 +447,16 @@ export default function CompaniesPage() {
                           {company.description}
                         </p>
                         
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {company.benefits.slice(0, 3).map((benefit, index) => (
-                            <span
-                              key={index}
-                              className="bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-800 text-xs px-2 py-1 rounded-full font-medium"
-                            >
-                              {benefit}
-                            </span>
-                          ))}
-                          {company.benefits.length > 3 && (
-                            <span className="text-xs text-gray-500 font-medium">
-                              +{company.benefits.length - 3} more
-                            </span>
-                          )}
-                        </div>
                         
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
-                            <button className="bg-[#9333E9] text-white px-4 py-2 rounded-lg transition-all duration-300 font-semibold transform hover:-translate-y-1 text-sm">
+                            <button
+                              onClick={() => router.push(`/companies/${company._id}`)} 
+                              className="bg-[#9333E9] text-white px-4 py-2 rounded-lg transition-all duration-300 font-semibold transform hover:-translate-y-1 text-sm">
                               View Jobs
                             </button>
                             <button 
-                              onClick={() => router.push(`/companies/${company.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`)}
+                              onClick={() => router.push(`/companies/${company._id}`)}
                               className="text-purple-600 hover:text-purple-700 font-semibold flex items-center transition-colors text-sm"
                             >
                               Company Profile
@@ -477,10 +474,10 @@ export default function CompaniesPage() {
                             <button className="p-1.5 text-gray-400 hover:text-purple-600 transition-colors">
                               <Share2 className="w-4 h-4" />
                             </button>
-                            <div className="flex items-center space-x-1 text-xs text-gray-500">
+                            {/* <div className="flex items-center space-x-1 text-xs text-gray-500">
                               <Globe className="w-3 h-3" />
                               <span>Founded {company.founded}</span>
-                            </div>
+                            </div> */}
                           </div>
                         </div>
                       </div>
@@ -492,19 +489,19 @@ export default function CompaniesPage() {
 
             {filteredCompanies.length === 0 && (
               <div className="text-center py-16">
-                <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="w-24 h-24 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Building2 className="w-12 h-12 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">No companies found</h3>
-                <p className="text-gray-600 mb-8 text-lg">
+                {/* <p className="text-gray-600 mb-8 text-lg">
                   Try adjusting your search criteria or clearing the filters.
                 </p>
                 <button
                   onClick={clearFilters}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold shadow-lg"
+                  className="bg-gradient-to-r from-pur text-white px-8 py-3 rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold shadow-lg"
                 >
                   Clear Filters
-                </button>
+                </button> */}
               </div>
             )}
           </div>

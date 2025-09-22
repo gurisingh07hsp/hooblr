@@ -153,7 +153,7 @@ const CompanyJobs = () => {
 
   const filteredJobs = filterStatus === 'all' 
     ? jobs 
-    : jobs.filter(job => job.status === filterStatus);
+    : jobs?.filter(job => job.status === filterStatus);
 
   if (showJobForm) {
     return (
@@ -168,7 +168,7 @@ const CompanyJobs = () => {
           }}
         />
       ) : (
-        <div>
+        <div className='text-center mt-[25%] text-xl font-semibold'>
           Create company before Posting the Job
         </div>
       )}
@@ -223,7 +223,7 @@ const CompanyJobs = () => {
         </p>
 
         {/* Grid Layout for Documents */}
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-2 grid-cols-1 gap-6">
           {/* Cover Letter */}
           <div className="p-4 border rounded-lg bg-white shadow-sm overflow-auto">
             <h2 className="text-lg font-semibold mb-2 text-gray-700">
@@ -260,7 +260,7 @@ const CompanyJobs = () => {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="mb-8 flex justify-between items-center">
+      <div className="mb-8 flex lg:flex-row flex-col justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Job Management</h1>
           <p className="text-gray-600">Create, manage, and track your job postings.</p>
@@ -276,11 +276,11 @@ const CompanyJobs = () => {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
         {[
-          { label: 'Total Jobs', count: jobs.length, status: 'all' },
-          { label: 'Active', count: jobs.filter(j => j.status === 'active').length, status: 'active' },
-          { label: 'Paused', count: jobs.filter(j => j.status === 'paused').length, status: 'paused' },
-          { label: 'Closed', count: jobs.filter(j => j.status === 'closed').length, status: 'closed' },
-          { label: 'Draft', count: jobs.filter(j => j.status === 'draft').length, status: 'draft' },
+          { label: 'Total Jobs', count: jobs?.length, status: 'all' },
+          { label: 'Active', count: jobs?.filter(j => j.status === 'active').length, status: 'active' },
+          { label: 'Paused', count: jobs?.filter(j => j.status === 'paused').length, status: 'paused' },
+          { label: 'Closed', count: jobs?.filter(j => j.status === 'closed').length, status: 'closed' },
+          { label: 'Draft', count: jobs?.filter(j => j.status === 'draft').length, status: 'draft' },
         ].map((stat) => (
           <button
             key={stat.status}
@@ -297,7 +297,7 @@ const CompanyJobs = () => {
         ))}
       </div>
 
-      {filteredJobs.length === 0 ? (
+      {!filteredJobs ? (
         <div className="text-center py-12 bg-white rounded-lg shadow">
           <div className="w-24 h-24 mx-auto mb-4 text-gray-400">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -322,7 +322,7 @@ const CompanyJobs = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Jobs List */}
           <div className="lg:col-span-2 space-y-4">
-            {filteredJobs.map((job) => (
+            {filteredJobs?.map((job) => (
               <div
                 key={job._id}
                 onClick={() => setSelectedJob(job)}

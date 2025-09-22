@@ -317,8 +317,8 @@ const CompanyProfile = () => {
                   className={`bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 p-6 transition-all duration-300 transform hover:-translate-y-1`}
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-4 flex-1">
-                      <div className="w-16 h-16 bg-[#9333E9] rounded-xl flex items-center justify-center shadow-lg">
+                    <div className="flex flex-col lg:flex-row items-start space-x-4 flex-1">
+                      <div className="w-16 hidden h-16 bg-[#9333E9] rounded-xl lg:flex items-center justify-center shadow-lg">
                         <Building2 className="w-8 h-8 text-white" />
                       </div>
                       
@@ -329,7 +329,7 @@ const CompanyProfile = () => {
                           </h3>
                         </div>
                         
-                        <div className="flex items-center space-x-4 text-gray-600 mb-3">
+                        <div className="flex lg:flex-row flex-col lg:items-center lg:space-x-4 text-gray-600 mb-3">
                           <div className="flex items-center">
                             <Award className="w-4 h-4 mr-1 text-purple-600" />
                             <span className="font-medium text-sm">{company?.industry}</span>
@@ -375,77 +375,10 @@ const CompanyProfile = () => {
                   </div>
                 </div>
               ))) : (
-                <button onClick={()=> setActiveSection('company')} className='bg-purple-600 p-2 mx-auto'>Create Company</button>
+                <button onClick={()=> setActiveSection('company')} className='bg-purple-600 text-white rounded-lg p-2 mx-auto'>Create Company</button>
               )}
             </div>
           )}
-
-          {/* {activeSection === 'security' && (
-            <form onSubmit={handlePasswordSubmit} className="space-y-6">
-              <div className="max-w-md">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Change Password</h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                      Current Password
-                    </label>
-                    <input
-                      type="password"
-                      id="currentPassword"
-                      name="currentPassword"
-                      value={profileData.currentPassword}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                      New Password
-                    </label>
-                    <input
-                      type="password"
-                      id="newPassword"
-                      name="newPassword"
-                      value={profileData.newPassword}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      minLength={6}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                      Confirm New Password
-                    </label>
-                    <input
-                      type="password"
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      value={profileData.confirmPassword}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      minLength={6}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-6">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading ? 'Updating...' : 'Update Password'}
-                  </button>
-                </div>
-              </div>
-            </form>
-          )} */}
         </div>
       </div>
     </div>

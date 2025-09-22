@@ -163,7 +163,7 @@ router.get(
       const skip = (page - 1) * limit;
 
       const jobs = await Job.find(filter)
-        .populate("company", "name logo location")
+        .populate("company", "name location")
         .sort(sortObj)
         .skip(skip)
         .limit(parseInt(limit));
@@ -195,7 +195,7 @@ router.get(
 router.get('/:id', optionalAuth, async (req, res) => {
   try {
     const job = await Job.findById(req.params.id)
-      .populate('company', 'company.name company.logo company.location company.description')
+      .populate('company', 'name logo location description')
       .populate('applications.user', 'profile.firstName profile.lastName profile.avatar');
 
     if (!job) {
@@ -361,7 +361,7 @@ router.get('/user/my-applications', auth, authorize('user'), async (req, res) =>
     const jobs = await Job.find({
       'applications.user': req.user._id
     })
-    .populate('company', 'company.name company.logo')
+    .populate('company', 'name company')
     .select('title location type applications salary')
     .sort({ 'applications.appliedAt': -1 });
 

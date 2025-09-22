@@ -24,7 +24,7 @@ import { useUser } from '@/context/UserContext';
 interface Job {
   _id: string;
   title: string;
-  company: {company: {name: string}};
+  company: {name: string};
   location: string;
   type: string;
   salary: {min: string, max: string, currency: string, period: string};
@@ -192,7 +192,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
         case 'salary-low':
           return parseInt(a.salary.max) - parseInt(b.salary.max);
         case 'company':
-          return a.company.company?.name.localeCompare(b.company.company.name);
+          return a.company?.name.localeCompare(b.company.name);
         default:
           return 0;
       }
@@ -458,7 +458,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
                       <div className="flex items-center space-x-4 text-gray-600 mb-3">
                         <div className="flex items-center">
                           <Building2 className="w-4 h-4 mr-1 text-purple-500" />
-                          <span>{job.company?.company?.name}</span>
+                          <span>{job.company?.name}</span>
                         </div>
                         <div className="flex items-center">
                           <MapPin className="w-4 h-4 mr-1 text-purple-500" />

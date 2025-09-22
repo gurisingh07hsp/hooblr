@@ -10,10 +10,8 @@ interface Job {
   title: string;
   company: {
     _id: string;
-    company: {
-      name: string;
-      logo?: string;
-    };
+    name: string;
+    logo?: string;
   };
   location: string;
   type: string;
@@ -149,21 +147,21 @@ const UserJobs = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center">
                     <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mr-4">
-                      {job.company.company.logo ? (
+                      {job.company?.logo ? (
                         <img 
-                          src={job.company.company.logo} 
-                          alt={job.company.company.name}
+                          src={job.company?.logo} 
+                          alt={job.company?.name}
                           className="w-8 h-8 rounded"
                         />
                       ) : (
                         <span className="text-sm font-medium text-gray-600">
-                          {job.company.company.name.charAt(0)}
+                          {job.company?.name?.charAt(0)}
                         </span>
                       )}
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">{job.title}</h3>
-                      <p className="text-sm text-gray-600">{job.company.company.name}</p>
+                      <p className="text-sm text-gray-600">{job.company.name}</p>
                     </div>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(job.applicationStatus)}`}>
@@ -209,7 +207,7 @@ const UserJobs = () => {
                 <div className="flex items-start justify-between mb-6">
                   <div>
                     <h2 className="text-xl font-bold text-gray-900 mb-2">{selectedJob.title}</h2>
-                    <p className="text-gray-600">{selectedJob.company.company.name}</p>
+                    <p className="text-gray-600">{selectedJob.company.name}</p>
                     <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium capitalize mt-2 ${getStatusColor(selectedJob.applicationStatus)}`}>
                       {selectedJob.applicationStatus}
                     </span>
