@@ -25,7 +25,7 @@ router.get('/', optionalAuth, [
 
     const {
       page = 1,
-      limit = 10,
+      limit = 20,
       industry,
       size,
       search,
@@ -163,6 +163,17 @@ router.put('/profile', auth, async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+router.delete('/:id', auth, async(req, res) => {
+  try{ 
+    await Company.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({message: "Company Deleted successfully"});
+  }catch(error){
+    console.error('Error Deleting Company :', error);
+    res.status(500).json({message: 'Internal server error'});
+  }
+})
 
 
 // @route   GET /api/companies/:id/jobs

@@ -19,6 +19,8 @@ import {
   Shield,
   Share2
 } from 'lucide-react';
+import JobForm from './JobForm';
+import { useUser } from '@/context/UserContext';
 
 interface AdminPanelProps {
   isOpen: boolean;
@@ -36,6 +38,50 @@ interface Job {
   posted: string;
   applications: number;
   views: number;
+}
+
+interface Job1 {
+  _id: string;
+  title: string;
+  location: string;
+  requirements: string;
+  responsibilities: string;
+  description: string;
+  benefits: string[];
+  type: string;
+  category: string;
+  department: string;
+  status: 'active' | 'paused' | 'closed' | 'draft';
+  salary: {
+    min: number;
+    max: number;
+    currency: string;
+    period: string;
+  };
+  applications: Array<{
+    _id: string;
+    user: {
+      _id: string;
+      profile: {
+        name: string;
+      };
+    };
+    coverLetter: string;
+    resume: string;
+    status: 'pending' | 'reviewed' | 'shortlisted' | 'rejected' | 'hired';
+    appliedAt: string;
+  }>;
+  views: number;
+  createdAt: string;
+  applicationDeadline?: string;
+  isRemote: boolean;
+  skills: string[];
+  experience: string;
+  education: string;
+  isGovernment: boolean;
+  tags: string[];
+  featured: boolean;
+  urgent: boolean;
 }
 
 interface Company {
@@ -71,10 +117,12 @@ interface User {
 }
 
 export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
+  const {user} = useUser();
   const [activeTab, setActiveTab] = useState('dashboard');
-
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [showJobForm, setShowJobForm] = useState(false);
+  const [editingJob, setEditingJob] = useState<Job1 | null>(null);
 
   // Mock data
   const [jobs, setJobs] = useState<Job[]>([
@@ -212,6 +260,11 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
     }
   ]);
 
+    const handleJobSaved = () => {
+    setShowJobForm(false);
+    setEditingJob(null);
+  };
+
   const handleDelete = (type: string, id: string) => {
     if (type === 'job') {
       setJobs(jobs.filter(job => job.id !== id));
@@ -254,6 +307,29 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+
+    if (showJobForm) {
+    return (
+      <>
+      {user?.companies && user.companies.length > 0 ? (
+        <JobForm
+          job={editingJob}
+          onSave={handleJobSaved}
+          onCancel={() => {
+            setShowJobForm(false);
+            setEditingJob(null);
+          }}
+        />
+      ) : (
+        <div className='text-center mt-[25%] text-xl font-semibold'>
+          Create company before Posting the Job
+        </div>
+      )}
+
+      </>
+    );
+  }
 
   const renderDashboard = () => (
     <div className="space-y-6">

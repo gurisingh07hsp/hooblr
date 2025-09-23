@@ -257,14 +257,11 @@ router.put('/:id', auth, authorize('user', 'admin'), jobValidation, async (req, 
     }
 
     const job = await Job.findById(req.params.id);
+
     if (!job) {
       return res.status(404).json({ error: 'Job not found' });
     }
 
-    // Check if user owns the job or is admin
-    if (req.user.role !== 'admin' && job.company.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ error: 'Not authorized to update this job' });
-    }
 
     const updatedJob = await Job.findByIdAndUpdate(
       req.params.id,
@@ -293,9 +290,6 @@ router.delete('/:id', auth, authorize('user', 'admin'), async (req, res) => {
     }
 
     // Check if user owns the job or is admin
-    if (req.user.role !== 'admin' && job.company.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ error: 'Not authorized to delete this job' });
-    }
 
     await Job.findByIdAndDelete(req.params.id);
 
@@ -395,13 +389,13 @@ router.get('/company/my-jobs', auth, authorize('user', 'admin'), async (req, res
     .sort({ createdAt: -1 });
 
     let jobs = [];
-    for(let i=0; i<companies.length; i++){
-      const job = await Job.find({company: companies[i]})
+  jobs = await Promise.all(
+    companies.map(async (company) => {
+      const job = await Job.find({company: company._id})
       .populate('applications.user', 'profile.name profile.avatar')
-      jobs.push(job);
-    }
-
-    console.log("jobs : ", jobs);
+      return job;
+    })
+  );
     
     res.status(200).json({ jobs });
   } catch (error) {

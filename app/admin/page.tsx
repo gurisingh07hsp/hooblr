@@ -108,7 +108,7 @@ export default function AdminPage() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-  const [modalType] = useState<'job' | 'company' | 'blog' | 'user'>('blog');
+  const [modalType] = useState<'job' | 'company' | 'blog' | 'user'>('job');
   
   // Blog editor states
   const [isBlogEditorOpen, setIsBlogEditorOpen] = useState(false);
@@ -572,7 +572,7 @@ export default function AdminPage() {
   };
 
   const renderEditModal = () => {
-    if (!selectedItem) return null;
+    // if (!selectedItem) return null;
 
     return (
       <EditModal 
@@ -958,7 +958,7 @@ export default function AdminPage() {
         <div className="bg-white/80 backdrop-blur-sm p-5 rounded-xl border border-purple-200">
           <h3 className="text-lg font-semibold mb-4 text-gray-900">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-3">
-            <button className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1">
+            <button onClick={()=> {setIsEditModalOpen(true); }} className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1">
               Add Job
             </button>
             <button className="p-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1">

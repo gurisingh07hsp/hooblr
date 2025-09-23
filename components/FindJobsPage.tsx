@@ -455,7 +455,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
                         )}
                       </div>
                       
-                      <div className="flex items-center space-x-4 text-gray-600 mb-3">
+                      <div className="flex flex-wrap items-center space-x-4 text-gray-600 mb-3">
                         <div className="flex items-center">
                           <Building2 className="w-4 h-4 mr-1 text-purple-500" />
                           <span>{job.company?.name}</span>

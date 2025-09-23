@@ -18,7 +18,7 @@ interface CompanyProfileData {
 }
 
 const CompanyProfile = () => {
-  const { user, setUser} = useUser();
+  const { user} = useUser();
   const [activeSection, setActiveSection] = useState('companies');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -116,6 +116,22 @@ const CompanyProfile = () => {
       setLoading(false);
     }
   };
+
+
+  const handleDeleteCompnay = async(id: string) => {
+    if (!confirm('Are you sure you want to delete this company? This action cannot be undo.')) {
+      return;
+    }
+    try{
+      const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies/${id}`, {withCredentials:true});
+      if(response.status == 200){
+        setMessage(response.data.message);
+      }
+    }catch(error){
+      console.error(error);
+      setMessage("Failed to Delete Company");
+    }
+  }
 
   const handleEditCompany = async(company: CompanyProfileData) => {
     if (user) {
@@ -361,7 +377,7 @@ const CompanyProfile = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          // handleDeleteJob(job._id);
+                          handleDeleteCompnay(company._id);
                         }}
                         className="p-1 text-gray-400 hover:text-red-600 transition-colors"
                       >

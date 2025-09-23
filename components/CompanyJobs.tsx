@@ -53,6 +53,7 @@ interface Job {
 const CompanyJobs = () => {
   const { user } = useUser();
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [showJobForm, setShowJobForm] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
@@ -69,7 +70,7 @@ const CompanyJobs = () => {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs/company/my-jobs`, {withCredentials:true});
       if (response.status == 200) {
         console.log(response.data.jobs);
-        setJobs(response.data.jobs[1]);
+        setJobs(response.data.jobs);
       }
     } catch (error) {
       console.error('Failed to fetch jobs:', error);
@@ -87,10 +88,11 @@ const CompanyJobs = () => {
   const handleEditJob = (job: Job) => {
     setEditingJob(job);
     setShowJobForm(true);
+    fetchJobs();
   };
 
   const handleDeleteJob = async (jobId: string) => {
-    if (!confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
+    if (!confirm('Are you sure you want to delete this job? This action cannot be undo.')) {
       return;
     }
 
@@ -98,38 +100,20 @@ const CompanyJobs = () => {
       const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs/${jobId}`, {withCredentials:true});
 
       if (response.status === 200) {
-        setJobs(jobs.filter(job => job._id !== jobId));
+        fetchJobs();
+        setMessage(response.data.message);
         if (selectedJob?._id === jobId) {
           setSelectedJob(null);
         }
       } else {
-        alert('Failed to delete job');
+        setMessage('Failed to delete job');
       }
     } catch (error) {
       console.error('Failed to delete job:', error);
-      alert('Failed to delete job');
+      setMessage('Failed to delete job');
     }
   };
 
-  const handleStatusChange = async (jobId: string, newStatus: string) => {
-    try {
-      const response = await fetch(`/api/company/jobs/${jobId}/status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      if (response.ok) {
-        setJobs(jobs.map(job => 
-          job._id === jobId ? { ...job, status: newStatus as any } : job
-        ));
-      }
-    } catch (error) {
-      console.error('Failed to update job status:', error);
-    }
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -153,7 +137,7 @@ const CompanyJobs = () => {
 
   const filteredJobs = filterStatus === 'all' 
     ? jobs 
-    : jobs?.filter(job => job.status === filterStatus);
+    : jobs?.flat().filter(job => job.status === filterStatus);
 
   if (showJobForm) {
     return (
@@ -177,7 +161,6 @@ const CompanyJobs = () => {
     );
   }
 
-  console.log("selected : ", selectedJob);
 
   if(showApplications){
     return (
@@ -194,7 +177,7 @@ const CompanyJobs = () => {
 
   {/* Applications List */}
   <div className="space-y-6">
-    {selectedJob?.applications.map((app, index) => (
+    {selectedJob && selectedJob?.applications?.length > 0 ? ( selectedJob?.applications.map((app, index) => (
       <div
         key={index}
         className="p-6 border rounded-xl bg-gray-50 shadow-md hover:shadow-lg transition"
@@ -243,7 +226,11 @@ const CompanyJobs = () => {
           </div>
         </div>
       </div>
-    ))}
+    ))) : (
+      <div>
+        No Applications Found.
+      </div>
+    )}
   </div>
 </div>
 
@@ -273,14 +260,24 @@ const CompanyJobs = () => {
         </button>
       </div>
 
+         {message && (
+        <div className={`mb-6 p-4 rounded-lg ${
+          message.includes('successfully') 
+            ? 'bg-green-100 text-green-700 border border-green-200'
+            : 'bg-red-100 text-red-700 border border-red-200'
+        }`}>
+          {message}
+        </div>
+      )}
+
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
         {[
           { label: 'Total Jobs', count: jobs?.length, status: 'all' },
-          { label: 'Active', count: jobs?.filter(j => j.status === 'active').length, status: 'active' },
-          { label: 'Paused', count: jobs?.filter(j => j.status === 'paused').length, status: 'paused' },
-          { label: 'Closed', count: jobs?.filter(j => j.status === 'closed').length, status: 'closed' },
-          { label: 'Draft', count: jobs?.filter(j => j.status === 'draft').length, status: 'draft' },
+          { label: 'Active', count: jobs?.flat().filter(j => j.status === 'active').length, status: 'active' },
+          { label: 'Paused', count: jobs?.flat().filter(j => j.status === 'paused').length, status: 'paused' },
+          { label: 'Closed', count: jobs?.flat().filter(j => j.status === 'closed').length, status: 'closed' },
+          { label: 'Draft', count: jobs?.flat().filter(j => j.status === 'draft').length, status: 'draft' },
         ].map((stat) => (
           <button
             key={stat.status}
@@ -322,7 +319,7 @@ const CompanyJobs = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Jobs List */}
           <div className="lg:col-span-2 space-y-4">
-            {filteredJobs?.map((job) => (
+            {filteredJobs?.flat()?.map((job) => (
               <div
                 key={job._id}
                 onClick={() => setSelectedJob(job)}
@@ -390,7 +387,7 @@ const CompanyJobs = () => {
 
                 <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
                   <div className="text-center">
-                    <div className="text-lg font-semibold text-gray-900">{job.applications.length}</div>
+                    <div className="text-lg font-semibold text-gray-900">{job?.applications?.length}</div>
                     <div className="text-xs text-gray-500">Applications</div>
                   </div>
                   <div className="text-center">
@@ -399,7 +396,7 @@ const CompanyJobs = () => {
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-semibold text-gray-900">
-                      {job.applications.filter(app => app.status === 'shortlisted').length}
+                      {job.applications?.filter(app => app.status === 'shortlisted').length}
                     </div>
                     <div className="text-xs text-gray-500">Shortlisted</div>
                   </div>
@@ -475,18 +472,7 @@ const CompanyJobs = () => {
                   </div>
                 </div>
 
-                <div className="space-y-3 pt-4 border-t border-gray-200">
-                  <select
-                    value={selectedJob.status}
-                    onChange={(e) => handleStatusChange(selectedJob._id, e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="active">Active</option>
-                    <option value="paused">Paused</option>
-                    <option value="closed">Closed</option>
-                    <option value="draft">Draft</option>
-                  </select>
-                  
+                <div className="space-y-3 pt-4 border-t border-gray-200">             
                   <button
                     onClick={() => handleEditJob(selectedJob)}
                     className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"

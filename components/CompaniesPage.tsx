@@ -128,16 +128,17 @@ export default function CompaniesPage() {
   // ]);
 
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>(companies);
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedIndustry, setSelectedIndustry] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
-  const [selectedSize, setSelectedSize] = useState('');
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   
-    // const [filters, setFilters] = useState({
-    //   size: '',
-    //   search: "",
-    // });
+    const [filters, setFilters] = useState({
+      size: '',
+      search: "",
+    });
 
   const industries = [
     'Technology & IT',
@@ -161,18 +162,32 @@ export default function CompaniesPage() {
   ];
 
   const companySizes = [
-    '1-50',
-    '50-200',
-    '200-1000',
-    '1000-5000',
-    '5000+'
+    '1-10',
+    '11-50',
+    '51-200',
+    '201-500',
+    '501-1000',
+    '1000+'
   ];
 
-  const getCompanies = async() => {
+  const getCompanies = async(pageNumber: number, filters: any) => {
     try{
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies/`);
+      const params = new URLSearchParams({
+        page: String(pageNumber),
+        limit: "20",
+        location: selectedLocation,
+        industry: selectedIndustry,
+        ...(filters.size && { size: filters.size }),
+        ...(filters.search && { search: filters.search }),
+      });
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies/?${params.toString()}`);
+
+
       if(response.status == 200){
-        setCompanies(response.data.companies);
+      const newCompanies = response.data.companies;
+      setCompanies(response.data.companies);
+      setFilteredCompanies((prev) => (pageNumber === 1 ? newCompanies : [...prev, ...newCompanies]));
+      setHasMore(pageNumber < response.data.pagination.pages);
         setFilteredCompanies(response.data.companies);
       }
     }catch(error){
@@ -180,86 +195,91 @@ export default function CompaniesPage() {
     }
   }
 
-  useEffect(()=>{
-    getCompanies();
-  },[])
+    // Reload jobs when filters change
+    useEffect(() => {
+      setPage(1);
+      getCompanies(1, filters);
+    }, [filters,selectedIndustry, selectedLocation]);
+  
+    // Infinite scroll
+    useEffect(() => {
+      if (!hasMore || loading) return;
+  
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            setPage((prev) => prev + 1);
+          }
+        },
+        { threshold: 1 }
+      );
+  
+      const el = document.getElementById("load-more");
+      if (el) observer.observe(el);
+  
+      return () => {
+        const el = document.getElementById("load-more");
+        if (el) observer.unobserve(el);
+      };
+    }, [hasMore, loading]);
+  
+    useEffect(() => {
+      if (page > 1) {
+        getCompanies(page, filters);
+      }
+    }, [page]);
+
 
   useEffect(()=> {
     console.log("companies : ", companies);
   },[companies])
 
-  const handleSearch = () => {
-    let filtered = companies;
-
-    if (searchTerm) {
-      filtered = filtered.filter(company =>
-        company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        company.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (selectedIndustry) {
-      filtered = filtered.filter(company => company.industry === selectedIndustry);
-    }
-
-    if (selectedLocation) {
-      filtered = filtered.filter(company => company.location === selectedLocation);
-    }
-
-    if (selectedSize) {
-      filtered = filtered.filter(company => company.size === selectedSize);
-    }
-
-      setFilteredCompanies(filtered);
-  };
-
-  React.useEffect(() => {
-    handleSearch();
-  }, [searchTerm, selectedIndustry, selectedLocation, selectedSize]);
 
   const clearFilters = () => {
-    setSearchTerm('');
-    setSelectedIndustry('');
     setSelectedLocation('');
-    setSelectedSize('');
+    setSelectedIndustry('');
+    setFilters({
+      size: "",
+      search: "",
+    });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl"></div>
+      <div className="relative overflow-hidden bg-white/80">
+        {/* <div className="absolute inset-0"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full blur-3xl"></div> */}
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Discover Amazing Companies
             </h1>
-            <p className="text-lg text-purple-100 mb-6 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
               Explore top companies from innovative startups to established government agencies. 
               Find your perfect workplace and build your career.
             </p>
             
             {/* Search Section */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 max-w-3xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-purple-200 shadow-lg max-w-3xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="text"
                     placeholder="Company name"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-2 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/90 backdrop-blur-sm"
+                    value={filters.search}
+                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                    className="w-full pl-2 py-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/90 backdrop-blur-sm"
                   />
                 </div>
                 
                 <select
                   value={selectedIndustry}
                   onChange={(e) => setSelectedIndustry(e.target.value)}
-                  className="px-3 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/90 backdrop-blur-sm"
+                  className="px-3 py-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/90 backdrop-blur-sm"
                 >
                   <option value="">All Industries</option>
                   {industries.map(industry => (
@@ -270,21 +290,13 @@ export default function CompaniesPage() {
                 <select
                   value={selectedLocation}
                   onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="px-3 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/90 backdrop-blur-sm"
+                  className="px-3 py-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/90 backdrop-blur-sm"
                 >
                   <option value="">All Locations</option>
                   {locations.map(location => (
                     <option key={location} value={location}>{location}</option>
                   ))}
                 </select>
-                
-                <button 
-                  onClick={handleSearch}
-                  className="bg-[#9333E9] text-white px-4 py-3 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center transform hover:-translate-y-1"
-                >
-                  <Search className="w-4 h-4 mr-2" />
-                  Search
-                </button>
               </div>
             </div>
           </div>
@@ -292,7 +304,7 @@ export default function CompaniesPage() {
       </div>
 
       {/* Stats Section */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-y border-purple-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
@@ -333,21 +345,22 @@ export default function CompaniesPage() {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">Company Size</label>
-                  <div className="space-y-2">
-                    {companySizes.map(size => (
-                      <label key={size} className="flex items-center cursor-pointer hover:bg-purple-50 p-2 rounded-lg transition-colors">
+
+                  {companySizes.map(
+                    (t) => (
+                      <label key={t} className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
                         <input
                           type="radio"
-                          name="companySize"
-                          value={size}
-                          checked={selectedSize === size}
-                          onChange={(e) => setSelectedSize(e.target.value)}
+                          name="size"
+                          value={t}
+                          checked={filters.size === t}
+                          onChange={(e) => setFilters({ ...filters, size: e.target.value })}
                           className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                         />
-                        <span className="ml-2 text-sm text-gray-700">{size} employees</span>
+                        <span className="ml-2 text-sm text-gray-700">{t} employees</span>
                       </label>
-                    ))}
-                  </div>
+                    )
+                  )}
                 </div>
 
                 {/* <div>
@@ -404,13 +417,13 @@ export default function CompaniesPage() {
                   }`}
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-4 flex-1">
+                    <div className="flex flex-col items-start space-x-4 flex-1">
+                      <div className='flex'>
                       <div className="w-16 h-16 bg-[#9333E9] rounded-xl flex items-center justify-center shadow-lg">
                         <Building2 className="w-8 h-8 text-white" />
                       </div>
                       
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
+                        <div className="flex ms-4 items-center space-x-3 mb-2">
                           <h3 className="text-xl font-bold text-gray-900 hover:text-purple-600 cursor-pointer transition-colors">
                             {company.name}
                           </h3>
@@ -420,8 +433,10 @@ export default function CompaniesPage() {
                             </span>
                           )}
                         </div>
+                      </div>
                         
-                        <div className="flex items-center space-x-4 text-gray-600 mb-3">
+                      <div className="flex-1 mt-2">
+                        <div className="flex flex-wrap items-center space-x-4 text-gray-600 mb-3">
                           <div className="flex items-center">
                             <Award className="w-4 h-4 mr-1 text-purple-600" />
                             <span className="font-medium text-sm">{company.industry}</span>
@@ -486,6 +501,10 @@ export default function CompaniesPage() {
                 </div>
               ))}
             </div>
+
+            {loading && <p>Loading...</p>}
+              <div id="load-more" className="h-10"></div>
+              {!hasMore && <p className="text-gray-500 ms-4">No more jobs</p>}
 
             {filteredCompanies.length === 0 && (
               <div className="text-center py-16">
