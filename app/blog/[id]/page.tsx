@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import Footer from '@/components/Footer';
 import { ArrowLeft, Calendar, User, Eye, Heart, Share2, Bookmark, Clock, Tag, Shield } from 'lucide-react';
+import Image from 'next/image';
 
 interface BlogPost {
   id: string;
@@ -218,10 +219,11 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
               className="flex items-center cursor-pointer"
               onClick={() => router.push('/')}
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg mr-3">
+              {/* <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg mr-3">
                 <Shield className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-bold text-gray-900">Hooblr</span>
+              <span className="text-2xl font-bold text-gray-900">Hooblr</span> */}
+              <Image src='/hooblrlogo.png' width={120} height={50} alt='logo'/>
             </div>
             
             <div className="hidden md:flex items-center space-x-8">

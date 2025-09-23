@@ -13,6 +13,7 @@ import {
   ArrowUp,
   Heart
 } from 'lucide-react';
+import Image from 'next/image';
 
 const Footer = () => {
   const scrollToTop = () => {
@@ -26,13 +27,14 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="lg:col-span-1">
-            <div className="flex items-center mb-6">
+            {/* <div className="flex items-center mb-6">
               <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg mr-3">
                 <Shield className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-bold">Hooblr</span>
-            </div>
-            <p className="text-purple-100 mb-6 leading-relaxed">
+            </div> */}
+            <Image src='/hooblrlogo.png' width={120} height={50} alt='logo'/>
+            <p className="text-purple-100 mt-2 mb-6 leading-relaxed">
               The most trusted platform for government careers. Connect with thousands of opportunities 
               across federal, state, and local government agencies with Hooblr.
             </p>

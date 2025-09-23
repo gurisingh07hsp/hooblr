@@ -10,6 +10,7 @@ import {
   Shield,
 } from 'lucide-react';
 import PostJobModal from './PostJobModal';
+import Image from 'next/image';
 const Header = () => {
       const router = useRouter();
       const {user,isLoggedIn, setIsLoggedIn,logout} = useUser();
@@ -44,10 +45,7 @@ const Header = () => {
               className="flex items-center cursor-pointer"
               onClick={() => router.push('/')}
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg mr-3">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-gray-900">Hooblr</span>
+            <Image src='/hooblrlogo.png' width={120} height={50} alt='logo'/>
             </div>
 
             {/* Desktop Navigation */}
