@@ -2,387 +2,948 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Shield, LogOut, ArrowLeft, X, Save, Plus } from 'lucide-react';
+import { Shield, LogOut, ArrowLeft, X, Save, Plus, Eye, Edit, Trash2, Building, Briefcase, Users, Settings, BarChart3, FileText, Menu, Search } from 'lucide-react';
 import BlogPostEditor from '../../components/BlogPostEditor';
 import Footer from '@/components/Footer';
 import { useUser } from '@/context/UserContext';
+import axios from 'axios';
 
-interface Job {
-  id: string;
-  title: string;
-  company: string;
+// Enhanced interfaces
+interface Company {
+  _id: string;
+  name: string;
+  companyemail: string;
+  companyowner: {
+    _id: string;
+    profile?: {
+      name: string;
+    };
+  };
+  size: '1-10' | '11-50' | '51-200' | '201-500' | '501-1000' | '1000+';
+  industry: string;
+  website?: string;
+  description?: string;
+  logo?: string;
   location: string;
-  type: string;
-  salary: string;
-  status: 'active' | 'inactive' | 'pending';
-  posted: string;
-  applications: number;
-  views: number;
+  createdAt: string;
+  jobs?: any[];
 }
 
-interface Company {
-  id: string;
-  name: string;
-  industry: string;
-  size: string;
+interface Job {
+  _id: string;
+  title: string;
+  company: Company;
+  description: string;
+  requirements: string;
+  responsibilities: string;
   location: string;
-  status: 'verified' | 'pending' | 'suspended';
-  jobsCount: number;
-  joined: string;
+  type: 'Full-time' | 'Part-time' | 'Contract' | 'Temporary' | 'Internship';
+  category: string;
+  department: string;
+  salary: {
+    min: number;
+    max: number;
+    currency: string;
+    period: 'hourly' | 'monthly' | 'yearly';
+  };
+  benefits: string[];
+  skills: string[];
+  experience: 'Entry-level' | 'Mid-level' | 'Senior-level' | 'Executive';
+  education: 'high-school' | 'associate' | 'bachelor' | 'master' | 'phd';
+  status: 'active' | 'paused' | 'closed' | 'draft';
+  isRemote: boolean;
+  isGovernment: boolean;
+  applicationDeadline?: string;
+  views: number;
+  applications: any[];
+  tags: string[];
+  featured: boolean;
+  urgent: boolean;
+  createdAt: string;
 }
 
 interface BlogPost {
-  id?: string;
+  _id?: string;
   title: string;
+  slug?: string;
   author: string;
-  category: string;
-  status: 'published' | 'draft' | 'archived';
-  published?: string;
+  content: string;
+  excerpt: string;
+  category: 'Interview Tips' | 'Workplace' | 'Government Jobs' | 'Career Growth' | 'Networking' | 'Salary Guide' | 'Resume Tips' | 'Industry News' | string;
+  tags: string[];
+  featuredImage: string;
+  status: 'draft' | 'published' | 'archived';
+  publishedAt?: string;
   views?: number;
   likes?: number;
-  content: string;
-  excerpt?: string;
-  tags?: string[];
-  featuredImage?: string;
+  comments?: any[];
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string[];
+  };
+  featured?: boolean;
+  readTime?: number;
+  createdAt?: string;
 }
 
 interface User {
-  id: string;
-  name: string;
+  _id: string;
   email: string;
-  role: 'user' | 'company' | 'admin';
-  status: 'active' | 'inactive' | 'suspended';
-  joined: string;
-  lastLogin: string;
-}
-
-
-interface Admin {
-  name: string | undefined;
-  email: string;
-  role: string;
-}
-
-type Status = "active" | "inactive" | "draft" | "pending" | "archived";
-
-// ------------------- POST -------------------
-interface Item {
-  type: string;
-  title: string;
-  author: string;
-  category: string;
-  status: Status;
-  views?: number;
-  likes?: number;
-  published?: string;
-  featuredImage?: string;
-  excerpt?: string;
-  content: string;
-  tags?: string[];
-  company: string;
-  location: string;
-  salary?: string;
-  applications: number;
-  posted: string;
-  industry: string;
-  size: string; // could make this enum if you want
-  jobsCount: number;
-  name: string;
-  email: string;
-  role: "user" | "company" | "admin";
-  joined: string;
+  authProvider: 'credentials' | 'google';
+  role: 'user' | 'admin';
+  profile?: {
+    name?: string;
+    phone?: string;
+    location?: string;
+    bio?: string;
+    skills?: string[];
+    experience?: string;
+    education?: string;
+    resume?: string;
+    avatar?: string;
+  };
+  isVerified: boolean;
+  isActive: boolean;
   lastLogin?: string;
+  preferences: {
+    jobAlerts: boolean;
+    emailNotifications: boolean;
+  };
+  savedJobs: string[];
+  jobAlerts: any[];
+  createdAt: string;
 }
-
-
 
 export default function AdminPage() {
   const router = useRouter();
-  const {user, logout} = useUser();
+  const { user, logout } = useUser();
+  
+  // State management
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [adminUser, setAdminUser] = useState<Admin | null>(null);
-  // Modal states
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-  const [modalType] = useState<'job' | 'company' | 'blog' | 'user'>('job');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
+  // Data states
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  
+  // Modal states
+  const [modalState, setModalState] = useState({
+    type: null as 'company' | 'job' | 'blog' | 'user' | null,
+    mode: null as 'create' | 'edit' | 'view' | null,
+    isOpen: false,
+    data: null as any
+  });
+
   // Blog editor states
-  const [isBlogEditorOpen, setIsBlogEditorOpen] = useState(false);
-  const [blogEditorMode, setBlogEditorMode] = useState<'create' | 'edit'>('create');
-  const [selectedBlogPost, setSelectedBlogPost] = useState<BlogPost | null>(null);
+  const [blogEditorState, setBlogEditorState] = useState({
+    isOpen: false,
+    mode: 'create' as 'create' | 'edit',
+    post: null as BlogPost | null
+  });
 
-  // Mock data
-  const [jobs, setJobs] = useState<Job[]>([
-    {
-      id: '1',
-      title: 'Senior Software Engineer',
-      company: 'TechCorp Inc.',
-      location: 'San Francisco, CA',
-      type: 'Full-time',
-      salary: '$120,000 - $180,000',
-      status: 'active',
-      posted: '2024-01-15',
-      applications: 45,
-      views: 234
-    },
-    {
-      id: '2',
-      title: 'Government Policy Analyst',
-      company: 'Department of Health',
-      location: 'Washington, DC',
-      type: 'Full-time',
-      salary: '$75,000 - $95,000',
-      status: 'active',
-      posted: '2024-01-14',
-      applications: 23,
-      views: 156
-    },
-    {
-      id: '3',
-      title: 'Marketing Manager',
-      company: 'Creative Agency',
-      location: 'New York, NY',
-      type: 'Full-time',
-      salary: '$80,000 - $110,000',
-      status: 'pending',
-      posted: '2024-01-13',
-      applications: 0,
-      views: 89
-    }
-  ]);
-
-  const [companies, setCompanies] = useState<Company[]>([
-    {
-      id: '1',
-      name: 'TechCorp Inc.',
-      industry: 'Technology',
-      size: '201-500 employees',
-      location: 'San Francisco, CA',
-      status: 'verified',
-      jobsCount: 12,
-      joined: '2023-06-15'
-    },
-    {
-      id: '2',
-      name: 'Department of Health',
-      industry: 'Government',
-      size: '1000+ employees',
-      location: 'Washington, DC',
-      status: 'verified',
-      jobsCount: 8,
-      joined: '2023-03-20'
-    },
-    {
-      id: '3',
-      name: 'Creative Agency',
-      industry: 'Marketing',
-      size: '11-50 employees',
-      location: 'New York, NY',
-      status: 'pending',
-      jobsCount: 3,
-      joined: '2024-01-10'
-    }
-  ]);
-
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([
-    {
-      id: '1',
-      title: 'Interview Tips for 2024',
-      author: 'Sarah Johnson',
-      category: 'Career Advice',
-      status: 'published',
-      published: '2024-01-15',
-      views: 1247,
-      likes: 89,
-      content: 'This comprehensive guide covers everything you need to know about acing job interviews in 2024. From preparation strategies to common questions and answers, we\'ve got you covered.',
-      excerpt: 'Master the art of job interviews with our comprehensive guide covering preparation strategies, common questions, and expert tips for 2024.',
-      tags: ['interview', 'career', 'tips', '2024'],
-      featuredImage: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800'
-    },
-    {
-      id: '2',
-      title: 'Remote Work Best Practices',
-      author: 'Mike Chen',
-      category: 'Workplace',
-      status: 'published',
-      published: '2024-01-12',
-      views: 892,
-      likes: 67,
-      content: 'Learn the essential best practices for remote work success. From setting up your home office to maintaining work-life balance, discover how to thrive in a remote work environment.',
-      excerpt: 'Discover essential strategies for remote work success, from home office setup to maintaining work-life balance.',
-      tags: ['remote-work', 'workplace', 'productivity'],
-      featuredImage: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800'
-    },
-    {
-      id: '3',
-      title: 'Government Job Application Guide',
-      author: 'Lisa Rodriguez',
-      category: 'Career Advice',
-      status: 'draft',
-      content: 'A step-by-step guide to applying for government positions. Learn about the application process, required documents, and tips for standing out in government job applications.',
-      excerpt: 'Navigate the government job application process with our step-by-step guide and expert tips.',
-      tags: ['government', 'application', 'career'],
-      featuredImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800'
-    }
-  ]);
-
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: '1',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      role: 'user',
-      status: 'active',
-      joined: '2023-12-01',
-      lastLogin: '2024-01-15'
-    },
-    {
-      id: '2',
-      name: 'TechCorp HR',
-      email: 'hr@techcorp.com',
-      role: 'company',
-      status: 'active',
-      joined: '2023-06-15',
-      lastLogin: '2024-01-14'
-    },
-    {
-      id: '3',
-      name: 'Admin User',
-              email: 'admin@hooblr.com',
-        role: 'admin',
-        status: 'active',
-        joined: '2023-01-01',
-        lastLogin: '2024-01-15'
-    }
-  ]);
+  const sidebarItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+    { id: 'companies', label: 'Companies', icon: Building },
+    { id: 'jobs', label: 'Jobs', icon: Briefcase },
+    { id: 'blog', label: 'Blog', icon: FileText },
+    { id: 'users', label: 'Users', icon: Users },
+    { id: 'settings', label: 'Settings', icon: Settings },
+  ];
 
   useEffect(() => {
-    // Check if user is authenticated as admin
-    const checkAuth = () => {
-      
-      if(user?.role === 'admin'){
-        setIsAuthenticated(true);
-        setAdminUser({
-          name: user.profile?.name,
-          email: user.email,
-          role: user.role
-        });
-      }
-      else{
-        if(user?.role === 'user')
+    if (user?.role === 'admin') {
+      setIsAuthenticated(true);
+      fetchData();
+    } else if (user?.role === 'user') {
+      router.push('/');
+    }
+  }, [user, router]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      await Promise.all([
+        fetchCompanies(),
+        fetchJobs(),
+        fetchBlogPosts(),
+        fetchUsers()
+      ]);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCompanies = async () => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies`);
+      const data = await response.data
+      setCompanies(data.companies || []);
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+      // Mock data for development
+      setCompanies([
         {
-          router.push('/');
+          _id: '1',
+          name: 'TechCorp Inc.',
+          companyemail: 'contact@techcorp.com',
+          companyowner: { _id: '1', profile: { name: 'John Smith' } },
+          size: '201-500',
+          industry: 'Technology',
+          website: 'https://techcorp.com',
+          description: 'Leading technology company',
+          location: 'San Francisco, CA',
+          createdAt: '2024-01-15T00:00:00Z'
+        }
+      ]);
+    }
+  };
+
+  const fetchJobs = async () => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/jobs`, {withCredentials:true});
+      const data = await response.data  ;
+      setJobs(data.jobs || []);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
+
+  const fetchBlogPosts = async () => {
+    try {
+      const response = await fetch('/api/admin/blog-posts');
+      const data = await response.json();
+      setBlogPosts(data.posts || []);
+    } catch (error) {
+      console.error('Error fetching blog posts:', error);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('/api/admin/users');
+      const data = await response.json();
+      setUsers(data.users || []);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  const openModal = (type: 'company' | 'job' | 'blog' | 'user', mode: 'create' | 'edit' | 'view', data?: any) => {
+    setModalState({ type, mode, isOpen: true, data });
+  };
+
+  const closeModal = () => {
+    setModalState({ type: null, mode: null, isOpen: false, data: null });
+  };
+
+  const handleSave = async (data: any) => {
+    try {
+      setLoading(true);
+      const { type, mode } = modalState;
+      
+      if (type === 'company') {
+        if (mode === 'create') {
+          const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies/profile`, {company: data}, {withCredentials:true});
+          if (response.status === 200) {
+            setCompanies(prev => [...prev, response.data.updatedCompany]);
+            closeModal();
+          }
+        } else if (mode === 'edit') {
+          const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies/profile`, {company: data, id: data._id}, {withCredentials: true});
+          if (response.status === 200) {
+            fetchCompanies();
+            closeModal();
+          }
+        }
+      } else if (type === 'job') {
+        if (mode === 'create') {
+          const response = await fetch('/api/admin/jobs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          const result = await response.json();
+          if (result.success) {
+            setJobs(prev => [...prev, result.job]);
+          }
+        } else if (mode === 'edit') {
+          const response = await fetch(`/api/admin/jobs/${data._id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          const result = await response.json();
+          if (result.success) {
+            setJobs(prev => prev.map(j => j._id === data._id ? result.job : j));
+          }
         }
       }
-    };
-      checkAuth();
-  }, [user]);
-
-  const handleLogout = () => {
-    logout();
-    setIsAuthenticated(false);
-    setAdminUser(null);
-  };
-
-  const handleDelete = (type: string, id: string) => {
-    if (type === 'job') {
-      setJobs(jobs.filter(job => job.id !== id));
-    } else if (type === 'company') {
-      setCompanies(companies.filter(company => company.id !== id));
-    } else if (type === 'blog') {
-      setBlogPosts(blogPosts.filter(post => post.id !== id));
-    } else if (type === 'user') {
-      setUsers(users.filter(user => user.id !== id));
+      
+      closeModal();
+    } catch (error) {
+      console.error('Error saving:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // const handleView = (type: 'job' | 'company' | 'blog' | 'user', item: Item) => {
-  //   setModalType(type);
-  //   setSelectedItem(item);
-  //   setIsViewModalOpen(true);
-  // };
-
-  // const handleEdit = (type: 'job' | 'company' | 'blog' | 'user', item: Item) => {
-  //   setModalType(type);
-  //   setSelectedItem(item);
-  //   setIsEditModalOpen(true);
-  // };
-
-  const handleSaveEdit = (updatedItem: any) => {
-    if (modalType === 'job') {
-      setJobs(jobs.map(job => job.id === updatedItem.id ? updatedItem : job));
-    } else if (modalType === 'company') {
-      setCompanies(companies.map(company => company.id === updatedItem.id ? updatedItem : company));
-    } else if (modalType === 'blog') {
-      setBlogPosts(blogPosts.map(post => post.id === updatedItem.id ? updatedItem : post));
-    } else if (modalType === 'user') {
-      setUsers(users.map(user => user.id === updatedItem.id ? updatedItem : user));
+  const handleDelete = async (type: string, id: string) => {
+    if (!confirm('Are you sure you want to delete this item?')) return;
+    
+    try {
+      setLoading(true);
+      // const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${type}s/${id}`, {withCredentials:true});
+      
+      if (type === 'company') {
+        const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies/${id}`, {withCredentials:true});
+        if (response.status === 200) {
+          fetchCompanies();
+        }
+      } else if (type === 'job') {
+        setJobs(prev => prev.filter(j => j._id !== id));
+      } else if (type === 'blog-post') {
+        setBlogPosts(prev => prev.filter(p => p._id !== id));
+      } else if (type === 'user') {
+        setUsers(prev => prev.filter(u => u._id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting:', error);
+    } finally {
+      setLoading(false);
     }
-    setIsEditModalOpen(false);
-    setSelectedItem(null);
-  };
-
-  const handleCreateBlogPost = () => {
-    setBlogEditorMode('create');
-    setSelectedBlogPost(null);
-    setIsBlogEditorOpen(true);
-  };
-
-  const handleEditBlogPost = (post: BlogPost) => {
-    setBlogEditorMode('edit');
-    setSelectedBlogPost(post);
-    setIsBlogEditorOpen(true);
-  };
-
-  const handleSaveBlogPost = (post: BlogPost) => {
-    if (blogEditorMode === 'create') {
-      setBlogPosts([...blogPosts, post]);
-    } else {
-      setBlogPosts(blogPosts.map(p => p.id === post.id ? post : p));
-    }
-    setIsBlogEditorOpen(false);
-    setSelectedBlogPost(null);
-  };
-
-  const handleCancelBlogEditor = () => {
-    setIsBlogEditorOpen(false);
-    setSelectedBlogPost(null);
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-      case 'published':
-      case 'verified':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-      case 'draft':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'inactive':
-      case 'archived':
-      case 'suspended':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+    const colors = {
+      active: 'bg-green-100 text-green-800',
+      published: 'bg-green-100 text-green-800',
+      verified: 'bg-green-100 text-green-800',
+      draft: 'bg-yellow-100 text-yellow-800',
+      pending: 'bg-yellow-100 text-yellow-800',
+      paused: 'bg-orange-100 text-orange-800',
+      inactive: 'bg-red-100 text-red-800',
+      closed: 'bg-red-100 text-red-800',
+      archived: 'bg-red-100 text-red-800',
+      suspended: 'bg-red-100 text-red-800',
+    };
+    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
-  const renderViewModal = () => {
-    if (!selectedItem) return null;
+  // Company Form Component
+  const CompanyForm = ({ company, onSave, onCancel }: { 
+    company?: Company; 
+    onSave: (data: any) => void; 
+    onCancel: () => void; 
+  }) => {
+    const [formData, setFormData] = useState({
+      name: company?.name || '',
+      companyemail: company?.companyemail || '',
+      size: company?.size || '1-10' as Company['size'],
+      industry: company?.industry || '',
+      website: company?.website || '',
+      description: company?.description || '',
+      location: company?.location || ''
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      onSave({ ...company, ...formData });
+    };
+
+    return (
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Company Name *</label>
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Company Email *</label>
+            <input
+              type="email"
+              required
+              value={formData.companyemail}
+              onChange={(e) => setFormData({ ...formData, companyemail: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Company Size</label>
+            <select
+              value={formData.size}
+              onChange={(e) => setFormData({ ...formData, size: e.target.value as Company['size'] })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="1-10">1-10</option>
+              <option value="11-50">11-50</option>
+              <option value="51-200">51-200</option>
+              <option value="201-500">201-500</option>
+              <option value="501-1000">501-1000</option>
+              <option value="1000+">1000+</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+            <input
+              type="text"
+              value={formData.industry}
+              onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
+            <input
+              type="url"
+              value={formData.website}
+              onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+            <input
+              type="text"
+              value={formData.location}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+          <textarea
+            rows={4}
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+        <div className="flex justify-end space-x-3 pt-4">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          >
+            <Save className="w-4 h-4" />
+            <span>Save Company</span>
+          </button>
+        </div>
+      </form>
+    );
+  };
+
+  // Job Form Component (simplified for brevity)
+ const JobForm = ({ job, onSave, onCancel }: { 
+    job?: Job; 
+    onSave: (data: any) => void; 
+    onCancel: () => void; 
+  }) => {
+    const [formData, setFormData] = useState({
+      title: job?.title || '',
+      company: job?.company?._id || '',
+      description: job?.description || '',
+      requirements: job?.requirements || '',
+      responsibilities: job?.responsibilities || '',
+      location: job?.location || '',
+      type: job?.type || 'Full-time',
+      category: job?.category || '',
+      department: job?.department || '',
+      salary: {
+        min: job?.salary?.min || 0,
+        max: job?.salary?.max || 0,
+        currency: job?.salary?.currency || 'USD',
+        period: job?.salary?.period || 'yearly'
+      },
+      benefits: job?.benefits || [],
+      skills: job?.skills || [],
+      experience: job?.experience || 'Entry-level',
+      education: job?.education || 'bachelor',
+      status: job?.status || 'draft',
+      isRemote: job?.isRemote || false,
+      isGovernment: job?.isGovernment || false,
+      applicationDeadline: job?.applicationDeadline || '',
+      tags: job?.tags || [],
+      featured: job?.featured || false,
+      urgent: job?.urgent || false
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!formData.company) {
+        alert('Please select a company first');
+        return;
+      }
+      onSave({ ...job, ...formData });
+    };
+
+    if (companies.length === 0) {
+      return (
+        <div className="text-center py-8">
+          <Building className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Companies Found</h3>
+          <p className="text-gray-600 mb-4">You need to create a company before posting jobs.</p>
+          <button
+            onClick={() => openModal('company', 'create')}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Create Company
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Job Title *</label>
+            <input
+              type="text"
+              required
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Company *</label>
+            <select
+              required
+              value={formData.company}
+              onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Select Company</option>
+              {companies.map((company) => (
+                <option key={company._id} value={company._id}>
+                  {company.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Location *</label>
+            <input
+              type="text"
+              required
+              value={formData.location}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Job Type *</label>
+            <select
+              required
+              value={formData.type}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value as Job['type'] })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Temporary">Temporary</option>
+              <option value="Internship">Internship</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+            <input
+              type="text"
+              required
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Department *</label>
+            <input
+              type="text"
+              required
+              value={formData.department}
+              onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        {/* Salary Section */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Min Salary *</label>
+            <input
+              type="number"
+              required
+              value={formData.salary.min}
+              onChange={(e) => setFormData({ 
+                ...formData, 
+                salary: { ...formData.salary, min: parseInt(e.target.value) || 0 }
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Max Salary *</label>
+            <input
+              type="number"
+              required
+              value={formData.salary.max}
+              onChange={(e) => setFormData({ 
+                ...formData, 
+                salary: { ...formData.salary, max: parseInt(e.target.value) || 0 }
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
+            <select
+              value={formData.salary.currency}
+              onChange={(e) => setFormData({ 
+                ...formData, 
+                salary: { ...formData.salary, currency: e.target.value }
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Period</label>
+            <select
+              value={formData.salary.period}
+              onChange={(e) => setFormData({ 
+                ...formData, 
+                salary: { ...formData.salary, period: e.target.value as 'hourly' | 'monthly' | 'yearly' }
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="hourly">Hourly</option>
+              <option value="monthly">Monthly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Text Areas */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+            <textarea
+              required
+              rows={4}
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Requirements *</label>
+            <textarea
+              required
+              rows={4}
+              value={formData.requirements}
+              onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Responsibilities *</label>
+            <textarea
+              required
+              rows={4}
+              value={formData.responsibilities}
+              onChange={(e) => setFormData({ ...formData, responsibilities: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        {/* Additional Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Experience Level *</label>
+            <select
+              required
+              value={formData.experience}
+              onChange={(e) => setFormData({ ...formData, experience: e.target.value as Job['experience'] })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="Entry-level">Entry-level</option>
+              <option value="Mid-level">Mid-level</option>
+              <option value="Senior-level">Senior-level</option>
+              <option value="Executive">Executive</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Education *</label>
+            <select
+              required
+              value={formData.education}
+              onChange={(e) => setFormData({ ...formData, education: e.target.value as Job['education'] })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="high-school">High School</option>
+              <option value="associate">Associate</option>
+              <option value="bachelor">Bachelor</option>
+              <option value="master">Master</option>
+              <option value="phd">PhD</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value as Job['status'] })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="draft">Draft</option>
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+              <option value="closed">Closed</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Checkboxes */}
+        <div className="flex flex-wrap gap-6">
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.isRemote}
+              onChange={(e) => setFormData({ ...formData, isRemote: e.target.checked })}
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm text-gray-700">Remote Work</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.isGovernment}
+              onChange={(e) => setFormData({ ...formData, isGovernment: e.target.checked })}
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm text-gray-700">Government Job</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.featured}
+              onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm text-gray-700">Featured</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.urgent}
+              onChange={(e) => setFormData({ ...formData, urgent: e.target.checked })}
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm text-gray-700">Urgent</span>
+          </label>
+        </div>
+
+        <div className="flex justify-end space-x-3 pt-4">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          >
+            <Save className="w-4 h-4" />
+            <span>Save Job</span>
+          </button>
+        </div>
+      </form>
+    );
+  };
+
+  // View Details Component
+  const ViewDetails = ({ data, type }: { data: any; type: string }) => {
+    if (type === 'company') {
+      return (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Company Information</h3>
+              <div className="space-y-3">
+                <div>
+                  <span className="font-medium text-gray-700">Name:</span>
+                  <p className="text-gray-900">{data.name}</p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Email:</span>
+                  <p className="text-gray-900">{data.companyemail}</p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Industry:</span>
+                  <p className="text-gray-900">{data.industry}</p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Size:</span>
+                  <p className="text-gray-900">{data.size} employees</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Additional Details</h3>
+              <div className="space-y-3">
+                <div>
+                  <span className="font-medium text-gray-700">Location:</span>
+                  <p className="text-gray-900">{data.location}</p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Website:</span>
+                  <p className="text-gray-900">{data.website || 'Not provided'}</p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Created:</span>
+                  <p className="text-gray-900">{new Date(data.createdAt).toLocaleDateString()}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          {data.description && (
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Description</h3>
+              <p className="text-gray-700 leading-relaxed">{data.description}</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    if (type === 'job') {
+      return (
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{data.title}</h2>
+            <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+              <span>{data.company?.name}</span>
+              <span>•</span>
+              <span>{data.location}</span>
+              <span>•</span>
+              <span>{data.type}</span>
+              <span>•</span>
+              <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(data.status)}`}>
+                {data.status}
+              </span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Job Details</h3>
+              <div className="space-y-2 text-sm">
+                <div><span className="font-medium">Category:</span> {data.category}</div>
+                <div><span className="font-medium">Department:</span> {data.department}</div>
+                <div><span className="font-medium">Experience:</span> {data.experience}</div>
+                <div><span className="font-medium">Education:</span> {data.education}</div>
+                <div><span className="font-medium">Salary:</span> {data.salary?.currency} {data.salary?.min} - {data.salary?.max} ({data.salary?.period})</div>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Statistics</h3>
+              <div className="space-y-2 text-sm">
+                <div><span className="font-medium">Applications:</span> {data.applications?.length || 0}</div>
+                <div><span className="font-medium">Views:</span> {data.views || 0}</div>
+                <div><span className="font-medium">Posted:</span> {new Date(data.createdAt).toLocaleDateString()}</div>
+                {data.applicationDeadline && (
+                  <div><span className="font-medium">Deadline:</span> {new Date(data.applicationDeadline).toLocaleDateString()}</div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Description</h3>
+            <div className="prose max-w-none">
+              <p className="text-gray-700 leading-relaxed">{data.description}</p>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Requirements</h3>
+            <div className="prose max-w-none">
+              <p className="text-gray-700 leading-relaxed">{data.requirements}</p>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Responsibilities</h3>
+            <div className="prose max-w-none">
+              <p className="text-gray-700 leading-relaxed">{data.responsibilities}</p>
+            </div>
+          </div>
+
+          {data.skills && data.skills.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Required Skills</h3>
+              <div className="flex flex-wrap gap-2">
+                {data.skills.map((skill: string, index: number) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  // Modal Component
+  const Modal = () => {
+    if (!modalState.isOpen) return null;
+
+    const { type, mode, data } = modalState;
+    const title = `${mode === 'create' ? 'Create' : mode === 'edit' ? 'Edit' : 'View'} ${type?.charAt(0).toUpperCase()}${type?.slice(1)}`;
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">
-              View {modalType === 'job' ? 'Job' : modalType === 'company' ? 'Company' : modalType === 'blog' ? 'Blog Post' : 'User'}
-            </h2>
+        <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white">
+            <h2 className="text-xl font-bold text-gray-900">{title}</h2>
             <button
-              onClick={() => setIsViewModalOpen(false)}
+              onClick={closeModal}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
               <X className="w-5 h-5 text-gray-500" />
@@ -390,484 +951,15 @@ export default function AdminPage() {
           </div>
 
           <div className="p-6">
-            {modalType === 'blog' && (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{selectedItem.title}</h3>
-                  <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
-                    <span>By {selectedItem.author}</span>
-                    <span>•</span>
-                    <span>{selectedItem.category}</span>
-                    <span>•</span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(selectedItem.status)}`}>
-                      {selectedItem.status}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-4 text-xs text-gray-500 mb-4">
-                    <span>{selectedItem.views || 0} views</span>
-                    <span>{selectedItem.likes || 0} likes</span>
-                    {selectedItem.published && <span>Published {selectedItem.published}</span>}
-                  </div>
-                  
-                  {selectedItem.featuredImage && (
-                    <img 
-                      src={selectedItem.featuredImage} 
-                      alt={selectedItem.title}
-                      className="w-full h-48 object-cover rounded-lg mb-4"
-                    />
-                  )}
-                  
-                  {selectedItem.excerpt && (
-                    <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                      <p className="text-lg text-gray-700 italic">{selectedItem.excerpt}</p>
-                    </div>
-                  )}
-                  
-                  <div className="prose max-w-none">
-                    <div 
-                      className="text-gray-700 leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: selectedItem.content }}
-                    />
-                  </div>
-                  
-                  {selectedItem.tags && selectedItem.tags.length > 0 && (
-                    <div className="mt-6 pt-4 border-t border-gray-200">
-                      <div className="flex flex-wrap gap-2">
-                        {selectedItem.tags.map((tag: string) => (
-                          <span 
-                            key={tag}
-                            className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+            {mode === 'view' ? (
+              <ViewDetails data={data} type={type!} />
+            ) : type === 'company' ? (
+              <CompanyForm company={data} onSave={handleSave} onCancel={closeModal} />
+            ) : type === 'job' ? (
+              <JobForm job={data} onSave={handleSave} onCancel={closeModal} />
+            ) : (
+              <div>Form for {type} not implemented</div>
             )}
-
-            {modalType === 'job' && (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{selectedItem.title}</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-gray-700">Company:</span>
-                      <p className="text-gray-900">{selectedItem.company}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Location:</span>
-                      <p className="text-gray-900">{selectedItem.location}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Type:</span>
-                      <p className="text-gray-900">{selectedItem.type}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Salary:</span>
-                      <p className="text-gray-900">{selectedItem.salary}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Status:</span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(selectedItem.status)}`}>
-                        {selectedItem.status}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Applications:</span>
-                      <p className="text-gray-900">{selectedItem.applications}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Views:</span>
-                      <p className="text-gray-900">{selectedItem.views}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Posted:</span>
-                      <p className="text-gray-900">{selectedItem.posted}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {modalType === 'company' && (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{selectedItem.name}</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-gray-700">Industry:</span>
-                      <p className="text-gray-900">{selectedItem.industry}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Size:</span>
-                      <p className="text-gray-900">{selectedItem.size}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Location:</span>
-                      <p className="text-gray-900">{selectedItem.location}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Status:</span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(selectedItem.status)}`}>
-                        {selectedItem.status}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Active Jobs:</span>
-                      <p className="text-gray-900">{selectedItem.jobsCount}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Joined:</span>
-                      <p className="text-gray-900">{selectedItem.joined}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {modalType === 'user' && (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{selectedItem.name}</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-gray-700">Email:</span>
-                      <p className="text-gray-900">{selectedItem.email}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Role:</span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        selectedItem.role === 'admin' ? 'bg-red-100 text-red-800' :
-                        selectedItem.role === 'company' ? 'bg-green-100 text-green-800' :
-                        'bg-blue-100 text-blue-800'
-                      }`}>
-                        {selectedItem.role}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Status:</span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(selectedItem.status)}`}>
-                        {selectedItem.status}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Joined:</span>
-                      <p className="text-gray-900">{selectedItem.joined}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Last Login:</span>
-                      <p className="text-gray-900">{selectedItem.lastLogin}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const renderEditModal = () => {
-    // if (!selectedItem) return null;
-
-    return (
-      <EditModal 
-        item={selectedItem}
-        type={modalType}
-        onSave={handleSaveEdit}
-        onClose={() => setIsEditModalOpen(false)}
-      />
-    );
-  };
-
-  const EditModal = ({ item, type, onSave, onClose }: { 
-    item: any; 
-    type: 'job' | 'company' | 'blog' | 'user'; 
-    // eslint-disable-next-line no-unused-vars
-    onSave: (updatedItem: any) => void; 
-    onClose: () => void; 
-  }) => {
-    const [editData, setEditData] = useState(item);
-
-    const handleSave = () => {
-      onSave(editData);
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                     <div className="flex items-center justify-between p-6 border-b border-gray-200">
-             <h2 className="text-xl font-bold text-gray-900">
-               Edit {type === 'job' ? 'Job' : type === 'company' ? 'Company' : type === 'blog' ? 'Blog Post' : 'User'}
-             </h2>
-             <button
-               onClick={onClose}
-               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-             >
-               <X className="w-5 h-5 text-gray-500" />
-             </button>
-           </div>
-
-          <div className="p-6">
-            {type === 'blog' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-                  <input
-                    type="text"
-                    value={editData.title}
-                    onChange={(e) => setEditData({...editData, title: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Author</label>
-                  <input
-                    type="text"
-                    value={editData.author}
-                    onChange={(e) => setEditData({...editData, author: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                  <select
-                    value={editData.category}
-                    onChange={(e) => setEditData({...editData, category: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="Career Advice">Career Advice</option>
-                    <option value="Workplace">Workplace</option>
-                    <option value="Technology">Technology</option>
-                    <option value="Leadership">Leadership</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                  <select
-                    value={editData.status}
-                    onChange={(e) => setEditData({...editData, status: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                    <option value="archived">Archived</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
-                  <textarea
-                    value={editData.content}
-                    onChange={(e) => setEditData({...editData, content: e.target.value})}
-                    rows={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-            )}
-
-            {type === 'job' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-                  <input
-                    type="text"
-                    value={editData.title}
-                    onChange={(e) => setEditData({...editData, title: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
-                  <input
-                    type="text"
-                    value={editData.company}
-                    onChange={(e) => setEditData({...editData, company: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                    <input
-                      type="text"
-                      value={editData.location}
-                      onChange={(e) => setEditData({...editData, location: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
-                    <select
-                      value={editData.type}
-                      onChange={(e) => setEditData({...editData, type: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="Full-time">Full-time</option>
-                      <option value="Part-time">Part-time</option>
-                      <option value="Contract">Contract</option>
-                      <option value="Internship">Internship</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Salary</label>
-                  <input
-                    type="text"
-                    value={editData.salary}
-                    onChange={(e) => setEditData({...editData, salary: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                  <select
-                    value={editData.status}
-                    onChange={(e) => setEditData({...editData, status: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="pending">Pending</option>
-                  </select>
-                </div>
-              </div>
-            )}
-
-            {type === 'company' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
-                  <input
-                    type="text"
-                    value={editData.name}
-                    onChange={(e) => setEditData({...editData, name: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
-                    <select
-                      value={editData.industry}
-                      onChange={(e) => setEditData({...editData, industry: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="Technology">Technology</option>
-                      <option value="Government">Government</option>
-                      <option value="Marketing">Marketing</option>
-                      <option value="Healthcare">Healthcare</option>
-                      <option value="Finance">Finance</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Size</label>
-                    <select
-                      value={editData.size}
-                      onChange={(e) => setEditData({...editData, size: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="1-10 employees">1-10 employees</option>
-                      <option value="11-50 employees">11-50 employees</option>
-                      <option value="51-200 employees">51-200 employees</option>
-                      <option value="201-500 employees">201-500 employees</option>
-                      <option value="501-1000 employees">501-1000 employees</option>
-                      <option value="1000+ employees">1000+ employees</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                  <input
-                    type="text"
-                    value={editData.location}
-                    onChange={(e) => setEditData({...editData, location: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                  <select
-                    value={editData.status}
-                    onChange={(e) => setEditData({...editData, status: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="verified">Verified</option>
-                    <option value="pending">Pending</option>
-                    <option value="suspended">Suspended</option>
-                  </select>
-                </div>
-              </div>
-            )}
-
-            {type === 'user' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                  <input
-                    type="text"
-                    value={editData.name}
-                    onChange={(e) => setEditData({...editData, name: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input
-                    type="email"
-                    value={editData.email}
-                    onChange={(e) => setEditData({...editData, email: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                    <select
-                      value={editData.role}
-                      onChange={(e) => setEditData({...editData, role: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="user">User</option>
-                      <option value="company">Company</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                    <select
-                      value={editData.status}
-                      onChange={(e) => setEditData({...editData, status: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                      <option value="suspended">Suspended</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="flex justify-end space-x-3 pt-6">
-              <button
-                onClick={() => setIsEditModalOpen(false)}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-              >
-                <Save className="w-4 h-4" />
-                <span>Save Changes</span>
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -876,129 +968,222 @@ export default function AdminPage() {
 
   const renderDashboard = () => (
     <div className="space-y-6">
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-xl border border-blue-200 transition-all duration-300 transform hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-600 text-xs font-medium mb-1">Total Jobs</p>
-              <p className="text-xl font-bold text-blue-900 mb-1">{jobs.length}</p>
-              <p className="text-blue-600 text-xs">+12% from last month</p>
+              <p className="text-blue-600 text-sm font-medium mb-1">Total Jobs</p>
+              <p className="text-2xl font-bold text-blue-900">{jobs.length}</p>
             </div>
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-              <span className="text-white text-sm font-bold">J</span>
-            </div>
+            <Briefcase className="w-8 h-8 text-blue-600" />
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-xl border border-green-200 transition-all duration-300 transform hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-600 text-xs font-medium mb-1">Active Users</p>
-              <p className="text-xl font-bold text-green-900 mb-1">{users.filter(u => u.status === 'active').length}</p>
-              <p className="text-green-600 text-xs">+8% from last month</p>
+              <p className="text-green-600 text-sm font-medium mb-1">Total Users</p>
+              <p className="text-2xl font-bold text-green-900">{users.length}</p>
             </div>
-            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-white text-sm font-bold">U</span>
-            </div>
+            <Users className="w-8 h-8 text-green-600" />
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-5 rounded-xl border border-purple-200 transition-all duration-300 transform hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-600 text-xs font-medium mb-1">Companies</p>
-              <p className="text-xl font-bold text-purple-900 mb-1">{companies.length}</p>
-              <p className="text-purple-600 text-xs">+5% from last month</p>
+              <p className="text-purple-600 text-sm font-medium mb-1">Companies</p>
+              <p className="text-2xl font-bold text-purple-900">{companies.length}</p>
             </div>
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-white text-sm font-bold">C</span>
-            </div>
+            <Building className="w-8 h-8 text-purple-600" />
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-5 rounded-xl border border-orange-200 transition-all duration-300 transform hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl border border-orange-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-orange-600 text-xs font-medium mb-1">Blog Posts</p>
-              <p className="text-xl font-bold text-orange-900 mb-1">{blogPosts.length}</p>
-              <p className="text-orange-600 text-xs">+3% from last month</p>
+              <p className="text-orange-600 text-sm font-medium mb-1">Blog Posts</p>
+              <p className="text-2xl font-bold text-orange-900">{blogPosts.length}</p>
             </div>
-            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-white text-sm font-bold">B</span>
-            </div>
+            <FileText className="w-8 h-8 text-orange-600" />
           </div>
         </div>
       </div>
 
-      {/* Recent Activities */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white/80 backdrop-blur-sm p-5 rounded-xl border border-purple-200">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Recent Activities</h3>
-          <div className="space-y-3">
-            <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-purple-50 transition-colors">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm text-gray-600">New job posted: Senior Developer at TechCorp</span>
-            </div>
-            <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-purple-50 transition-colors">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span className="text-sm text-gray-600">User registered: john.doe@example.com</span>
-            </div>
-            <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-purple-50 transition-colors">
-              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <span className="text-sm text-gray-600">Blog published: Interview Tips for 2024</span>
-            </div>
-            <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-purple-50 transition-colors">
-              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-              <span className="text-sm text-gray-600">Company verified: Creative Agency</span>
-            </div>
-          </div>
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">Quick Actions</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <button
+            onClick={() => openModal('company', 'create')}
+            className="p-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center space-y-2"
+          >
+            <Building className="w-6 h-6" />
+            <span>Add Company</span>
+          </button>
+          <button
+            onClick={() => openModal('job', 'create')}
+            className="p-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center space-y-2"
+          >
+            <Briefcase className="w-6 h-6" />
+            <span>Post Job</span>
+          </button>
+          <button
+            onClick={() => setBlogEditorState({ isOpen: true, mode: 'create', post: null })}
+            className="p-4 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center space-y-2"
+          >
+            <FileText className="w-6 h-6" />
+            <span>Write Blog</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('users')}
+            className="p-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center space-y-2"
+          >
+            <Users className="w-6 h-6" />
+            <span>Manage Users</span>
+          </button>
         </div>
+      </div>
 
-        <div className="bg-white/80 backdrop-blur-sm p-5 rounded-xl border border-purple-200">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Quick Actions</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={()=> {setIsEditModalOpen(true); }} className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1">
-              Add Job
-            </button>
-            <button className="p-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1">
-              Write Blog
-            </button>
-            <button className="p-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1">
-              Manage Users
-            </button>
-            <button className="p-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-lg text-white text-sm font-medium transition-all duration-300 transform hover:-translate-y-1">
-              View Analytics
-            </button>
-          </div>
+      {/* Recent Activities */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">Recent Activities</h3>
+        <div className="space-y-3">
+          {jobs.slice(0, 5).map((job) => (
+            <div key={job._id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-sm text-gray-600">
+                New job posted: {job.title} at {job.company?.name}
+              </span>
+              <span className="text-xs text-gray-400 ml-auto">
+                {new Date(job.createdAt).toLocaleDateString()}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 
-  const renderJobsManagement = () => (
+  const renderCompaniesManagement = () => (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Job Management</h2>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
-          <span>+</span>
-          <span>Add Job</span>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-2xl font-bold text-gray-900">Company Management</h2>
+        <button
+          onClick={() => openModal('company', 'create')}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add Company</span>
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search jobs..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
+      {/* Search and Filter */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Search companies..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      {/* Companies Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {companies
+          .filter(company => 
+            company?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            company?.industry.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+          .map((company) => (
+          <div key={company._id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">{company.name}</h3>
+                <p className="text-sm text-gray-600 mb-2">{company.industry}</p>
+                <div className="flex items-center space-x-4 text-xs text-gray-500">
+                  <span>{company.size} employees</span>
+                  <span>•</span>
+                  <span>{company.location}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
+              <span>{company.jobs?.length || 0} jobs</span>
+              <span>Joined {new Date(company.createdAt).toLocaleDateString()}</span>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <button 
+                onClick={() => openModal('company', 'view', company)}
+                className="flex-1 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors flex items-center justify-center space-x-1"
+              >
+                <Eye className="w-4 h-4" />
+                <span>View</span>
+              </button>
+              <button 
+                onClick={() => openModal('company', 'edit', company)}
+                className="flex-1 bg-green-50 text-green-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors flex items-center justify-center space-x-1"
+              >
+                <Edit className="w-4 h-4" />
+                <span>Edit</span>
+              </button>
+              <button 
+                onClick={() => handleDelete('company', company._id)}
+                className="flex-1 bg-red-50 text-red-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors flex items-center justify-center space-x-1"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Delete</span>
+              </button>
+            </div>
           </div>
+        ))}
+      </div>
+
+      {companies.length === 0 && (
+        <div className="text-center py-12">
+          <Building className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No companies found</h3>
+          <p className="text-gray-600 mb-4">Get started by creating your first company.</p>
+          <button
+            onClick={() => openModal('company', 'create')}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Add Company
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderJobsManagement = () => (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-2xl font-bold text-gray-900">Job Management</h2>
+        <button
+          onClick={() => openModal('job', 'create')}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Post Job</span>
+        </button>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Search jobs..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
         </div>
         <select
           value={filterStatus}
@@ -1007,8 +1192,9 @@ export default function AdminPage() {
         >
           <option value="all">All Status</option>
           <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="pending">Pending</option>
+          <option value="draft">Draft</option>
+          <option value="paused">Paused</option>
+          <option value="closed">Closed</option>
         </select>
       </div>
 
@@ -1033,40 +1219,40 @@ export default function AdminPage() {
                   (filterStatus === 'all' || job.status === filterStatus)
                 )
                 .map((job) => (
-                <tr key={job.id} className="hover:bg-gray-50">
+                <tr key={job._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">{job.title}</div>
                       <div className="text-sm text-gray-500">{job.location} • {job.type}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.company}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.company?.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(job.status)}`}>
                       {job.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.applications}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{job.posted}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.applications?.length || 0}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(job.createdAt).toLocaleDateString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <button 
-                        // onClick={() => handleView('job', job)}
+                        onClick={() => openModal('job', 'view', job)}
                         className="text-blue-600 hover:text-blue-900"
                       >
-                        👁️
+                        <Eye className="w-4 h-4" />
                       </button>
                       <button 
-                        // onClick={() => handleEdit('job', job)}
+                        onClick={() => openModal('job', 'edit', job)}
                         className="text-green-600 hover:text-green-900"
                       >
-                        ✏️
+                        <Edit className="w-4 h-4" />
                       </button>
                       <button 
-                        onClick={() => handleDelete('job', job.id)}
+                        onClick={() => handleDelete('job', job._id)}
                         className="text-red-600 hover:text-red-900"
                       >
-                        🗑️
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -1076,407 +1262,439 @@ export default function AdminPage() {
           </table>
         </div>
       </div>
-    </div>
-  );
 
-  const renderCompaniesManagement = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Company Management</h2>
-        <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2">
-          <span>+</span>
-          <span>Add Company</span>
-        </button>
-      </div>
-
-      {/* Companies Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {companies.map((company) => (
-          <div key={company.id} className="bg-white rounded-lg border border-gray-200 p-6 transition-shadow">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">{company.name}</h3>
-                <p className="text-sm text-gray-600 mb-2">{company.industry}</p>
-                <div className="flex items-center space-x-4 text-xs text-gray-500">
-                  <span>{company.size}</span>
-                  <span>•</span>
-                  <span>{company.location}</span>
-                </div>
-              </div>
-              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(company.status)}`}>
-                {company.status}
-              </span>
-            </div>
-            
-            <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
-              <span>{company.jobsCount} active jobs</span>
-              <span>Joined {company.joined}</span>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <button 
-                // onClick={() => handleView('company', company)}
-                className="flex-1 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
-              >
-                👁️ View
-              </button>
-              <button 
-                // onClick={() => handleEdit('company', company)}
-                className="flex-1 bg-green-50 text-green-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors"
-              >
-                ✏️ Edit
-              </button>
-              <button 
-                onClick={() => handleDelete('company', company.id)}
-                className="flex-1 bg-red-50 text-red-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors"
-              >
-                🗑️ Delete
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const renderBlogManagement = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Blog Management</h2>
-        <button 
-          onClick={handleCreateBlogPost}
-          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Write Post</span>
-        </button>
-      </div>
-
-      {/* Blog Posts */}
-      <div className="space-y-4">
-        {blogPosts.map((post) => (
-          <div key={post.id} className="bg-white rounded-lg border border-gray-200 p-6 transition-shadow">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{post.title}</h3>
-                <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
-                  <span>By {post.author}</span>
-                  <span>•</span>
-                  <span>{post.category}</span>
-                  {post.published && (
-                    <>
-                      <span>•</span>
-                      <span>Published {post.published}</span>
-                    </>
-                  )}
-                </div>
-                <div className="flex items-center space-x-4 text-xs text-gray-500">
-                  <span>{post.views} views</span>
-                  <span>{post.likes} likes</span>
-                </div>
-                {post.excerpt && (
-                  <p className="text-sm text-gray-600 mt-2 line-clamp-2">{post.excerpt}</p>
-                )}
-                {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {post.tags.slice(0, 3).map((tag: string) => (
-                      <span 
-                        key={tag}
-                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                    {post.tags.length > 3 && (
-                      <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                        +{post.tags.length - 3} more
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(post.status)}`}>
-                {post.status}
-              </span>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <button 
-                // onClick={() => handleView('blog', post)}
-                className="flex-1 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
-              >
-                👁️ Preview
-              </button>
-              <button 
-                onClick={() => handleEditBlogPost(post)}
-                className="flex-1 bg-green-50 text-green-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors"
-              >
-                ✏️ Edit
-              </button>
-              <button className="flex-1 bg-purple-50 text-purple-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-purple-100 transition-colors">
-                📤 Share
-              </button>
-              <button 
-                onClick={() => post.id && handleDelete('blog', post.id)}
-                className="flex-1 bg-red-50 text-red-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors"
-              >
-                🗑️ Delete
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const renderUserManagement = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
-        <button className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors flex items-center space-x-2">
-          <span>+</span>
-          <span>Add User</span>
-        </button>
-      </div>
-
-      {/* Users Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                      <div className="text-sm text-gray-500">{user.email}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      user.role === 'admin' ? 'bg-red-100 text-red-800' :
-                      user.role === 'company' ? 'bg-green-100 text-green-800' :
-                      'bg-blue-100 text-blue-800'
-                    }`}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(user.status)}`}>
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.joined}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.lastLogin}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button 
-                        // onClick={() => handleView('user', user)}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        👁️
-                      </button>
-                      <button 
-                        // onClick={() => handleEdit('user', user)}
-                        className="text-green-600 hover:text-green-900"
-                      >
-                        ✏️
-                      </button>
-                      <button className="text-orange-600 hover:text-orange-900">🛡️</button>
-                      <button 
-                        onClick={() => handleDelete('user', user.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {jobs.length === 0 && (
+        <div className="text-center py-12">
+          <Briefcase className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs found</h3>
+          <p className="text-gray-600 mb-4">Create a company first, then post your first job.</p>
+          <button
+            onClick={() => companies.length > 0 ? openModal('job', 'create') : openModal('company', 'create')}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+          >
+            {companies.length > 0 ? 'Post Job' : 'Create Company First'}
+          </button>
         </div>
-      </div>
-    </div>
-  );
-
-  const renderSettings = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900">System Settings</h2>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* General Settings */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">General Settings</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Site Name</label>
-              <input
-                type="text"
-                defaultValue="Hooblr"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Site Description</label>
-              <textarea
-                defaultValue="Find your dream government job or hire top talent"
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
-              <input
-                type="email"
-                defaultValue="admin@hooblr.com"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Job Settings */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Job Settings</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Auto-approve Jobs</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <option>No</option>
-                <option>Yes</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Job Expiry Days</label>
-              <input
-                type="number"
-                defaultValue="30"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Max Applications per Job</label>
-              <input
-                type="number"
-                defaultValue="100"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Email Settings */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Email Settings</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">SMTP Host</label>
-              <input
-                type="text"
-                defaultValue="smtp.gmail.com"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">SMTP Port</label>
-              <input
-                type="number"
-                defaultValue="587"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">From Email</label>
-              <input
-                type="email"
-                defaultValue="noreply@hooblr.com"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Security Settings */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Security Settings</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Session Timeout (minutes)</label>
-              <input
-                type="number"
-                defaultValue="30"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Max Login Attempts</label>
-              <input
-                type="number"
-                defaultValue="5"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Password Policy</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <option>Strong (8+ chars, special chars)</option>
-                <option>Medium (6+ chars)</option>
-                <option>Weak (4+ chars)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
-          <span>💾</span>
-          <span>Save Settings</span>
-        </button>
-      </div>
+      )}
     </div>
   );
 
   if (!isAuthenticated) {
     return (
-          <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <div className="text-center">
-          <Shield className="w-12 h-12 text-purple-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Admin Access Required</h2>
-          <p className="text-gray-600 mb-6">Please log in with admin credentials to access this page.</p>
-          <button
-            onClick={() => router.push('/')}
-            className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-colors"
-          >
-            Go to Home
-          </button>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+          <div className="text-center">
+            <Shield className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Admin Access Required</h2>
+            <p className="text-gray-600 mb-6">Please log in with admin credentials to access this page.</p>
+            <button
+              onClick={() => router.push('/')}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-colors"
+            >
+              Go to Home
+            </button>
+          </div>
         </div>
       </div>
-    </div>
     );
   }
 
+
+    // Blog Management Component
+  function renderBlogManagement() {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h2 className="text-2xl font-bold text-gray-900">Blog Management</h2>
+          <button
+            onClick={() => setBlogEditorState({ isOpen: true, mode: 'create', post: null })}
+            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Write Post</span>
+          </button>
+        </div>
+
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Search blog posts..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          />
+        </div>
+
+        {/* Blog Posts */}
+        <div className="space-y-4">
+          {blogPosts
+            .filter(post => 
+              post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              post.category.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .map((post) => (
+            <div key={post._id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{post.title}</h3>
+                  <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                    <span>By {post.author || 'Unknown'}</span>
+                    <span>•</span>
+                    <span>{post.category}</span>
+                    {post.publishedAt && (
+                      <>
+                        <span>•</span>
+                        <span>Published {new Date(post.publishedAt).toLocaleDateString()}</span>
+                      </>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-4 text-xs text-gray-500 mb-3">
+                    <span>{post.views} views</span>
+                    <span>{post.likes} likes</span>
+                    <span>{post.comments?.length || 0} comments</span>
+                  </div>
+                  {post.excerpt && (
+                    <p className="text-sm text-gray-600 line-clamp-2 mb-3">{post.excerpt}</p>
+                  )}
+                  {post.tags && post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {post.tags.slice(0, 3).map((tag: string) => (
+                        <span 
+                          key={tag}
+                          className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                      {post.tags.length > 3 && (
+                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                          +{post.tags.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(post.status)}`}>
+                  {post.status}
+                </span>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <button 
+                  onClick={() => openModal('blog', 'view', post)}
+                  className="flex-1 bg-purple-50 text-purple-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-purple-100 transition-colors flex items-center justify-center space-x-1"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>Preview</span>
+                </button>
+                <button 
+                  onClick={() => setBlogEditorState({ isOpen: true, mode: 'edit', post })}
+                  className="flex-1 bg-green-50 text-green-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors flex items-center justify-center space-x-1"
+                >
+                  <Edit className="w-4 h-4" />
+                  <span>Edit</span>
+                </button>
+                <button 
+                  onClick={() => handleDelete('blog-post', post._id!)}
+                  className="flex-1 bg-red-50 text-red-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors flex items-center justify-center space-x-1"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {blogPosts.length === 0 && (
+          <div className="text-center py-12">
+            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No blog posts found</h3>
+            <p className="text-gray-600 mb-4">Start creating engaging content for your audience.</p>
+            <button
+              onClick={() => setBlogEditorState({ isOpen: true, mode: 'create', post: null })}
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              Write Your First Post
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+
+  // User Management Component
+  function renderUserManagement() {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
+        </div>
+
+        {/* Search and Filter */}
+        <div className="flex flex-col lg:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            />
+          </div>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          >
+            <option value="all">All Users</option>
+            <option value="user">Users</option>
+            <option value="admin">Admins</option>
+          </select>
+        </div>
+
+        {/* Users Table */}
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {users
+                  .filter(user => 
+                    (user.profile?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                     user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
+                    (filterStatus === 'all' || user.role === filterStatus)
+                  )
+                  .map((user) => (
+                  <tr key={user._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{user.profile?.name || 'Unknown'}</div>
+                        <div className="text-sm text-gray-500">{user.email}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        user.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {user.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          onClick={() => openModal('user', 'view', user)}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => openModal('user', 'edit', user)}
+                          className="text-green-600 hover:text-green-900"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        {user.role !== 'admin' && (
+                          <button 
+                            onClick={() => handleDelete('user', user._id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Settings Component
+  function renderSettings() {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-2xl font-bold text-gray-900">System Settings</h2>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* General Settings */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">General Settings</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Site Name</label>
+                <input
+                  type="text"
+                  defaultValue="Hooblr"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Site Description</label>
+                <textarea
+                  defaultValue="Find your dream government job or hire top talent"
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
+                <input
+                  type="email"
+                  defaultValue="admin@hooblr.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Job Settings */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Job Settings</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Auto-approve Jobs</label>
+                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Job Expiry Days</label>
+                <input
+                  type="number"
+                  defaultValue="30"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Featured Job Price</label>
+                <input
+                  type="number"
+                  defaultValue="99"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Email Settings */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Email Settings</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">SMTP Host</label>
+                <input
+                  type="text"
+                  defaultValue="smtp.gmail.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">SMTP Port</label>
+                <input
+                  type="number"
+                  defaultValue="587"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">From Email</label>
+                <input
+                  type="email"
+                  defaultValue="noreply@hooblr.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Security Settings */}
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Security Settings</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Session Timeout (minutes)</label>
+                <input
+                  type="number"
+                  defaultValue="30"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Max Login Attempts</label>
+                <input
+                  type="number"
+                  defaultValue="5"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Two-Factor Authentication</label>
+                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option>Optional</option>
+                  <option>Required for Admins</option>
+                  <option>Required for All</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Save Button */}
+        <div className="flex justify-end">
+          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+            <Save className="w-5 h-5" />
+            <span>Save Settings</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+
+
+
+
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
-      {/* Header */}
-      <header className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-purple-200 fixed w-full top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <button
+   <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
+       {/* Header */}
+       <header className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-purple-200 fixed w-full top-0 z-50">
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+           <div className="flex justify-between items-center h-16">
+             <div className="flex items-center space-x-4">
+               <button
                 onClick={() => router.push('/')}
                 className="flex items-center space-x-2 text-gray-600 hover:text-purple-600 transition-colors p-2 rounded-lg hover:bg-purple-50"
               >
@@ -1497,11 +1715,11 @@ export default function AdminPage() {
             
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">{adminUser?.name}</p>
-                <p className="text-xs text-gray-500">{adminUser?.email}</p>
+                {/* <p className="text-sm font-medium text-gray-900">{adminUser?.name}</p> */}
+                {/* <p className="text-xs text-gray-500">{adminUser?.email}</p> */}
               </div>
               <button
-                onClick={handleLogout}
+                // onClick={handleLogout}
                 className="flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors p-2 rounded-lg hover:bg-red-50"
               >
                 <LogOut className="w-5 h-5" />
@@ -1512,107 +1730,93 @@ export default function AdminPage() {
         </div>
       </header>
 
-      <div className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-8">
-          {/* Sidebar */}
-          <div className="w-64 flex-shrink-0">
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-purple-200 p-6 sticky top-6">
-              <nav className="space-y-3">
-                <button
-                  onClick={() => setActiveTab('dashboard')}
-                  className={`w-full px-4 py-3 rounded-xl text-left transition-all duration-300 ${
-                    activeTab === 'dashboard' 
-                      ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg' 
-                      : 'text-gray-600 hover:bg-purple-50 hover:text-purple-700'
-                  }`}
-                >
-                  <span className="font-medium">Dashboard</span>
-                </button>
-                
-                <button
-                  onClick={() => setActiveTab('jobs')}
-                  className={`w-full px-4 py-3 rounded-xl text-left transition-all duration-300 ${
-                    activeTab === 'jobs' 
-                      ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg' 
-                      : 'text-gray-600 hover:bg-purple-50 hover:text-purple-700'
-                  }`}
-                >
-                  <span className="font-medium">Job Management</span>
-                </button>
-                
-                <button
-                  onClick={() => setActiveTab('companies')}
-                  className={`w-full px-4 py-3 rounded-xl text-left transition-all duration-300 ${
-                    activeTab === 'companies' 
-                      ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg' 
-                      : 'text-gray-600 hover:bg-purple-50 hover:text-purple-700'
-                  }`}
-                >
-                  <span className="font-medium">Company Management</span>
-                </button>
-                
-                <button
-                  onClick={() => setActiveTab('blog')}
-                  className={`w-full px-4 py-3 rounded-xl text-left transition-all duration-300 ${
-                    activeTab === 'blog' 
-                      ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg' 
-                      : 'text-gray-600 hover:bg-purple-50 hover:text-purple-700'
-                  }`}
-                >
-                  <span className="font-medium">Blog Management</span>
-                </button>
-                
-                <button
-                  onClick={() => setActiveTab('users')}
-                  className={`w-full px-4 py-3 rounded-xl text-left transition-all duration-300 ${
-                    activeTab === 'users' 
-                      ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg' 
-                      : 'text-gray-600 hover:bg-purple-50 hover:text-purple-700'
-                  }`}
-                >
-                  <span className="font-medium">User Management</span>
-                </button>
-                
-                <button
-                  onClick={() => setActiveTab('settings')}
-                  className={`w-full px-4 py-3 rounded-xl text-left transition-all duration-300 ${
-                    activeTab === 'settings' 
-                      ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg' 
-                      : 'text-gray-600 hover:bg-purple-50 hover:text-purple-700'
-                  }`}
-                >
-                  <span className="font-medium">Settings</span>
-                </button>
-              </nav>
+           <div className="pt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex gap-8">
+            {/* Sidebar */}
+            <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-30 w-64 transition-transform duration-300 ease-in-out lg:transition-none pt-16 lg:pt-0`}>
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-purple-200 p-6 h-full lg:h-auto lg:sticky lg:top-6">
+                <nav className="space-y-2">
+                  {sidebarItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActiveTab(item.id);
+                          setSidebarOpen(false);
+                        }}
+                        className={`w-full px-4 py-3 rounded-xl text-left transition-all duration-300 flex items-center space-x-3 ${
+                          activeTab === item.id 
+                            ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg' 
+                            : 'text-gray-600 hover:bg-purple-50 hover:text-purple-700'
+                        }`}
+                      >
+                        <Icon className="w-5 h-5" />
+                        <span className="font-medium">{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </nav>
+              </div>
             </div>
-          </div>
 
-          {/* Main Content */}
-          <div className="flex-1">
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-purple-200 p-6">
-              {activeTab === 'dashboard' && renderDashboard()}
-              {activeTab === 'jobs' && renderJobsManagement()}
-              {activeTab === 'companies' && renderCompaniesManagement()}
-              {activeTab === 'blog' && renderBlogManagement()}
-              {activeTab === 'users' && renderUserManagement()}
-              {activeTab === 'settings' && renderSettings()}
+            {/* Overlay for mobile sidebar */}
+            {sidebarOpen && (
+              <div
+                className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
+                onClick={() => setSidebarOpen(false)}
+              ></div>
+            )}
+
+            {/* Main Content */}
+            <div className="flex-1">
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-purple-200 p-6">
+                {loading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                  </div>
+                ) : (
+                  <>
+                    {activeTab === 'dashboard' && renderDashboard()}
+                    {activeTab === 'companies' && renderCompaniesManagement()}
+                    {activeTab === 'jobs' && renderJobsManagement()}
+                    {activeTab === 'blog' && renderBlogManagement()}
+                    {activeTab === 'users' && renderUserManagement()}
+                    {activeTab === 'settings' && renderSettings()}
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
-      {isViewModalOpen && renderViewModal()}
-      {isEditModalOpen && renderEditModal()}
-      {isBlogEditorOpen && (
+
+      {/* Modals */}
+      <Modal />
+      
+      {blogEditorState.isOpen && (
         <BlogPostEditor
-          post={selectedBlogPost || undefined}
-          onSave={handleSaveBlogPost}
-          onCancel={handleCancelBlogEditor}
-          mode={blogEditorMode}
+          post={blogEditorState.post || undefined}
+          onSave={(post: BlogPost) => {
+            if (blogEditorState.mode === 'create') {
+              setBlogPosts([...blogPosts, post]);
+            } else {
+              setBlogPosts(blogPosts.map(p => p._id === post._id ? post : p));
+            }
+            setBlogEditorState({ isOpen: false, mode: 'create', post: null });
+          }}
+          onCancel={() => setBlogEditorState({ isOpen: false, mode: 'create', post: null })}
+          mode={blogEditorState.mode}
         />
       )}
 
-      {/* Footer */}
       <Footer />
     </div>
   );
-} 
+}
+
+
+
+
+

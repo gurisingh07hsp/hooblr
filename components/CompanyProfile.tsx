@@ -5,11 +5,13 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@/context/UserContext';
 import axios from 'axios';
 import { Award, Building2, MapPin, Users } from 'lucide-react';
+import Image from 'next/image';
 
 interface CompanyProfileData {
   _id?: string;
   name: string;
   companyemail: string;
+  logo?: string;
   size: string;
   industry: string;
   website?: string;
@@ -26,6 +28,7 @@ const CompanyProfile = () => {
     _id: '',
     name: '',
     companyemail: '',
+    logo: '',
     size: '',
     industry: '',
     website: '',
@@ -62,6 +65,7 @@ const CompanyProfile = () => {
         _id: '',
         name: '',
         companyemail: '',
+        logo: '',
         size: '',
         industry: '',
         website: '',
@@ -76,6 +80,25 @@ const CompanyProfile = () => {
     setProfileData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleUpload = async (e: any) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "hooblr");
+
+    const res = await fetch("https://api.cloudinary.com/v1_1/dtjobqhxb/image/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    setProfileData(prev => ({ ...prev, logo: data.secure_url }));
+    console.log("Uploaded image:", data.secure_url);
+  };
+
+
   const handleCompanyInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -86,6 +109,7 @@ const CompanyProfile = () => {
           company: {
             name: profileData.name,
             companyemail: profileData.companyemail,
+            logo: profileData.logo,
             size: profileData.size,
             industry: profileData.industry,
             website: profileData.website,
@@ -100,6 +124,7 @@ const CompanyProfile = () => {
         _id: '',
         name: '',
         companyemail: '',
+        logo: '',
         size: '',
         industry: '',
         website: '',
@@ -139,6 +164,7 @@ const CompanyProfile = () => {
         _id: company._id,
         name: company.name || '',
         companyemail: company.companyemail || '',
+        logo: company.logo || '',
         size: company.size || '',
         industry: company.industry || '',
         website: company?.website || '',
@@ -220,6 +246,19 @@ const CompanyProfile = () => {
                     name="companyemail"
                     value={profileData.companyemail}
                     onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    Upload Logo
+                  </label>
+                  <input
+                    type="file"
+                    id="logo"
+                    name="companylogo"
+                    onChange={handleUpload}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -334,9 +373,13 @@ const CompanyProfile = () => {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex flex-col lg:flex-row items-start space-x-4 flex-1">
+                      {company.logo ? (
+                        <img src={company.logo} alt='company logo' width={64} height={64} className='rounded-md'/>
+                      ): (
                       <div className="w-16 hidden h-16 bg-[#9333E9] rounded-xl lg:flex items-center justify-center shadow-lg">
                         <Building2 className="w-8 h-8 text-white" />
                       </div>
+                      )}
                       
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">

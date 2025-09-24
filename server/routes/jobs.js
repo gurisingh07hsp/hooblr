@@ -335,7 +335,8 @@ router.post('/:id/apply', auth, authorize('user'), [
     job.applications.push({
       user: req.user._id,
       coverLetter: req.body.coverLetter,
-      resume: req.body.resume
+      resume: req.body.resume,
+      phone: req.body.phone
     });
 
     await job.save();

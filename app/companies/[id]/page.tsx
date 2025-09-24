@@ -253,9 +253,16 @@ export default function CompanyProfilePage() {
           <div className="bg-white rounded-2xl border p-8 mb-8">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
               <div className="flex items-start space-x-6 mb-6 lg:mb-0">
-                <div className="w-20 h-20 bg-[#9333E9] rounded-xl flex items-center justify-center shadow-lg">
+                 {company.logo ? (
+                    <img src={company.logo} alt='company logo' width={100} height={80} className='rounded-md'/>
+                  ): (
+                  <div className="w-16 hidden h-16 bg-[#9333E9] rounded-xl lg:flex items-center justify-center shadow-lg">
+                    <Building2 className="w-8 h-8 text-white" />
+                  </div>
+                  )}
+                {/* <div className="w-20 h-20 bg-[#9333E9] rounded-xl flex items-center justify-center shadow-lg">
                   <Building2 className="w-10 h-10 text-white" />
-                </div>
+                </div> */}
                 <div>
                   <div className="flex items-center space-x-3 mb-2">
                     <h1 className="text-3xl font-bold text-gray-900">{company.name}</h1>

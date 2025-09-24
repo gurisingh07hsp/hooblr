@@ -13,18 +13,28 @@ const ReactQuill = dynamic(() => import('react-quill'), {
 import 'react-quill/dist/quill.snow.css';
 
 interface BlogPost {
-  id?: string;
+  _id?: string;
   title: string;
+  slug?: string;
   author: string;
-  category: string;
-  status: 'draft' | 'published' | 'archived';
   content: string;
-  excerpt?: string;
-  tags?: string[];
-  featuredImage?: string;
-  published?: string;
+  excerpt: string;
+  category: 'Interview Tips' | 'Workplace' | 'Government Jobs' | 'Career Growth' | 'Networking' | 'Salary Guide' | 'Resume Tips' | 'Industry News' | string;
+  tags: string[];
+  featuredImage: string;
+  status: 'draft' | 'published' | 'archived';
+  publishedAt?: string;
   views?: number;
   likes?: number;
+  comments?: any[];
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string[];
+  };
+  featured?: boolean;
+  readTime?: number;
+  createdAt?: string;
 }
 
 interface BlogPostEditorProps {
@@ -42,7 +52,7 @@ export default function BlogPostEditor({
   const [blogPost, setBlogPost] = useState<BlogPost>({
     title: '',
     author: '',
-    category: 'Career Advice',
+    category: 'Career Growth',
     status: 'draft',
     content: '',
     excerpt: '',
@@ -76,7 +86,7 @@ export default function BlogPostEditor({
   const handleSave = () => {
     const postToSave = {
       ...blogPost,
-      id: blogPost.id || Date.now().toString(),
+      id: blogPost._id || Date.now().toString(),
       published: blogPost.status === 'published' ? new Date().toISOString().split('T')[0] : undefined,
       views: blogPost.views || 0,
       likes: blogPost.likes || 0

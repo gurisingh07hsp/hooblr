@@ -19,7 +19,6 @@ router.get('/dashboard', async (req, res) => {
     const stats = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ role: 'user' }),
-      User.countDocuments({ role: 'company' }),
       Job.countDocuments(),
       Job.countDocuments({ status: 'active' }),
       BlogPost.countDocuments(),
@@ -43,7 +42,7 @@ router.get('/dashboard', async (req, res) => {
       .select('email role createdAt');
 
     const recentJobs = await Job.find()
-      .populate('company', 'company.name')
+      .populate('company', 'name')
       .sort({ createdAt: -1 })
       .limit(5)
       .select('title company status createdAt');
@@ -216,7 +215,7 @@ router.get('/jobs', [
     const skip = (page - 1) * limit;
 
     const jobs = await Job.find(filter)
-      .populate('company', 'company.name company.logo')
+      .populate('company', 'name logo')
       .sort(sortObj)
       .skip(skip)
       .limit(parseInt(limit));

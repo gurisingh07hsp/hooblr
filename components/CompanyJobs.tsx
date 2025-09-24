@@ -34,6 +34,7 @@ interface Job {
     };
     coverLetter: string;
     resume: string;
+    phone?: string;
     status: 'pending' | 'reviewed' | 'shortlisted' | 'rejected' | 'hired';
     appliedAt: string;
   }>;
@@ -201,6 +202,10 @@ const CompanyJobs = () => {
         </div>
 
         {/* Meta Info */}
+        {app.phone && <p className="text-sm text-gray-500 mb-6">
+          Phone: {app.phone}
+        </p> }
+        
         <p className="text-sm text-gray-500 mb-6">
           Applied on: {new Date(app.appliedAt).toLocaleDateString()}
         </p>
@@ -273,7 +278,7 @@ const CompanyJobs = () => {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
         {[
-          { label: 'Total Jobs', count: jobs?.length, status: 'all' },
+          { label: 'Total Jobs', count: jobs?.flat().length, status: 'all' },
           { label: 'Active', count: jobs?.flat().filter(j => j.status === 'active').length, status: 'active' },
           { label: 'Paused', count: jobs?.flat().filter(j => j.status === 'paused').length, status: 'paused' },
           { label: 'Closed', count: jobs?.flat().filter(j => j.status === 'closed').length, status: 'closed' },

@@ -104,7 +104,8 @@ const jobSchema = new mongoose.Schema({
       default: Date.now
     },
     coverLetter: String,
-    resume: String
+    resume: String,
+    phone: String
   }],
   tags: [String],
   featured: {

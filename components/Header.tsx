@@ -7,7 +7,7 @@ import { useUser } from '@/context/UserContext';
 import { 
   Menu, 
   X,  
-  Shield,
+  LogOut
 } from 'lucide-react';
 import PostJobModal from './PostJobModal';
 import Image from 'next/image';
@@ -88,7 +88,7 @@ const Header = () => {
 
                   <button
                     onClick={() => router.push('/dashboard')}
-                    className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
+                    className="text-gray-700 border hover:border-purple-600 p-2 rounded-lg hover:text-purple-600 transition-colors font-medium"
                   >
                     Dashboard
                   </button>
@@ -104,9 +104,10 @@ const Header = () => {
                   
                   <button
                     onClick={handleLogout}
-                    className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
+                    className="p-2 flex items-center rounded-lg bg-red-600 text-white transition-colors font-medium"
                   >
                     Logout
+                    <LogOut className='w-4 h-4 ms-1'/>
                   </button>
                 </div>
               ) : (
@@ -202,7 +203,7 @@ const Header = () => {
 
                 <button
                     onClick={() => router.push('/dashboard')}
-                    className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
+                    className="text-gray-700 px-3 py-2 hover:text-purple-600 transition-colors font-medium"
                   >
                     Dashboard
                   </button>

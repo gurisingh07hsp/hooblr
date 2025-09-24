@@ -419,9 +419,16 @@ export default function CompaniesPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex flex-col items-start space-x-4 flex-1">
                       <div className='flex'>
-                      <div className="w-16 h-16 bg-[#9333E9] rounded-xl flex items-center justify-center shadow-lg">
+                      {company.logo ? (
+                        <img src={company.logo} alt='company logo' width={80} height={70} className='rounded-md'/>
+                      ): (
+                      <div className="w-16 hidden h-16 bg-[#9333E9] rounded-xl lg:flex items-center justify-center shadow-lg">
                         <Building2 className="w-8 h-8 text-white" />
                       </div>
+                      )}
+                      {/* <div className="w-16 h-16 bg-[#9333E9] rounded-xl flex items-center justify-center shadow-lg">
+                        <Building2 className="w-8 h-8 text-white" />
+                      </div> */}
                       
                         <div className="flex ms-4 items-center space-x-3 mb-2">
                           <h3 className="text-xl font-bold text-gray-900 hover:text-purple-600 cursor-pointer transition-colors">

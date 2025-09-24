@@ -47,6 +47,7 @@ export default function JobDetailsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
   const [resume, setResume] = useState('');
+  const [phone, setPhone] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [isApplied, setIsApplied] = useState(false); 
@@ -89,7 +90,7 @@ export default function JobDetailsPage() {
     if (!id) return;
     try {
       setSubmitting(true);
-      const res = await axios.post(`${API_BASE}/api/jobs/${id}/apply`, { coverLetter, resume }, {withCredentials:true});
+      const res = await axios.post(`${API_BASE}/api/jobs/${id}/apply`, { coverLetter, resume, phone }, {withCredentials:true});
       if(res.status === 200){
         setCoverLetter('');
         setResume('');
@@ -287,6 +288,10 @@ export default function JobDetailsPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Resume / Summary</label>
                 <textarea value={resume} onChange={(e) => setResume(e.target.value)} rows={4} className="w-full border rounded-lg px-3 py-2" placeholder="Paste resume or short experience summary" required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone*</label>
+                <input type='text' value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border rounded-lg px-3 py-2" required />
               </div>
               <p className='text-center text-red-600 font-semibold'>{error}</p>
               <div className="flex justify-end gap-3 pt-2">
