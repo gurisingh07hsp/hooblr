@@ -35,6 +35,7 @@ interface Job {
     coverLetter: string;
     resume: string;
     phone?: string;
+    location?: string;
     status: 'pending' | 'reviewed' | 'shortlisted' | 'rejected' | 'hired';
     appliedAt: string;
   }>;
@@ -140,6 +141,20 @@ const CompanyJobs = () => {
     ? jobs 
     : jobs?.flat().filter(job => job.status === filterStatus);
 
+  const handleChangeStatus = async(value: string, userId: string) => {
+    if(selectedJob){
+    try{
+      const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs/applications/change-status`, {jobId: selectedJob._id, userId, value}, {withCredentials: true});
+      if(response.status === 200){
+        setSelectedJob(response.data.job);
+        console.log(response.data);
+      }
+    }catch(error){
+      console.error(error);
+    }
+  }
+}
+
   if (showJobForm) {
     return (
       <>
@@ -188,6 +203,15 @@ const CompanyJobs = () => {
           <h3 className="text-xl font-semibold text-gray-800">
             {app.user.profile.name}
           </h3>
+          <div>
+            <select onChange={(e)=>handleChangeStatus(e.target.value, app.user._id)} name="status" id="status" className='p-2 rounded-lg'>
+              <option value="">Change Status</option>
+              <option value="reviewed">Reviewed</option>
+              <option value="shortlisted">Shortlisted</option>
+              <option value="rejected">Rejected</option>
+              <option value="hired">Hired</option>
+            </select>
+          </div>
           <span
             className={`px-3 py-1 rounded-full text-sm font-medium ${
               app.status === "shortlisted"
@@ -205,13 +229,16 @@ const CompanyJobs = () => {
         {app.phone && <p className="text-sm text-gray-500 mb-6">
           Phone: {app.phone}
         </p> }
+        {app.location && <p className="text-sm text-gray-500 mb-6">
+          Location: {app.location}
+        </p> }
         
         <p className="text-sm text-gray-500 mb-6">
           Applied on: {new Date(app.appliedAt).toLocaleDateString()}
         </p>
 
         {/* Grid Layout for Documents */}
-        <div className="grid lg:grid-cols-2 grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-6">
           {/* Cover Letter */}
           <div className="p-4 border rounded-lg bg-white shadow-sm overflow-auto">
             <h2 className="text-lg font-semibold mb-2 text-gray-700">
@@ -410,11 +437,24 @@ const CompanyJobs = () => {
             ))}
           </div>
 
+
           {/* Job Details */}
           <div className="lg:sticky lg:top-8">
             {selectedJob ? (
               <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-start justify-between mb-6">
+                <div className="space-y-3 pb-4 border-b border-gray-200">             
+                  <button
+                    onClick={() => handleEditJob(selectedJob)}
+                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Edit Job
+                  </button>
+                  
+                  <button onClick={()=> setShowApplications(true)} className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
+                    View Applications
+                  </button>
+                </div>
+                <div className="flex items-start mt-2 justify-between mb-6">
                   <div>
                     <h2 className="text-xl font-bold text-gray-900 mb-2">{selectedJob.title}</h2>
                     <p className="text-gray-600">{selectedJob.department} • {selectedJob.category}</p>
@@ -477,7 +517,7 @@ const CompanyJobs = () => {
                   </div>
                 </div>
 
-                <div className="space-y-3 pt-4 border-t border-gray-200">             
+                {/* <div className="space-y-3 pt-4 border-t border-gray-200">             
                   <button
                     onClick={() => handleEditJob(selectedJob)}
                     className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
@@ -488,7 +528,7 @@ const CompanyJobs = () => {
                   <button onClick={()=> setShowApplications(true)} className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
                     View Applications
                   </button>
-                </div>
+                </div> */}
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow p-6 text-center">

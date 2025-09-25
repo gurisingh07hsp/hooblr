@@ -279,6 +279,47 @@ router.put('/:id', auth, authorize('user', 'admin'), jobValidation, async (req, 
   }
 });
 
+// router.put('/applications/change-status', auth, async(req,res) => {
+//   try{
+//     const {jobId, userId, value} = req.body;
+
+//     const job = Job.findByIdAndUpdate(
+//       jobId,
+//       {applications: {user: userId}},
+//       { status: value },
+//       { new: true, runValidators: true }
+//     );
+//     res.status(200).json('Done');
+//   }catch(error){
+//     res.status(500).json({error: 'Server error'});
+//   }
+// })
+
+router.put('/applications/change-status', auth, async (req, res) => {
+  try {
+    const { jobId, userId, value } = req.body;
+
+    const job = await Job.findByIdAndUpdate(
+      jobId,
+      { $set: { "applications.$[elem].status": value } },
+      {
+        new: true,
+        runValidators: true,
+        arrayFilters: [{ "elem.user": userId }]
+      }
+    ).populate('applications.user', 'profile.name profile.avatar');
+
+    if (!job) {
+      return res.status(404).json({ error: "Job not found" });
+    }
+
+    res.status(200).json({ message: "Status updated successfully", job });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // @route   DELETE /api/jobs/:id
 // @desc    Delete a job
 // @access  Private (Job owner or admin)
@@ -336,7 +377,8 @@ router.post('/:id/apply', auth, authorize('user'), [
       user: req.user._id,
       coverLetter: req.body.coverLetter,
       resume: req.body.resume,
-      phone: req.body.phone
+      phone: req.body.phone,
+      location: req.body.location
     });
 
     await job.save();

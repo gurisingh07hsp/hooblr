@@ -105,7 +105,8 @@ const jobSchema = new mongoose.Schema({
     },
     coverLetter: String,
     resume: String,
-    phone: String
+    phone: String,
+    location: String,
   }],
   tags: [String],
   featured: {

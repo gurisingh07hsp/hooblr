@@ -303,14 +303,13 @@ router.get('/blog', [
     const skip = (page - 1) * limit;
 
     const posts = await BlogPost.find(filter)
-      .populate('author', 'profile.firstName profile.lastName company.name')
       .sort(sortObj)
       .skip(skip)
       .limit(parseInt(limit));
 
     const total = await BlogPost.countDocuments(filter);
 
-    res.json({
+    res.status(200).json({
       posts,
       pagination: {
         page: parseInt(page),

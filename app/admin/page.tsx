@@ -66,7 +66,7 @@ interface BlogPost {
   _id?: string;
   title: string;
   slug?: string;
-  author: string;
+  author?: string;
   content: string;
   excerpt: string;
   category: 'Interview Tips' | 'Workplace' | 'Government Jobs' | 'Career Growth' | 'Networking' | 'Salary Guide' | 'Resume Tips' | 'Industry News' | string;
@@ -219,9 +219,12 @@ export default function AdminPage() {
 
   const fetchBlogPosts = async () => {
     try {
-      const response = await fetch('/api/admin/blog-posts');
-      const data = await response.json();
-      setBlogPosts(data.posts || []);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/blog`, {withCredentials:true});
+      if(response.status == 200){
+        console.log("blogs: ", response.data);
+        const data = response.data;
+        setBlogPosts(data.posts || []);
+      }
     } catch (error) {
       console.error('Error fetching blog posts:', error);
     }
@@ -266,24 +269,17 @@ export default function AdminPage() {
         }
       } else if (type === 'job') {
         if (mode === 'create') {
-          const response = await fetch('/api/admin/jobs', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
-          const result = await response.json();
-          if (result.success) {
-            setJobs(prev => [...prev, result.job]);
+          const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs/`, data, {withCredentials: true} );
+          if(response.status === 200){
+            fetchJobs();
+            closeModal();
           }
+          
         } else if (mode === 'edit') {
-          const response = await fetch(`/api/admin/jobs/${data._id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
-          const result = await response.json();
-          if (result.success) {
-            setJobs(prev => prev.map(j => j._id === data._id ? result.job : j));
+          const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs/${data._id}`, data, {withCredentials: true});
+          if (response.status === 200) {
+            setJobs(prev => prev.map(j => j._id === data._id ? response.data.job : j));
+            closeModal();
           }
         }
       }
@@ -301,7 +297,6 @@ export default function AdminPage() {
     
     try {
       setLoading(true);
-      // const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${type}s/${id}`, {withCredentials:true});
       
       if (type === 'company') {
         const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies/${id}`, {withCredentials:true});
@@ -309,12 +304,18 @@ export default function AdminPage() {
           fetchCompanies();
         }
       } else if (type === 'job') {
-        setJobs(prev => prev.filter(j => j._id !== id));
+        const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs/${id}`, {withCredentials:true});
+        if(response.status === 200){
+          setJobs(prev => prev.filter(j => j._id !== id));
+        }
       } else if (type === 'blog-post') {
-        setBlogPosts(prev => prev.filter(p => p._id !== id));
+         const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/blog/${id}`, {withCredentials:true});
+         if(response.status == 200){
+           setBlogPosts(prev => prev.filter(p => p._id !== id));
+         }
       } else if (type === 'user') {
         setUsers(prev => prev.filter(u => u._id !== id));
-      }
+      }   
     } catch (error) {
       console.error('Error deleting:', error);
     } finally {
@@ -471,8 +472,8 @@ export default function AdminPage() {
       category: job?.category || '',
       department: job?.department || '',
       salary: {
-        min: job?.salary?.min || 0,
-        max: job?.salary?.max || 0,
+        min: job?.salary?.min,
+        max: job?.salary?.max,
         currency: job?.salary?.currency || 'USD',
         period: job?.salary?.period || 'yearly'
       },
@@ -600,7 +601,7 @@ export default function AdminPage() {
               value={formData.salary.min}
               onChange={(e) => setFormData({ 
                 ...formData, 
-                salary: { ...formData.salary, min: parseInt(e.target.value) || 0 }
+                salary: { ...formData.salary, min: parseInt(e.target.value)}
               })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -613,7 +614,7 @@ export default function AdminPage() {
               value={formData.salary.max}
               onChange={(e) => setFormData({ 
                 ...formData, 
-                salary: { ...formData.salary, max: parseInt(e.target.value) || 0 }
+                salary: { ...formData.salary, max: parseInt(e.target.value)}
               })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -629,6 +630,7 @@ export default function AdminPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="USD">USD</option>
+              <option value="INR">INR</option>
               <option value="EUR">EUR</option>
               <option value="GBP">GBP</option>
             </select>
@@ -925,6 +927,60 @@ export default function AdminPage() {
           )}
         </div>
       );
+    }
+    if(type === "blog"){
+      return (
+            <div className="prose max-w-none">
+      <h1 className="text-3xl font-bold text-gray-900 mb-4">{data.title}</h1>
+      <div className="flex items-center space-x-4 text-sm text-gray-600 mb-6">
+        <span>By {data.author}</span>
+        <span>•</span>
+        <span>{data.category}</span>
+        <span>•</span>
+        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+          data.status === 'published' ? 'bg-green-100 text-green-800' :
+          data.status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
+          'bg-red-100 text-red-800'
+        }`}>
+          {data.status}
+        </span>
+      </div>
+      
+      {data.featuredImage && (
+        <img 
+          src={data.featuredImage} 
+          alt={data.title}
+          className="w-full h-64 object-cover rounded-lg mb-6"
+        />
+      )}
+      
+      {data.excerpt && (
+        <div className="bg-gray-50 p-4 rounded-lg mb-6">
+          <p className="text-lg text-gray-700 italic">{data.excerpt}</p>
+        </div>
+      )}
+      
+      <div 
+        className="text-gray-700 leading-relaxed"
+        dangerouslySetInnerHTML={{ __html: data.content }}
+      />
+      
+      {data.tags && data.tags.length > 0 && (
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <div className="flex flex-wrap gap-2">
+            {data.tags.map((tag: string) => (
+              <span 
+                key={tag}
+                className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+      )
     }
 
     return null;
@@ -1340,8 +1396,8 @@ export default function AdminPage() {
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">{post.title}</h3>
                   <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
-                    <span>By {post.author || 'Unknown'}</span>
-                    <span>•</span>
+                    {/* <span>By {post.author || 'Unknown'}</span> */}
+                    {/* <span>•</span> */}
                     <span>{post.category}</span>
                     {post.publishedAt && (
                       <>
@@ -1719,7 +1775,7 @@ export default function AdminPage() {
                 {/* <p className="text-xs text-gray-500">{adminUser?.email}</p> */}
               </div>
               <button
-                // onClick={handleLogout}
+                onClick={logout}
                 className="flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors p-2 rounded-lg hover:bg-red-50"
               >
                 <LogOut className="w-5 h-5" />

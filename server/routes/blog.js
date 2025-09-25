@@ -20,7 +20,7 @@ const blogPostValidation = [
 // @route   GET /api/blog
 // @desc    Get all blog posts
 // @access  Public
-router.get('/', optionalAuth, [
+router.get('/', [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('Limit must be between 1 and 50'),
   query('category').optional().isString().withMessage('Category must be a string'),
@@ -66,7 +66,7 @@ router.get('/', optionalAuth, [
 
     const total = await BlogPost.countDocuments(filter);
 
-    res.json({
+    res.status(200).json({
       posts,
       pagination: {
         page: parseInt(page),
@@ -128,9 +128,9 @@ router.post('/', auth, authorize('admin'), blogPostValidation, async (req, res) 
     await post.save();
 
     const populatedPost = await BlogPost.findById(post._id)
-      .populate('author', 'profile.firstName profile.lastName company.name');
+      .populate('author', 'profile.name');
 
-    res.status(201).json({
+    res.status(200).json({
       message: 'Blog post created successfully',
       post: populatedPost
     });
@@ -164,9 +164,9 @@ router.put('/:id', auth, authorize('admin'), blogPostValidation, async (req, res
       req.params.id,
       req.body,
       { new: true, runValidators: true }
-    ).populate('author', 'profile.firstName profile.lastName company.name');
+    );
 
-    res.json({
+    res.status(200).json({
       message: 'Blog post updated successfully',
       post: updatedPost
     });
@@ -188,7 +188,7 @@ router.delete('/:id', auth, authorize('admin'), async (req, res) => {
 
     await BlogPost.findByIdAndDelete(req.params.id);
 
-    res.json({ message: 'Blog post deleted successfully' });
+    res.status(200).json({ message: 'Blog post deleted successfully' });
   } catch (error) {
     console.error('Delete blog post error:', error);
     res.status(500).json({ error: 'Server error' });

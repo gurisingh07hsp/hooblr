@@ -11,12 +11,13 @@ const ReactQuill = dynamic(() => import('react-quill'), {
 });
 
 import 'react-quill/dist/quill.snow.css';
+import axios from 'axios';
 
 interface BlogPost {
   _id?: string;
   title: string;
   slug?: string;
-  author: string;
+  author?: string;
   content: string;
   excerpt: string;
   category: 'Interview Tips' | 'Workplace' | 'Government Jobs' | 'Career Growth' | 'Networking' | 'Salary Guide' | 'Resume Tips' | 'Industry News' | string;
@@ -51,7 +52,7 @@ export default function BlogPostEditor({
   const initialPost = post || {};
   const [blogPost, setBlogPost] = useState<BlogPost>({
     title: '',
-    author: '',
+    slug: '',
     category: 'Career Growth',
     status: 'draft',
     content: '',
@@ -83,15 +84,25 @@ export default function BlogPostEditor({
     'link', 'image', 'blockquote', 'code-block'
   ];
 
-  const handleSave = () => {
-    const postToSave = {
-      ...blogPost,
-      id: blogPost._id || Date.now().toString(),
-      published: blogPost.status === 'published' ? new Date().toISOString().split('T')[0] : undefined,
-      views: blogPost.views || 0,
-      likes: blogPost.likes || 0
-    };
-    onSave(postToSave);
+  const handleSave = async() => {
+    try{
+      if(mode == "create"){
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/blog/`, blogPost, {withCredentials:true});
+        if(response.status == 200){
+          onSave(response.data.blog);
+          onCancel();
+        }
+      }
+      else{
+        const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/blog/${blogPost._id}`, blogPost, {withCredentials: true});
+        if(response.status == 200){
+          onSave(response.data.blog);
+          onCancel();
+        }
+      }
+    }catch(error){
+      console.error(error);
+    }
   };
 
   const addTag = () => {
@@ -185,7 +196,7 @@ export default function BlogPostEditor({
             placeholder="Enter blog post title..."
           />
         </div>
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Author *</label>
           <input
             type="text"
@@ -194,7 +205,7 @@ export default function BlogPostEditor({
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Enter author name..."
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -205,10 +216,11 @@ export default function BlogPostEditor({
             onChange={(e) => setBlogPost({...blogPost, category: e.target.value})}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="Career Advice">Career Advice</option>
+            <option value="Career Growth">Career Growth</option>
             <option value="Workplace">Workplace</option>
-            <option value="Technology">Technology</option>
-            <option value="Leadership">Leadership</option>
+            <option value="Industry News">Industry News</option>
+            <option value="Networking">Networking</option>
+            <option value="Salary Guide">Salary Guide</option>
             <option value="Government Jobs">Government Jobs</option>
             <option value="Interview Tips">Interview Tips</option>
             <option value="Resume Writing">Resume Writing</option>
@@ -229,15 +241,26 @@ export default function BlogPostEditor({
       </div>
 
       {/* Featured Image */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Featured Image URL</label>
-        <input
-          type="url"
-          value={blogPost.featuredImage}
-          onChange={(e) => setBlogPost({...blogPost, featuredImage: e.target.value})}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="https://example.com/image.jpg"
-        />
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Featured Image URL</label>
+          <input
+            type="url"
+            value={blogPost.featuredImage}
+            onChange={(e) => setBlogPost({...blogPost, featuredImage: e.target.value})}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="https://example.com/image.jpg"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Slug*</label>
+          <input
+            type="text"
+            value={blogPost.slug}
+            onChange={(e) => setBlogPost({...blogPost, slug: e.target.value})}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
       </div>
 
       {/* Excerpt */}
@@ -342,7 +365,7 @@ export default function BlogPostEditor({
             </button>
             <button
               onClick={handleSave}
-              disabled={!blogPost.title || !blogPost.author || !blogPost.content}
+              disabled={!blogPost.title || !blogPost.content}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="w-4 h-4" />

@@ -48,6 +48,7 @@ export default function JobDetailsPage() {
   const [coverLetter, setCoverLetter] = useState('');
   const [resume, setResume] = useState('');
   const [phone, setPhone] = useState('');
+  const [location, setLocation] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [isApplied, setIsApplied] = useState(false); 
@@ -90,7 +91,7 @@ export default function JobDetailsPage() {
     if (!id) return;
     try {
       setSubmitting(true);
-      const res = await axios.post(`${API_BASE}/api/jobs/${id}/apply`, { coverLetter, resume, phone }, {withCredentials:true});
+      const res = await axios.post(`${API_BASE}/api/jobs/${id}/apply`, { coverLetter, resume, phone, location }, {withCredentials:true});
       if(res.status === 200){
         setCoverLetter('');
         setResume('');
@@ -166,23 +167,9 @@ export default function JobDetailsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
-      <header className="bg-white backdrop-blur-sm shadow-sm border-b border-purple-200 fixed w-full top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <button onClick={() => router.push('/jobs')} className="flex items-center text-gray-600 hover:text-purple-600">
-              <ArrowLeft className="w-5 h-5 mr-2" /> Back to Jobs
-            </button>
-            <div className="flex items-center gap-2">
-              <button className="p-2 text-gray-400 hover:text-red-500"><Heart className="w-5 h-5" /></button>
-              <button className="p-2 text-gray-400 hover:text-purple-500"><Share2 className="w-5 h-5" /></button>
-            </div>
-          </div>
-        </div>
-      </header>
-
       {showLoginPrompt && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="w-[40vw] bg-white rounded-2xl shadow-2xl overflow-hidden">
+          <div className="lg:w-[40vw] w-[90vw] bg-white rounded-2xl shadow-2xl overflow-hidden">
             
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
@@ -292,6 +279,10 @@ export default function JobDetailsPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Phone*</label>
                 <input type='text' value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border rounded-lg px-3 py-2" required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Location*</label>
+                <input type='text' value={location} onChange={(e) => setLocation(e.target.value)} className="w-full border rounded-lg px-3 py-2" required />
               </div>
               <p className='text-center text-red-600 font-semibold'>{error}</p>
               <div className="flex justify-end gap-3 pt-2">

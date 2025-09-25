@@ -259,6 +259,8 @@ import CompanyProfile from './CompanyProfile';
 import CompanyJobs from './CompanyJobs';
 import axios from 'axios';
 import { ChartBarIcon } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface SidebarItem {
   id: string;
@@ -269,6 +271,7 @@ interface SidebarItem {
 
 const UserDashboard = () => {
   const { user, logout } = useUser();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -316,10 +319,9 @@ const UserDashboard = () => {
       {/* Header */}
       <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
         <div className="flex items-center">
-          <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-            <span className="text-white font-bold text-sm">JB</span>
+          <div className="flex items-center cursor-pointer" onClick={() => router.push('/')}>
+            <Image src='/hooblrlogo.png' width={120} height={50} alt='logo'/>
           </div>
-          <span className="ml-2 text-lg font-semibold text-gray-900">JobBoard</span>
         </div>
         {/* Close button for mobile */}
         <button
@@ -437,10 +439,9 @@ const UserDashboard = () => {
               <Bars3Icon className="h-6 w-6" />
             </button>
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-sm">JB</span>
+              <div className="flex items-center cursor-pointer" onClick={() => router.push('/')}>
+                <Image src='/hooblrlogo.png' width={120} height={50} alt='logo'/>
               </div>
-              <span className="ml-2 text-lg font-semibold text-gray-900">JobBoard</span>
             </div>
             <div className="w-10"></div> {/* Spacer for centering */}
           </div>

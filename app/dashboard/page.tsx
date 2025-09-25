@@ -5,7 +5,6 @@
 import { useUser } from '@/context/UserContext';
 import UserDashboard from '@/components/UserDashboard';
 import { useRouter } from 'next/navigation';
-import CompanyDashboard from '@/components/CompanyDashboard';
 import { useEffect } from 'react';
 import axios from 'axios';
 
