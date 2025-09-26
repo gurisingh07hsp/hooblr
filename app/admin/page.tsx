@@ -7,6 +7,7 @@ import BlogPostEditor from '../../components/BlogPostEditor';
 import Footer from '@/components/Footer';
 import { useUser } from '@/context/UserContext';
 import axios from 'axios';
+import Image from 'next/image';
 
 // Enhanced interfaces
 interface Company {
@@ -239,6 +240,10 @@ export default function AdminPage() {
       console.error('Error fetching users:', error);
     }
   };
+
+  useEffect(()=>{
+    fetchBlogPosts();
+  },[setBlogEditorState])
 
   const openModal = (type: 'company' | 'job' | 'blog' | 'user', mode: 'create' | 'edit' | 'view', data?: any) => {
     setModalState({ type, mode, isOpen: true, data });
@@ -1255,7 +1260,7 @@ export default function AdminPage() {
       </div>
 
       {/* Jobs Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-white w-[80vw] lg:w-full rounded-lg border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
@@ -1387,8 +1392,8 @@ export default function AdminPage() {
         <div className="space-y-4">
           {blogPosts
             .filter(post => 
-              post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              post.category.toLowerCase().includes(searchTerm.toLowerCase())
+              post?.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              post?.category.toLowerCase().includes(searchTerm.toLowerCase())
             )
             .map((post) => (
             <div key={post._id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
@@ -1514,7 +1519,7 @@ export default function AdminPage() {
         </div>
 
         {/* Users Table */}
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-lg w-[80vw] lg:w-full border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">
@@ -1752,27 +1757,25 @@ export default function AdminPage() {
              <div className="flex items-center space-x-4">
                <button
                 onClick={() => router.push('/')}
-                className="flex items-center space-x-2 text-gray-600 hover:text-purple-600 transition-colors p-2 rounded-lg hover:bg-purple-50"
+                className="lg:flex hidden items-center space-x-2 text-gray-600 hover:text-purple-600 transition-colors p-2 rounded-lg hover:bg-purple-50"
               >
                 <ArrowLeft className="w-5 h-5" />
                 <span className="font-medium">Back to Site</span>
               </button>
-              <div className="h-6 w-px bg-purple-300"></div>
+              <Menu onClick={()=>setSidebarOpen(true)} className='lg:hidden block'/>
+              <div className="h-6 lg:block hidden w-px bg-purple-300"></div>
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Shield className="w-7 h-7 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-gray-900">Hooblr Admin</h1>
-                  <p className="text-sm text-gray-600">System Management</p>
-                </div>
+                 <div 
+                              className="flex items-center cursor-pointer"
+                              onClick={() => router.push('/')}
+                            >
+                            <Image src='/hooblrlogo.png' width={120} height={50} alt='logo'/>
+                            </div>
               </div>
             </div>
             
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                {/* <p className="text-sm font-medium text-gray-900">{adminUser?.name}</p> */}
-                {/* <p className="text-xs text-gray-500">{adminUser?.email}</p> */}
               </div>
               <button
                 onClick={logout}

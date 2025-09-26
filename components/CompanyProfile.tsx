@@ -81,6 +81,7 @@ const CompanyProfile = () => {
   };
 
   const handleUpload = async (e: any) => {
+    setLoading(true);
     const file = e.target.files[0];
     if (!file) return;
 
@@ -95,7 +96,7 @@ const CompanyProfile = () => {
 
     const data = await res.json();
     setProfileData(prev => ({ ...prev, logo: data.secure_url }));
-    console.log("Uploaded image:", data.secure_url);
+    setLoading(false);
   };
 
 

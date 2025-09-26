@@ -59,7 +59,7 @@ router.get('/', [
     const skip = (page - 1) * limit;
 
     const posts = await BlogPost.find(filter)
-      .populate('author', 'profile.firstName profile.lastName company.name')
+      .populate('author', 'profile')
       .sort(sortObj)
       .skip(skip)
       .limit(parseInt(limit));
@@ -87,7 +87,7 @@ router.get('/', [
 router.get('/:slug', optionalAuth, async (req, res) => {
   try {
     const post = await BlogPost.findOne({ slug: req.params.slug, status: 'published' })
-      .populate('author', 'profile.firstName profile.lastName company.name');
+      .populate('author', 'profile');
 
     if (!post) {
       return res.status(404).json({ error: 'Blog post not found' });
@@ -97,7 +97,7 @@ router.get('/:slug', optionalAuth, async (req, res) => {
     post.views += 1;
     await post.save();
 
-    res.json({ post });
+    res.status(200).json({ post });
   } catch (error) {
     console.error('Get blog post error:', error);
     res.status(500).json({ error: 'Server error' });

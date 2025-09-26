@@ -89,14 +89,14 @@ export default function BlogPostEditor({
       if(mode == "create"){
         const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/blog/`, blogPost, {withCredentials:true});
         if(response.status == 200){
-          onSave(response.data.blog);
+          onSave(response.data.post);
           onCancel();
         }
       }
       else{
         const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/blog/${blogPost._id}`, blogPost, {withCredentials: true});
         if(response.status == 200){
-          onSave(response.data.blog);
+          onSave(response.data.post);
           onCancel();
         }
       }
@@ -315,7 +315,7 @@ export default function BlogPostEditor({
       {/* Rich Text Editor */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Content *</label>
-        <div className="border border-gray-300 rounded-lg">
+        <div className="rounded-lg pb-10">
           <ReactQuill
             value={blogPost.content}
             onChange={(content) => setBlogPost({...blogPost, content})}
@@ -333,11 +333,11 @@ export default function BlogPostEditor({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex flex-wrap relative items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-4">
             <button
               onClick={onCancel}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 hidden lg:block rounded-full transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-gray-500" />
             </button>
@@ -349,9 +349,17 @@ export default function BlogPostEditor({
                 {mode === 'create' ? 'Write a new blog post for your audience' : 'Update your blog post content'}
               </p>
             </div>
+
+               <button
+              onClick={onCancel}
+              className="p-2 hover:bg-gray-100 lg:hidden block absolute right-4 top-4 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+
           </div>
           
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center mt-2 lg:mt-0 space-x-3">
             <button
               onClick={() => setIsPreviewMode(!isPreviewMode)}
               className={`px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 ${
@@ -373,7 +381,7 @@ export default function BlogPostEditor({
             </button>
             <button
               onClick={onCancel}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 hidden lg:block rounded-full transition-colors"
             >
               <X className="w-5 h-5 text-gray-500" />
             </button>

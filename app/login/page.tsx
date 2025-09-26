@@ -3,17 +3,23 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useUser } from "@/context/UserContext";
 import { useRouter } from 'next/navigation';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { signIn} from "next-auth/react";
 import { FcGoogle } from "react-icons/fc";
 import {Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { usePreviousRoute } from '@/hooks/usePreviousRoute';
 
 export default function AuthModal() {
   const { setUser} = useUser();
   const router = useRouter();
-  // const [selectedRole, setSelectedRole] = useState<'user' | 'company' | 'admin' | null>(null);
+  const previousRoute = usePreviousRoute();
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [showPassword, setShowPassword] = useState(false);
+   const [email, setEmail] = useState('');
+   const [showForgot, setShowForgot] = useState(false);
   const [message, setMessage] = useState('');
+   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -47,10 +53,12 @@ export default function AuthModal() {
         const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`, formData, {withCredentials: true});
         setUser(response.data.user);
         setMessage('✅ Account Created successful!');
+        if (previousRoute === "/forgotpassword") {
+          router.push("/");
+        } else {
+          router.back();
+        }
         resetForm();
-        setTimeout(()=>{
-        router.back();
-        },1500);
       }catch(error){
         if (axios.isAxiosError(error)) {
           const err = error.response?.data?.message || 'Failed to Signup';
@@ -65,7 +73,11 @@ export default function AuthModal() {
         const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, formData, {withCredentials: true});
         setUser(response.data.user);
         setMessage('✅ Login successful!');
-        router.back();
+        if (previousRoute === "/login") {
+          router.push("/");
+        } else {
+          router.back();
+        }
         resetForm();
       }catch(error){
         if (axios.isAxiosError(error)) {
@@ -77,6 +89,28 @@ export default function AuthModal() {
       } 
     }
   };
+
+
+      const handleClick = async(e: React.FormEvent) => {
+        e.preventDefault();
+         setLoading(true);
+        try {
+          const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/forgotpassword`, {email});
+          if(response.status == 200){
+            setLoading(false);
+            window.location.href = `/forgotpassword?email=${email}`;
+            console.log(response.data);
+          }
+          else{
+            setLoading(false);
+            setMessage(response.data.message);
+          }
+        } catch(error) {
+          setLoading(false);
+          setMessage("Email not found");
+          console.log(error);
+        }
+      }
 
   const resetForm = () => {
     setAuthMode('signin');
@@ -96,7 +130,7 @@ export default function AuthModal() {
 
   return (
     <div className="fixed inset-0 bg-zinc-200 flex items-center justify-center z-50 p-4" style={{ zIndex: 9999 }}>
-      <div className="bg-white rounded-xl w-full max-w-md overflow-hidden" style={{ zIndex: 10000 }}>
+      <div className={`bg-white ${showForgot ? 'hidden' : 'block'} rounded-xl w-full max-w-md overflow-hidden`} style={{ zIndex: 10000 }}>
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-2xl font-semibold text-gray-900">
@@ -106,7 +140,7 @@ export default function AuthModal() {
 
         {/* Authentication Step */}
         
-          <div className={`${authMode == 'signin' ? 'p-6' : 'px-6'}`}>
+          <div className={`${authMode == 'signin' ? 'p-6' : 'px-6'} ${showForgot ? 'hidden' : 'block'}`}>
 
             {/* Auth Mode Toggle */}
             <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
@@ -220,6 +254,14 @@ export default function AuthModal() {
                 <FcGoogle className="mr-2 size-5" />
                 {authMode === 'signin' ? 'Continue with Google' : 'Sign up with Google'}
               </button>
+
+               {authMode === 'signin' && (
+                  <button onClick={()=> setShowForgot(true)} className="text-blue-600 ms-[35%] mt-2 hover:text-blue-700 text-sm transition-colors">
+                    Forgot password?
+                  </button>
+                )}
+
+
             {/* Terms and Privacy (Sign Up Only) */}
             {authMode === 'signup' && (
                 <p className="text-xs text-gray-600 text-center mt-3 pb-2">
@@ -230,8 +272,51 @@ export default function AuthModal() {
                 </p>
               )}
           </div>
-
       </div>
+                  <section className={`${showForgot ? 'flex' : 'hidden'} min-h-screen bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent`}>
+                <form onSubmit={handleClick}
+                className="bg-muted m-auto h-fit w-full max-w-sm overflow-hidden bg-white rounded-lg border shadow-md shadow-zinc-950/5 dark:[--color-muted:var(--color-zinc-900)]">
+                <div className="bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pb-6">
+                    <div className="text-center">
+                        <h1 className="mb-1 mt-4 text-xl font-semibold">Recover Password</h1>
+                        <p className="text-sm">Enter your email to receive a OTP</p>
+                    </div>
+
+                    <div className="mt-6 space-y-6">
+                        <div className="space-y-2">
+                            <Label
+                                className="block text-sm">
+                                Email
+                            </Label>
+                            <Input
+                                type="email"
+                                required
+                                value={email}
+                                onChange={(e)=> setEmail(e.target.value)}
+                                placeholder="name@example.com"
+                            />
+                        </div>
+
+                        <input type='submit' className="w-full bg-purple-600 py-2 text-white rounded-md cursor-pointer" value={`${loading ? 'Sending...' : 'Send OTP'}`}/>
+                    </div>
+                    <p className='text-center mt-3 text-red-600'>{message}</p>
+                    <div className="mt-6 text-center">
+                        <p className="text-muted-foreground text-sm">We&apos;ll send you a OTP to reset your password.</p>
+                    </div>
+                </div>
+
+                <div className="p-3 bg-zinc-50">
+                    <p className="text-accent-foreground text-center text-sm">
+                        Remembered your password?
+                        <button
+                            onClick={()=> setShowForgot(false)}
+                            className="px-2 font-semibold hover:underline">
+                            Log in
+                        </button>
+                    </p>
+                </div>
+            </form>
+        </section>
     </div>
   );
 }

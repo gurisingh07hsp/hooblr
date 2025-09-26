@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Calendar, User, Eye, Heart, ArrowLeft, Search, BookOpen, Star, Clock, Share2, Sparkles, Bookmark, MessageCircle } from 'lucide-react';
 
 interface BlogPost {
-  id?: string;
+  _id?: string;
   title: string;
-  author: string;
+  slug: string;
+  author: {profile: {name: string}};
   category: string;
   status: 'published' | 'draft' | 'archived';
   content: string;
@@ -15,6 +16,7 @@ interface BlogPost {
   tags?: string[];
   featuredImage?: string;
   published?: string;
+  featured: boolean;
   views?: number;
   likes?: number;
 }
@@ -58,7 +60,7 @@ export default function BlogPage({ posts }: BlogPageProps) {
   };
 
   const featuredPosts = publishedPosts.slice(0, 2);
-  const regularPosts = filteredPosts.filter(post => !featuredPosts.includes(post));
+  const regularPosts = filteredPosts;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
@@ -116,10 +118,10 @@ export default function BlogPage({ posts }: BlogPageProps) {
         {featuredPosts.length > 0 && searchTerm === '' && selectedCategory === 'all' && (
           <div className="mb-20">
             <div className="text-center mb-12">
-              <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
+              {/* <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
                 <Star className="w-4 h-4" />
                 <span>Featured Articles</span>
-              </div>
+              </div> */}
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Must-Read Career Insights</h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                 Our most popular and highly-rated articles to help you advance your career
@@ -127,7 +129,7 @@ export default function BlogPage({ posts }: BlogPageProps) {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {featuredPosts.map((post) => (
-                <article key={post.id} className="group bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 overflow-hidden transition-all duration-300 transform hover:-translate-y-1">
+                <article key={post._id} className="group bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 overflow-hidden transition-all duration-300 transform hover:-translate-y-1">
                   {post.featuredImage && (
                     <div className="aspect-video overflow-hidden">
                       <img 
@@ -143,10 +145,13 @@ export default function BlogPage({ posts }: BlogPageProps) {
                       <span className={`inline-flex px-2 py-1 text-xs font-bold rounded-full bg-gradient-to-r ${getCategoryColor(post.category)} text-white shadow-md`}>
                         {post.category}
                       </span>
+                      {post.featured && 
                       <span className="inline-flex items-center space-x-1 px-2 py-1 bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-800 text-xs font-bold rounded-full">
                         <Star className="w-3 h-3" />
                         <span>Featured</span>
                       </span>
+                      }
+                      
                     </div>
                     
                     <h2 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors line-clamp-2">
@@ -163,7 +168,7 @@ export default function BlogPage({ posts }: BlogPageProps) {
                       <div className="flex items-center space-x-3">
                         <div className="flex items-center space-x-1">
                           <User className="w-3 h-3 text-purple-600" />
-                          <span className="font-medium">{post.author}</span>
+                          <span className="font-medium">{post.author.profile.name}</span>
                         </div>
                         {post.published && (
                           <div className="flex items-center space-x-1">
@@ -177,10 +182,10 @@ export default function BlogPage({ posts }: BlogPageProps) {
                           <Eye className="w-3 h-3 text-purple-600" />
                           <span>{post.views || 0}</span>
                         </div>
-                        <div className="flex items-center space-x-1">
+                        {/* <div className="flex items-center space-x-1">
                           <Heart className="w-3 h-3 text-red-500" />
                           <span>{post.likes || 0}</span>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                     
@@ -204,7 +209,7 @@ export default function BlogPage({ posts }: BlogPageProps) {
                     
                     <div className="flex items-center justify-between">
                       <button 
-                        onClick={() => router.push(`/blog/${post.id}`)}
+                        onClick={() => router.push(`/blog/${post.slug}`)}
                         className="bg-[#9333E9] text-white px-4 py-2 rounded-lg transition-all duration-300 text-sm font-semibold flex items-center space-x-2 transform hover:-translate-y-1"
                       >
                         <span>Read Full Article</span>
@@ -261,7 +266,7 @@ export default function BlogPage({ posts }: BlogPageProps) {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {regularPosts.map((post) => (
-                <article key={post.id} className="group bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 overflow-hidden transition-all duration-300 transform hover:-translate-y-1">
+                <article key={post._id} className="group bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 overflow-hidden transition-all duration-300 transform hover:-translate-y-1">
                   {post.featuredImage && (
                     <div className="aspect-video overflow-hidden">
                       <img 
@@ -293,7 +298,7 @@ export default function BlogPage({ posts }: BlogPageProps) {
                       <div className="flex items-center space-x-2">
                         <div className="flex items-center space-x-1">
                           <User className="w-3 h-3 text-purple-600" />
-                          <span className="font-medium">{post.author}</span>
+                          <span className="font-medium">{post.author.profile.name}</span>
                         </div>
                         {post.published && (
                           <div className="flex items-center space-x-1">
@@ -307,10 +312,10 @@ export default function BlogPage({ posts }: BlogPageProps) {
                           <Eye className="w-3 h-3 text-purple-600" />
                           <span>{post.views || 0}</span>
                         </div>
-                        <div className="flex items-center space-x-1">
+                        {/* <div className="flex items-center space-x-1">
                           <Heart className="w-3 h-3 text-red-500" />
                           <span>{post.likes || 0}</span>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                     
@@ -334,7 +339,7 @@ export default function BlogPage({ posts }: BlogPageProps) {
                     
                     <div className="flex items-center justify-between">
                       <button 
-                        onClick={() => router.push(`/blog/${post.id}`)}
+                        onClick={() => router.push(`/blog/${post.slug}`)}
                         className="bg-[#9333E9] text-white px-3 py-1.5 rounded-lg transition-all duration-300 text-xs font-semibold"
                       >
                         Read More
