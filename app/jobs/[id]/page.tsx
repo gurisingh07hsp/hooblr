@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Building2, MapPin, Clock, DollarSign, ArrowLeft, Heart, Share2, X, CheckCircle, IndianRupee, Euro } from 'lucide-react';
+import { Building2, MapPin, Clock, DollarSign, X, CheckCircle, IndianRupee, Euro, Eye, FileText, Upload } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import Footer from '@/components/Footer';
 import axios from 'axios';
@@ -51,7 +51,10 @@ export default function JobDetailsPage() {
   const [location, setLocation] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const [isApplied, setIsApplied] = useState(false); 
+  const [isApplied, setIsApplied] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [showResumeField, setShowResumeField] = useState(false); 
+  const [file, setFile] = useState<File | null>(null);
 
    const fetchJob = async () => {
      try {
@@ -74,13 +77,16 @@ export default function JobDetailsPage() {
 
 
   useEffect(()=>{
-    console.log("job : ", job);
     if(job && user){
       job.applications.forEach(app => {
-        if(app.user._id == user._id){
+        if(app.user?._id == user._id){
           setIsApplied(true);
         }
       });
+    }
+
+    if(user?.profile?.resume){
+      setShowResumeField(true);
     }
   },[job, user])
 
@@ -89,9 +95,29 @@ export default function JobDetailsPage() {
   const submitApplication = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
+
+        const formData = new FormData();
+
+    // Always create formData and append profile data as JSON string
+    formData.append("jobData", JSON.stringify({
+      location,
+      phone,
+      coverLetter
+    }));
+
+    // Append resume file if it exists
+    if (file) {
+      formData.append("resume", file);
+    }
+
     try {
       setSubmitting(true);
-      const res = await axios.post(`${API_BASE}/api/jobs/${id}/apply`, { coverLetter, resume, phone, location }, {withCredentials:true});
+      const res = await axios.post(`${API_BASE}/api/jobs/${id}/apply`, formData, {
+        withCredentials:true,
+        headers: {
+        "Content-Type": "multipart/form-data"
+      }
+      });
       if(res.status === 200){
         setCoverLetter('');
         setResume('');
@@ -118,6 +144,35 @@ export default function JobDetailsPage() {
         setShowLoginPrompt(true);
       }
   }
+
+    const handleFileChange = (e: any) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFile(file);
+      console.log('File selected:', file.name);
+      setShowResumeField(true);
+    }
+  };
+
+  const handleDragOver = (e: any) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: any) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if(file){
+      setFile(file);
+      setShowResumeField(true);
+    }
+
+  };
 
     const getCurrencyIcon = (currency: string) => {
   switch (currency) {
@@ -265,17 +320,9 @@ export default function JobDetailsPage() {
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl">
             <div className="p-4 border-b flex items-center justify-between">
               <h3 className="text-xl font-semibold">Apply for {job.title}</h3>
-              <button onClick={() => setShowApply(false)} className="text-gray-500 hover:text-gray-700"><X className="w-5 h-5" /></button>
+              <button onClick={() => {setFile(null); setShowResumeField(false); setShowApply(false)}} className="text-gray-500 hover:text-gray-700"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={submitApplication} className="p-4 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Cover Letter</label>
-                <textarea value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)} rows={6} className="w-full border rounded-lg px-3 py-2" placeholder="Why are you a great fit?" required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Resume / Summary</label>
-                <textarea value={resume} onChange={(e) => setResume(e.target.value)} rows={4} className="w-full border rounded-lg px-3 py-2" placeholder="Paste resume or short experience summary" required />
-              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Phone*</label>
                 <input type='text' value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border rounded-lg px-3 py-2" required />
@@ -283,6 +330,95 @@ export default function JobDetailsPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Location*</label>
                 <input type='text' value={location} onChange={(e) => setLocation(e.target.value)} className="w-full border rounded-lg px-3 py-2" required />
+              </div>
+              {showResumeField ?
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 transition-colors">
+          <div>
+            <div className='flex gap-2 items-center'>
+            <div className="bg-blue-100 p-2 rounded-full mb-3">
+              <FileText className="w-5 h-5 text-blue-600" />
+            </div>
+            
+            <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">
+              {file?.name || user?.profile?.resume?.split('/').pop()?.slice(14)}
+            </p>
+                </div>
+            </div>
+            <div>         
+              <label
+                htmlFor="resume-upload"
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg 
+                hover:bg-blue-700 transition-all shadow-sm hover:shadow text-sm font-medium cursor-pointer"
+              >
+                <Upload className="w-4 h-4" />
+                Change Resume
+                <input
+                  id="resume-upload"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </label>
+              </div>
+          </div>
+        </div>
+              : (
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`relative border-2 border-dashed rounded-xl p-2 transition-all ${
+            isDragging 
+              ? 'border-blue-500 bg-blue-50' 
+              : 'border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50/50'
+          }`}
+        >
+          <label htmlFor="resume-upload">
+          <div className="flex flex-col items-center text-center">
+            <div className="bg-blue-600 p-3 rounded-2xl mb-2 shadow-lg">
+              <Upload className="w-6 h-6 text-white" />
+            </div>
+            
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Upload Your Resume
+            </h3>
+            <p className="text-sm text-gray-600 mb-2 max-w-sm">
+              Drag and drop your resume here, or click to browse.
+            </p>
+            
+            <div className="flex flex-col justify-center sm:flex-row w-full max-w-md">     
+              <label
+                htmlFor="resume-upload"
+              >
+                {/* <Upload className="w-4 h-4" />
+                Change Resume */}
+                <input
+                  id="resume-upload"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </label>
+            </div>
+            
+            <div className="mt-2 flex items-center gap-4 text-xs text-gray-500">
+              <span className="flex items-center gap-1">
+                <FileText className="w-4 h-4" />
+                DOC, DOCX and PDF
+              </span>
+              <span>•</span>
+              <span>Max 2MB</span>
+            </div>
+          </div>
+          </label>
+        </div>
+              )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Cover Letter</label>
+                <textarea value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)} rows={6} className="w-full border rounded-lg px-3 py-2" placeholder="Why are you a great fit?" required />
               </div>
               <p className='text-center text-red-600 font-semibold'>{error}</p>
               <div className="flex justify-end gap-3 pt-2">

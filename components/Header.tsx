@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/context/UserContext';
+import { usePathname } from "next/navigation";
 import { 
   Menu, 
   X,  
@@ -12,10 +13,12 @@ import {
 import PostJobModal from './PostJobModal';
 import Image from 'next/image';
 const Header = () => {
-      const router = useRouter();
-      const {user,isLoggedIn, setIsLoggedIn,logout} = useUser();
-      const [isMenuOpen, setIsMenuOpen] = useState(false);
-      const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const hideNavbar = ["/dashboard"].includes(pathname);
+  const {user,isLoggedIn, setIsLoggedIn,logout} = useUser();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
 
     const handleAuth = () => {
     setIsLoggedIn(true);
@@ -36,20 +39,20 @@ const Header = () => {
     // In a real app, this would send data to an API
   };
   return (
-    <div>
+    <div className={`${hideNavbar && 'lg:block hidden'}`}>
         <nav className="bg-white/90 backdrop-blur-md shadow-sm border-b border-purple-200 fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className={`flex ${hideNavbar ? 'justify-end' : 'justify-between'} items-center h-16`}>
             {/* Logo */}
             <div 
-              className="flex items-center cursor-pointer"
+              className={`${hideNavbar ? 'hidden' : 'flex'} items-center cursor-pointer`}
               onClick={() => router.push('/')}
             >
             <Image src='/hooblrlogo.png' width={120} height={50} alt='logo'/>
             </div>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className={`hidden md:flex items-center space-x-8`}>
               <button
                 onClick={() => router.push('/jobs')}
                 className="text-gray-700 hover:text-purple-600 transition-colors font-medium"

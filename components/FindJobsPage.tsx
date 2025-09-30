@@ -303,7 +303,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters */}
-          <div className="lg:w-1/4">
+          {/* <div className="lg:w-1/4">
             <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-200 p-6 sticky top-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -403,7 +403,201 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
           ))}
         </div>
       </div>
-    </div>
+    </div> */}
+
+
+    {/* Sidebar Filters - Desktop */}
+          <div className="hidden lg:block lg:w-1/4">
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-200 p-6 sticky top-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                  <Filter className="w-5 h-5 mr-2 text-purple-600" />
+                  Filters
+                </h3>
+                <button
+                  onClick={clearFilters}
+                  className="text-purple-600 hover:text-purple-700 text-sm font-medium"
+                >
+                  Clear All
+                </button>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">Job Type</label>
+                {["Full-time", "Part-time", "Contract", "Temporary", "Internship"].map(
+                  (t) => (
+                    <label key={t} className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="jobType"
+                        value={t}
+                        checked={filters.type === t}
+                        onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+                        className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">{t}</span>
+                    </label>
+                  )
+                )}
+              </div>
+
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Salary Range</label>
+                <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="salary"
+                    onChange={() =>
+                      setFilters({ ...filters, minSalary: "0", maxSalary: "50000" })
+                    }
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">$0–50k</span>
+                </label>
+                <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="salary"
+                    onChange={() =>
+                      setFilters({ ...filters, minSalary: "50000", maxSalary: "100000" })
+                    }
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">$50k–100k</span>
+                </label>
+                <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="salary"
+                    onChange={() =>
+                      setFilters({ ...filters, minSalary: "100000", maxSalary: "150000" })
+                    }
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">$100k–150k</span>
+                </label>
+                <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="salary"
+                    onChange={() =>
+                      setFilters({ ...filters, minSalary: "150000", maxSalary: "9999999" })
+                    }
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">$150k+</span>
+                </label>
+              </div>
+
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Experience</label>
+                {["Entry-level", "Mid-level", "Senior-level", "Executive"].map((exp) => (
+                  <label key={exp} className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="experience"
+                      checked={filters.experience === exp}
+                      onChange={() => setFilters({ ...filters, experience: exp })}
+                      className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">{exp}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Filters - Horizontal Scroll */}
+          <div className="lg:hidden mb-6">
+            <div className="flex items-center justify-between mb-4 px-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                <Filter className="w-5 h-5 mr-2 text-purple-600" />
+                Filters
+              </h3>
+              <button
+                onClick={clearFilters}
+                className="text-purple-600 hover:text-purple-700 text-sm font-medium"
+              >
+                Clear All
+              </button>
+            </div>
+
+            <div className="overflow-x-auto pb-4 px-4">
+              <div className="flex gap-3 min-w-max">
+                {/* Job Type Dropdown */}
+                <div className="flex-shrink-0">
+                  <select
+                    value={filters.type}
+                    onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+                    className="px-4 py-2 border border-purple-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">Job Type</option>
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Temporary">Temporary</option>
+                    <option value="Internship">Internship</option>
+                  </select>
+                </div>
+
+                {/* Salary Range Dropdown */}
+                <div className="flex-shrink-0">
+                  <select
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "0-50000") {
+                        setFilters({ ...filters, minSalary: "0", maxSalary: "50000" });
+                      } else if (value === "50000-100000") {
+                        setFilters({ ...filters, minSalary: "50000", maxSalary: "100000" });
+                      } else if (value === "100000-150000") {
+                        setFilters({ ...filters, minSalary: "100000", maxSalary: "150000" });
+                      } else if (value === "150000+") {
+                        setFilters({ ...filters, minSalary: "150000", maxSalary: "9999999" });
+                      } else {
+                        setFilters({ ...filters, minSalary: "", maxSalary: "" });
+                      }
+                    }}
+                    className="px-4 py-2 border border-purple-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">Salary Range</option>
+                    <option value="0-50000">$0–50k</option>
+                    <option value="50000-100000">$50k–100k</option>
+                    <option value="100000-150000">$100k–150k</option>
+                    <option value="150000+">$150k+</option>
+                  </select>
+                </div>
+
+                {/* Experience Dropdown */}
+                <div className="flex-shrink-0">
+                  <select
+                    value={filters.experience}
+                    onChange={(e) => setFilters({ ...filters, experience: e.target.value })}
+                    className="px-4 py-2 border border-purple-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">Experience</option>
+                    <option value="Entry-level">Entry-level</option>
+                    <option value="Mid-level">Mid-level</option>
+                    <option value="Senior-level">Senior-level</option>
+                    <option value="Executive">Executive</option>
+                  </select>
+                </div>
+
+                {/* Sort By Dropdown */}
+                <div className="flex-shrink-0">
+                  <select 
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="px-4 py-2 border border-purple-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="recent">Most Recent</option>
+                    <option value="salary-high">Highest Salary</option>
+                    <option value="salary-low">Lowest Salary</option>
+                    <option value="company">Company A-Z</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Job Listings */}
           <div className="lg:w-3/4">
@@ -532,8 +726,8 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
                   Try adjusting your search criteria or clearing the filters.
                 </p>
                 <button
-                  // onClick={clearFilters}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 shadow-lg"
+                  onClick={clearFilters}
+                  className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 shadow-lg"
                 >
                   Clear Filters
                 </button>

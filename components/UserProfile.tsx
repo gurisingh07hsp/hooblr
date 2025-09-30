@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@/context/UserContext';
 import axios from 'axios';
+import { Eye, FileText, X } from 'lucide-react';
 
 interface UserProfileData {
   name: string;
@@ -14,6 +15,7 @@ interface UserProfileData {
   skills: string[];
   experience: string;
   education: string;
+  resume?: string;
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
@@ -24,6 +26,10 @@ const UserProfile = () => {
   const [activeSection, setActiveSection] = useState('personal');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [resume, setResume] = useState<File | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showResumeField, setShowResumeField] = useState(false);
+
   const [profileData, setProfileData] = useState<UserProfileData>({
     name: '',
     email: '',
@@ -49,10 +55,14 @@ const UserProfile = () => {
         skills: user.profile?.skills || [],
         experience: user.profile?.experience || '',
         education: user.profile?.education || '',
+        resume: user.profile?.resume,
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       });
+    }
+    if(user?.profile?.resume){
+      setShowResumeField(true);
     }
   }, [user]);
 
@@ -70,19 +80,32 @@ const UserProfile = () => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
+    const formData = new FormData();
+
+    // Always create formData and append profile data as JSON string
+    formData.append("profile", JSON.stringify({
+      name: profileData.name,
+      phone: profileData.phone,
+      location: profileData.location,
+      bio: profileData.bio,
+      skills: profileData.skills,
+      experience: profileData.experience,
+      education: profileData.education
+    }));
+
+    // Append resume file if it exists
+    if (resume) {
+      formData.append("resume", resume);
+    }
+    console.log(formData);
 
     try {
-      const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/profile`, {
-          profile: {
-            name: profileData.name,
-            phone: profileData.phone,
-            location: profileData.location,
-            bio: profileData.bio,
-            skills: profileData.skills,
-            experience: profileData.experience,
-            education: profileData.education
-          }
-      }, {withCredentials:true});
+      const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/profile`,
+        formData, {withCredentials:true,
+         headers: {
+        "Content-Type": "multipart/form-data"
+      }
+      });
 
       if (response.status == 200) {
         setUser(response.data.user);
@@ -93,6 +116,7 @@ const UserProfile = () => {
       }
     } catch (error: unknown) {
       if(axios.isAxiosError(error)){
+        console.log(error);
         setMessage(error.response?.data?.message ||'An error occurred while updating profile');
       }
     } finally {
@@ -146,6 +170,7 @@ const UserProfile = () => {
     { id: 'personal', name: 'Personal Information' },
     { id: 'security', name: 'Security' },
   ];
+
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -229,6 +254,62 @@ const UserProfile = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="e.g., New York, NY"
                   />
+                </div>
+
+                  <div>
+                {!showResumeField ?
+                <div>
+                    <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
+                    Upload Resume
+                  </label>
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => setResume(e.target.files?.[0] || null)}
+                    className="w-full px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <span className='text-[12px] text-gray-600'>DOC, DOCX and PDF (2 MB)</span>
+                </div>
+                : (
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 transition-colors">
+          <div>
+            <div className='flex gap-2 items-center'>
+            <div className="bg-blue-100 p-4 rounded-full mb-3">
+              <FileText className="w-6 h-6 text-blue-600" />
+            </div>
+            
+            <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">
+              {user?.profile?.resume?.split('/').pop()?.slice(14)}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={(e) => {e.preventDefault(); setShowModal(true)}}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                >
+                <Eye className="w-4 h-4" />
+                View
+              </button>
+              
+              <button
+                onClick={(e) => {e.preventDefault(); setShowResumeField(false)}}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                >
+                Change Resume
+              </button>
+              </div>
+                </div>
+            </div>
+          </div>
+          {/* <div className="flex-1 overflow-hidden">
+              <iframe
+                src={profileData.resume}
+                className="w-full h-full"
+                title="Resume Preview"
+              />
+            </div> */}
+        </div>
+                )}
                 </div>
               </div>
 
@@ -383,6 +464,45 @@ const UserProfile = () => {
           )}
         </div>
       </div>
+
+
+                {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-4xl h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold text-gray-800">Resume Preview</h3>
+              <div className="flex items-center gap-2">
+                {/* <button
+                  onClick={(e)=>{e.preventDefault(); handleDownload}}
+                  className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                >
+                  <Download className="w-4 h-4" />
+                  Download
+                </button> */}
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
+            
+            {/* PDF Viewer */}
+            <div className="flex-1 overflow-hidden">
+              <iframe
+                src={profileData.resume}
+                className="w-full h-full"
+                title="Resume Preview"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
     </div>
   );
 };

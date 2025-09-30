@@ -1,9 +1,10 @@
 const express = require('express');
 const { body, validationResult, query } = require('express-validator');
 const Job = require('../models/Job');
-// const User = require('../models/User');
+const User = require('../models/User');
 const Company = require('../models/Company')
 const { auth, authorize, optionalAuth } = require('../middleware/auth');
+const {upload, uploadResume} = require('../middleware/uploadResume');
 
 const router = express.Router();
 
@@ -22,80 +23,6 @@ const jobValidation = [
   body('experience').isIn(['Entry-level', 'Mid-level', 'Senior-level', 'Executive']).withMessage('Invalid experience level'),
   body('education').isIn(['high-school', 'associate', 'bachelor', 'master', 'phd']).withMessage('Invalid education level')
 ];
-
-// @route   GET /api/jobs
-// @desc    Get all jobs with filters
-// @access  Public
-// router.get('/', optionalAuth, [
-//   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-//   query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('Limit must be between 1 and 50'),
-//   query('category').optional().isString().withMessage('Category must be a string'),
-//   query('location').optional().isString().withMessage('Location must be a string'),
-//   query('type').optional().isIn(['Full-time', 'Part-time', 'Contract', 'Temporary', 'Internship',]).withMessage('Invalid job type'),
-//   query('experience').optional().isIn(['Entry-level', 'Mid-level', 'Senior-level', 'Executive']).withMessage('Invalid experience level'),
-//   query('search').optional().isString().withMessage('Search must be a string')
-// ], async (req, res) => {
-//   try {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//       return res.status(400).json({ errors: errors.array() });
-//     }
-
-//     const {
-//       page = 1,
-//       limit = 10,
-//       category,
-//       location,
-//       type,
-//       experience,
-//       search,
-//       sort = 'createdAt',
-//       order = 'desc'
-//     } = req.query;
-
-//     // Build filter object
-//     const filter = { status: 'active' };
-
-//     if (category) filter.category = category;
-//     if (location) filter.location = { $regex: location, $options: 'i' };
-//     if (type) filter.type = type;
-//     if (experience) filter.experience = experience;
-
-//     // Text search
-//     if (search) {
-//       filter.$text = { $search: search };
-//     }
-
-//     // Build sort object
-//     const sortObj = {};
-//     sortObj[sort] = order === 'desc' ? -1 : 1;
-
-//     const skip = (page - 1) * limit;
-
-//     const jobs = await Job.find(filter)
-//       .populate('company', 'company.name company.logo company.location')
-//       .sort(sortObj)
-//       .skip(skip)
-//       .limit(parseInt(limit));
-
-//     const total = await Job.countDocuments(filter);
-
-//     res.json({
-//       jobs,
-//       pagination: {
-//         page: parseInt(page),
-//         limit: parseInt(limit),
-//         total,
-//         pages: Math.ceil(total / limit)
-//       }
-//     });
-//   } catch (error) {
-//     console.error('Get jobs error:', error);
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// });
-
-
 
 
 router.get(
@@ -344,9 +271,7 @@ router.delete('/:id', auth, authorize('user', 'admin'), async (req, res) => {
 // @route   POST /api/jobs/:id/apply
 // @desc    Apply for a job
 // @access  Private (User only)
-router.post('/:id/apply', auth, authorize('user'), [
-  body('coverLetter').optional().isString().withMessage('Cover letter must be a string'),
-  body('resume').optional().isString().withMessage('Resume must be a string')
+router.post('/:id/apply', auth, upload.single("resume"), uploadResume, authorize('user'), [
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -371,15 +296,34 @@ router.post('/:id/apply', auth, authorize('user'), [
     if (existingApplication) {
       return res.status(400).json({ error: 'You have already applied for this job' });
     }
-
+    const data = req.body.jobData ? JSON.parse(req.body.jobData) : null;
     // Add application
-    job.applications.push({
-      user: req.user._id,
-      coverLetter: req.body.coverLetter,
-      resume: req.body.resume,
-      phone: req.body.phone,
-      location: req.body.location
-    });
+    if (req.fileUrl) {
+
+      await User.findByIdAndUpdate(
+        req.user._id,
+       { $set: { "profile.resume": req.fileUrl } },
+        { new: true, runValidators: true }
+      ).select('-password');
+
+
+      job.applications.push({
+        user: req.user._id,
+        coverLetter: data.coverLetter,
+        resume: req.fileUrl,
+        phone: data.phone,
+        location: data.location
+      });
+    }
+    else{
+      job.applications.push({
+        user: req.user._id,
+        coverLetter: data.coverLetter,
+        resume: req.user.profile.resume,
+        phone: data.phone,
+        location: data.location
+      });
+    }
 
     await job.save();
 

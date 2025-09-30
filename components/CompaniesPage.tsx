@@ -327,7 +327,7 @@ export default function CompaniesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters */}
-          <div className="lg:w-1/4">
+          <div className="lg:w-1/4 lg:block hidden">
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-200 p-6 sticky top-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -390,6 +390,35 @@ export default function CompaniesPage() {
               </div>
             </div>
           </div>
+
+                    {/* Mobile Filters - Horizontal Scroll */}
+                    <div className="lg:hidden mb-6">
+                      <div className="flex items-center justify-between mb-4 px-4">
+                        <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                          <Filter className="w-5 h-5 mr-2 text-purple-600" />
+                          Filters
+                        </h3>
+                        <button
+                          onClick={clearFilters}
+                          className="text-purple-600 hover:text-purple-700 text-sm font-medium"
+                        >
+                          Clear All
+                        </button>
+                      </div>
+
+                                   <div className="flex-shrink-0">
+                  <select
+                    value={filters.size}
+                    onChange={(e) => setFilters({ ...filters, size: e.target.value })}
+                    className="px-4 py-2 border border-purple-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">Company Size</option>
+                    {companySizes.map((s,index)=>(
+                      <option key={index} value={s}>{s} employees</option>
+                    ))}
+                  </select>
+                </div>
+                    </div>
 
           {/* Company Listings */}
           <div className="lg:w-3/4">

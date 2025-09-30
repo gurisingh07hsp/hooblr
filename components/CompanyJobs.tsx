@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@/context/UserContext';
 import JobForm from './JobForm';
 import axios from 'axios';
+import { Eye, FileText, X } from 'lucide-react';
 
 interface Job {
   _id: string;
@@ -62,6 +63,8 @@ const CompanyJobs = () => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [showApplications, setShowApplications] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [resume, setResume] = useState('');
 
   useEffect(() => {
     fetchJobs();
@@ -250,12 +253,67 @@ const CompanyJobs = () => {
           </div>
 
           {/* Resume */}
+          {app.resume && 
           <div className="p-4 border rounded-lg bg-white shadow-sm overflow-auto">
             <h2 className="text-lg font-semibold mb-2 text-gray-700">Resume</h2>
-            <pre className="whitespace-pre-wrap text-sm leading-relaxed text-gray-600">
-              {app.resume}
-            </pre>
+            <div>
+            <div className='flex gap-2 items-center'>
+            <div className="bg-blue-100 p-4 rounded-full mb-3">
+              <FileText className="w-6 h-6 text-blue-600" />
+            </div>
+            
+            <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">
+              {app.resume?.split('/').pop()?.slice(14)}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={(e) => {e.preventDefault(); setResume(app.resume); setShowModal(true)}}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                >
+                <Eye className="w-4 h-4" />
+                View
+              </button>
+              </div>
+                </div>
+            </div>
           </div>
+                          {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-4xl h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold text-gray-800">Resume Preview</h3>
+              <div className="flex items-center gap-2">
+                {/* <button
+                  onClick={(e)=>{e.preventDefault(); handleDownload}}
+                  className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                >
+                  <Download className="w-4 h-4" />
+                  Download
+                </button> */}
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
+            
+            {/* PDF Viewer */}
+            <div className="flex-1 overflow-hidden">
+              <iframe
+                src={resume}
+                className="w-full h-full"
+                title="Resume Preview"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+          </div>
+          }
         </div>
       </div>
     ))) : (

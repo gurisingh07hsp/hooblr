@@ -5,6 +5,7 @@ const { auth } = require('../middleware/auth');
 const sendToken = require('../utils/jwtToken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require("nodemailer");
+const {upload, uploadResume} = require('../middleware/uploadResume');
 
 const router = express.Router();
 
@@ -176,21 +177,22 @@ router.get('/logout', async (req, res) => {
 // @route   PUT /api/auth/profile
 // @desc    Update user profile
 // @access  Private
-router.put('/profile', auth, async (req, res) => {
+router.put('/profile', auth, upload.single("resume"), uploadResume,  async (req, res) => {
   try {
-    const { profile, company, preferences } = req.body;
+    const profile = req.body.profile ? JSON.parse(req.body.profile) : null;
     const updates = {};
 
     if (profile) {
       updates.profile = { ...req.user.profile, ...profile };
     }
 
-    if (company && req.user.role === 'company') {
-      updates.company = { ...req.user.company, ...company };
-    }
+    // if (preferences) {
+    //   updates.preferences = { ...req.user.preferences, ...preferences };
+    // }
 
-    if (preferences) {
-      updates.preferences = { ...req.user.preferences, ...preferences };
+      if (req.fileUrl) {
+      updates.profile = updates.profile || { ...req.user.profile };
+      updates.profile.resume = req.fileUrl;
     }
 
     const user = await User.findByIdAndUpdate(

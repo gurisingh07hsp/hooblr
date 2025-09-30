@@ -447,7 +447,7 @@ const UserDashboard = () => {
           </div>
         </div>
 
-        <main className="p-4 lg:p-8">
+        <main className="p-4 lg:p-8 mt-10">
           {renderContent()}
         </main>
       </div>
