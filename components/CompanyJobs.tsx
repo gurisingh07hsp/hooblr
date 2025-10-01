@@ -5,7 +5,8 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@/context/UserContext';
 import JobForm from './JobForm';
 import axios from 'axios';
-import { Eye, FileText, X } from 'lucide-react';
+import { Eye, FileText, User, X } from 'lucide-react';
+import { sendMessage, listenToMessages } from "@/lib/chat";
 
 interface Job {
   _id: string;
@@ -53,6 +54,13 @@ interface Job {
   urgent: boolean;
 }
 
+interface Message {
+  senderId: string;
+  senderName: string;
+  text: string;
+  timestamp: {seconds: number};
+}
+
 const CompanyJobs = () => {
   const { user } = useUser();
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -63,8 +71,10 @@ const CompanyJobs = () => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [showApplications, setShowApplications] = useState(false);
+  const [showMessages, setShowMessages] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [resume, setResume] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
     fetchJobs();
@@ -83,6 +93,18 @@ const CompanyJobs = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!selectedJob?._id) return;
+    const unsub = listenToMessages(selectedJob?._id, (msgs: any) => {
+    setMessages(msgs);
+  });
+    return () => unsub();
+  }, [selectedJob]);
+
+  useEffect(()=>{
+    console.log("messge : ", messages);
+  },[messages])
 
   const handleJobSaved = () => {
     setShowJobForm(false);
@@ -157,6 +179,7 @@ const CompanyJobs = () => {
     }
   }
 }
+
 
   if (showJobForm) {
     return (
@@ -278,20 +301,13 @@ const CompanyJobs = () => {
                 </div>
             </div>
           </div>
-                          {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-4xl h-[90vh] flex flex-col">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="text-lg font-semibold text-gray-800">Resume Preview</h3>
               <div className="flex items-center gap-2">
-                {/* <button
-                  onClick={(e)=>{e.preventDefault(); handleDownload}}
-                  className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                >
-                  <Download className="w-4 h-4" />
-                  Download
-                </button> */}
                 <button
                   onClick={() => setShowModal(false)}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -312,8 +328,8 @@ const CompanyJobs = () => {
           </div>
         </div>
       )}
-          </div>
-          }
+    </div>
+        }
         </div>
       </div>
     ))) : (
@@ -326,6 +342,106 @@ const CompanyJobs = () => {
 
     )
   }
+
+  // if(showMessages){
+  //   return (
+  //     <div className='h-[85vh] border'>
+  //       <div className="flex justify-end mb-4">
+  //         <button
+  //           onClick={() => setShowMessages(false)}
+  //           className="px-3 py-1 text-white bg-red-600 rounded-lg hover:bg-red-700 transition"
+  //         >
+  //           ✕
+  //         </button>
+  //         </div>
+  //         <div className='flex flex-col items-center border h-[90%]'>
+  //           {messages && messages.map((msg,index)=> (
+  //             <div className='w-[60vw] h-10'>
+  //               <div className='flex items-center gap-3'>
+  //                 <div className='bg-blue-500 p-3 w-10 h-10 rounded-full'>
+  //                   <User className='h-4 w-4'/>
+  //                 </div>
+  //               <p>{msg.senderName}</p>
+  //               </div>
+  //               <div className='ms-10'>
+  //                 {msg.text}
+  //               </div>
+  //             </div>
+  //           ))}
+  //         </div>
+  //     </div>
+  //   )
+  // }
+
+  if(showMessages){
+  return (
+    <div className='h-[85vh] bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl shadow-lg overflow-hidden'>
+      {/* Header */}
+      <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-slate-800">Messages</h2>
+          <p className="text-sm text-slate-500">{messages?.length || 0} messages</p>
+        </div>
+        <button
+          onClick={() => setShowMessages(false)}
+          className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Messages Container */}
+      <div className='overflow-y-auto h-[calc(100%-76px)] px-6 py-4'>
+        {messages && messages.length > 0 ? (
+          <div className='space-y-4'>
+            {messages.map((msg, index) => (
+              <div key={index} className='bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200 border border-slate-200'>
+                <div className='flex items-center gap-3 mb-3'>
+                  <div className='bg-gradient-to-br from-blue-500 to-blue-600 p-2 w-10 h-10 rounded-full flex items-center justify-center shadow-md'>
+                    <User className='h-5 w-5 text-white'/>
+                  </div>
+                  <div>
+                    <p className='font-semibold text-slate-800'>{msg.senderName}</p>
+                    <p className='text-xs text-slate-500'>
+                            {msg.timestamp 
+        ? new Date(msg.timestamp.seconds * 1000).toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+          })
+        : 'Just now'
+      }
+                    </p>
+                  </div>
+                </div>
+                <div className='ml-13 pl-3 border-l-2 border-blue-200'>
+                  <p className='text-slate-700 leading-relaxed'>{msg.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className='flex flex-col items-center justify-center h-full'>
+            <div className='bg-white rounded-full p-6 shadow-lg mb-4'>
+              <svg className="w-16 h-16 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </div>
+            <h3 className='text-xl font-semibold text-slate-700 mb-2'>No Messages Yet</h3>
+            <p className='text-slate-500 text-center max-w-sm'>
+              When you receive messages, they&apos;ll appear here. Check back later!
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 
   if (loading) {
     return (
@@ -510,6 +626,9 @@ const CompanyJobs = () => {
                   
                   <button onClick={()=> setShowApplications(true)} className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
                     View Applications
+                  </button>
+                  <button onClick={()=> setShowMessages(true)} className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
+                    View Messages
                   </button>
                 </div>
                 <div className="flex items-start mt-2 justify-between mb-6">

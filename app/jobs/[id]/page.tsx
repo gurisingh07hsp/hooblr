@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Building2, MapPin, Clock, DollarSign, X, CheckCircle, IndianRupee, Euro, Eye, FileText, Upload } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import Footer from '@/components/Footer';
+import { sendMessage, listenToMessages } from "@/lib/chat";
 import axios from 'axios';
 
 type Salary = { min: number; max: number; currency: string; period: string };
@@ -55,6 +56,8 @@ export default function JobDetailsPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [showResumeField, setShowResumeField] = useState(false); 
   const [file, setFile] = useState<File | null>(null);
+  const [text, setText] = useState("");
+  // const [messages, setMessages] = useState([]);
 
    const fetchJob = async () => {
      try {
@@ -89,6 +92,21 @@ export default function JobDetailsPage() {
       setShowResumeField(true);
     }
   },[job, user])
+
+
+  //   useEffect(() => {
+  //   if (!user?._id || !job?._id) return;
+  //   const unsub = listenToMessages(user._id, setMessages);
+  //   return () => unsub();
+  // }, [user, job]);
+
+  const handleSend = async () => {
+    if(user?._id && user.profile?.name && job?._id){
+      await sendMessage(user?._id, user?.profile?.name, job?._id, text);
+      setText("");
+    }
+  };
+
 
   const formatSalary = (s: Salary) => `${Math.round(s.min/1000)}k - ${Math.round(s.max/1000)}k ${s.period}`;
 
@@ -310,7 +328,13 @@ export default function JobDetailsPage() {
                   {job.education && <li>Education: {job.education}</li>}
                 </ul>
               </div>
+              <div className="bg-white/80 rounded-xl shadow border border-purple-200 p-6">
+                <label>Send Message</label>
+                <textarea rows={5} value={text} onChange={e => setText(e.target.value)} className='border rounded-lg w-full'></textarea>
+                <button onClick={handleSend} className="bg-purple-600 text-white px-4 py-2 rounded ms-[70%]">Send</button>
+              </div>
             </aside>
+
           </div>
         </div>
       </main>
