@@ -380,6 +380,7 @@ router.get('/company/my-jobs', auth, authorize('user', 'admin'), async (req, res
     companies.map(async (company) => {
       const job = await Job.find({company: company._id})
       .populate('applications.user', 'profile.name profile.avatar')
+      .populate('company', 'name');
       return job;
     })
   );

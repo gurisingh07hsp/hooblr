@@ -37,7 +37,7 @@ interface Job {
 }
 
 interface JobFormProps {
-  job?: Job | null;
+  job?: any;
   onSave: (job: Job) => void;
   onCancel: () => void;
   className?: string;

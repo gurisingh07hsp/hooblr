@@ -101,8 +101,8 @@ export default function JobDetailsPage() {
   // }, [user, job]);
 
   const handleSend = async () => {
-    if(user?._id && user.profile?.name && job?._id){
-      await sendMessage(user?._id, user?.profile?.name, job?._id, text);
+    if(user?._id && user.profile?.name && job?._id && job.company.name){
+      await sendMessage(user?._id, user?.profile?.name, job?._id, job.company.name, text);
       setText("");
     }
   };
@@ -328,11 +328,13 @@ export default function JobDetailsPage() {
                   {job.education && <li>Education: {job.education}</li>}
                 </ul>
               </div>
-              <div className="bg-white/80 rounded-xl shadow border border-purple-200 p-6">
-                <label>Send Message</label>
-                <textarea rows={5} value={text} onChange={e => setText(e.target.value)} className='border rounded-lg w-full'></textarea>
-                <button onClick={handleSend} className="bg-purple-600 text-white px-4 py-2 rounded ms-[70%]">Send</button>
-              </div>
+              {user?._id &&
+                <div className="bg-white/80 rounded-xl shadow border border-purple-200 p-6">
+                  <label>Send Message</label>
+                  <textarea rows={5} value={text} onChange={e => setText(e.target.value)} className='border rounded-lg w-full'></textarea>
+                  <button onClick={handleSend} className="bg-purple-600 text-white px-4 py-2 rounded ms-[70%]">Send</button>
+                </div>
+              }
             </aside>
 
           </div>

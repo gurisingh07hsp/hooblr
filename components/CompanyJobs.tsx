@@ -6,7 +6,7 @@ import { useUser } from '@/context/UserContext';
 import JobForm from './JobForm';
 import axios from 'axios';
 import { Eye, FileText, User, X } from 'lucide-react';
-import { sendMessage, listenToMessages } from "@/lib/chat";
+import { sendMessage, listenToMessages, markMessagesAsSeen } from "@/lib/chat";
 
 interface Job {
   _id: string;
@@ -18,6 +18,7 @@ interface Job {
   benefits: string[];
   type: string;
   category: string;
+  company?: {name: string}; 
   department: string;
   status: 'active' | 'paused' | 'closed' | 'draft';
   salary: {
@@ -55,10 +56,18 @@ interface Job {
 }
 
 interface Message {
+  id: string;
+  participants: string[];
+  texts: Array<{
+    sender: string;
+    senderName: string;
+    text: string;
+    isSeen: boolean;
+    timestamp: Date;
+  }>;
   senderId: string;
   senderName: string;
   text: string;
-  timestamp: {seconds: number};
 }
 
 const CompanyJobs = () => {
@@ -75,6 +84,9 @@ const CompanyJobs = () => {
   const [showModal, setShowModal] = useState(false);
   const [resume, setResume] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [showChat, setShowChat] = useState(false);
+  const [selectedConversation, setSelectedConversation] = useState('');
+  const [text, setText] = useState('');
 
   useEffect(() => {
     fetchJobs();
@@ -94,12 +106,16 @@ const CompanyJobs = () => {
     }
   };
 
-  useEffect(() => {
+  const fetchMessages = () => {
     if (!selectedJob?._id) return;
-    const unsub = listenToMessages(selectedJob?._id, (msgs: any) => {
-    setMessages(msgs);
-  });
+      const unsub = listenToMessages(selectedJob?._id, (msgs: any) => {
+      setMessages(msgs);
+    });
     return () => unsub();
+  }
+
+  useEffect(() => {
+    fetchMessages();
   }, [selectedJob]);
 
   useEffect(()=>{
@@ -140,6 +156,17 @@ const CompanyJobs = () => {
       setMessage('Failed to delete job');
     }
   };
+
+    const handleSend = async (receiver: string, receiverName: string) => {
+      if(selectedJob?._id && selectedJob.company?.name && receiver && text){
+        await sendMessage(selectedJob._id, selectedJob.company.name, receiver, receiverName, text);
+        setText("");
+      }
+    };
+
+    const handleSeen = (id: string, userId: string = '') => {
+      markMessagesAsSeen(id, userId);
+    }
 
 
   const getStatusColor = (status: string) => {
@@ -343,36 +370,6 @@ const CompanyJobs = () => {
     )
   }
 
-  // if(showMessages){
-  //   return (
-  //     <div className='h-[85vh] border'>
-  //       <div className="flex justify-end mb-4">
-  //         <button
-  //           onClick={() => setShowMessages(false)}
-  //           className="px-3 py-1 text-white bg-red-600 rounded-lg hover:bg-red-700 transition"
-  //         >
-  //           ✕
-  //         </button>
-  //         </div>
-  //         <div className='flex flex-col items-center border h-[90%]'>
-  //           {messages && messages.map((msg,index)=> (
-  //             <div className='w-[60vw] h-10'>
-  //               <div className='flex items-center gap-3'>
-  //                 <div className='bg-blue-500 p-3 w-10 h-10 rounded-full'>
-  //                   <User className='h-4 w-4'/>
-  //                 </div>
-  //               <p>{msg.senderName}</p>
-  //               </div>
-  //               <div className='ms-10'>
-  //                 {msg.text}
-  //               </div>
-  //             </div>
-  //           ))}
-  //         </div>
-  //     </div>
-  //   )
-  // }
-
   if(showMessages){
   return (
     <div className='h-[85vh] bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl shadow-lg overflow-hidden'>
@@ -380,7 +377,7 @@ const CompanyJobs = () => {
       <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold text-slate-800">Messages</h2>
-          <p className="text-sm text-slate-500">{messages?.length || 0} messages</p>
+          {/* <p className="text-sm text-slate-500">{messages?.length || 0} messages</p> */}
         </div>
         <button
           onClick={() => setShowMessages(false)}
@@ -397,16 +394,19 @@ const CompanyJobs = () => {
         {messages && messages.length > 0 ? (
           <div className='space-y-4'>
             {messages.map((msg, index) => (
-              <div key={index} className='bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200 border border-slate-200'>
+              <div key={index} onClick={()=> {setShowChat(true); setSelectedConversation(msg?.id); handleSeen(msg.id,selectedJob?._id); setShowMessages(false)}} className='bg-white cursor-pointer rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200 border border-slate-200'>
                 <div className='flex items-center gap-3 mb-3'>
                   <div className='bg-gradient-to-br from-blue-500 to-blue-600 p-2 w-10 h-10 rounded-full flex items-center justify-center shadow-md'>
                     <User className='h-5 w-5 text-white'/>
                   </div>
-                  <div>
-                    <p className='font-semibold text-slate-800'>{msg.senderName}</p>
-                    <p className='text-xs text-slate-500'>
-                            {msg.timestamp 
-        ? new Date(msg.timestamp.seconds * 1000).toLocaleString('en-US', {
+                  <div className='w-full'>
+                    <div className='flex justify-between'>
+                      <p className='font-semibold text-slate-800'>{msg.texts[0].senderName}</p>
+                      <p className={`w-8 h-8 ${msg.texts.filter((m)=> m.isSeen == false && m.sender != selectedJob?._id ).length == 0 ? 'hidden' : 'flex'} justify-center items-center bg-green-600 text-white rounded-full mr-4`}>{msg.texts.filter((m)=> m.isSeen == false && m.sender != selectedJob?._id ).length}</p>
+                    </div>
+                    {/* <p className='text-xs text-slate-500'>
+                            {msg.texts[msg?.texts?.length - 1 ].timestamp 
+        ? new Date(msg.texts[msg?.texts?.length - 1].timestamp  * 1000).toLocaleString('en-US', {
             month: 'short',
             day: 'numeric',
             hour: 'numeric',
@@ -415,11 +415,11 @@ const CompanyJobs = () => {
           })
         : 'Just now'
       }
-                    </p>
+                    </p> */}
                   </div>
                 </div>
                 <div className='ml-13 pl-3 border-l-2 border-blue-200'>
-                  <p className='text-slate-700 leading-relaxed'>{msg.text}</p>
+                  <p className='text-slate-700 leading-relaxed'>Check new messges.</p>
                 </div>
               </div>
             ))}
@@ -437,6 +437,69 @@ const CompanyJobs = () => {
             </p>
           </div>
         )}
+      </div>
+    </div>
+  )
+}
+
+
+if(showChat){
+  return (
+          <div className='h-[85vh] relative bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl shadow-lg overflow-hidden'>
+      {/* Header */}
+      <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+              <div className='flex items-center gap-3 mb-3'>
+                  <div className='bg-gradient-to-br from-blue-500 to-blue-600 p-2 w-10 h-10 rounded-full flex items-center justify-center shadow-md'>
+                    <User className='h-5 w-5 text-white'/>
+                  </div>
+                  <div className='w-full'>
+                    <div className='flex justify-between'>
+                      <p className='font-semibold text-slate-800'>{messages.find((msg) => msg.id === selectedConversation)?.texts?.[0]?.senderName }</p>
+                    </div>
+                    {/* <p className='text-xs text-slate-500'>
+                            {selectedConversation.texts[selectedConversation?.texts?.length - 1 ].timestamp 
+        ? new Date(selectedConversation.texts[selectedConversation?.texts?.length - 1 ].timestamp  * 1000).toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+          })
+        : 'Just now'
+      }
+                    </p> */}
+                  </div>
+                </div>
+        <button
+          onClick={() => {setShowChat(false); setShowMessages(true)}}
+          className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div className='h-[75%] overflow-y-auto'>
+      {messages.find((msg) => msg.id === selectedConversation)?.texts.map((m,index)=> (
+        <div key={index} className={`flex ${m.sender == selectedJob?._id ? 'justify-end' : 'justify-start'}`}>
+          <div className={`ml-13 p-3 inline-block max-w-[40%] ${m.sender == selectedJob?._id ? 'mr-10 border-r-2 border-blue-200 text-right bg-slate-100' : 'ms-8 border-l-2 border-blue-200'} bg-slate-100 mt-4 py-2 `}>
+            <p className='text-slate-700 leading-relaxed'>{m.text}</p>
+          </div>
+          <br />
+        </div>
+      ))}
+      </div>
+      <div className='bg-slate-400 py-2 absolute bottom-0 w-full flex justify-center gap-4'>
+        <input type="text"
+          onChange={(e)=> setText(e.target.value)}
+          value={text}
+          required
+          className='w-[90%] rounded-3xl ps-3'
+          placeholder='Message'
+        />
+        <button onClick={(e)=> {e.preventDefault(); handleSend(messages.find((msg) => msg.id === selectedConversation)?.participants?.[0] ?? '', messages.find((msg) => msg.id === selectedConversation)?.senderName ?? '')}} className='bg-green-600 p-3 text-white rounded-full'>
+          send
+        </button>
       </div>
     </div>
   )
