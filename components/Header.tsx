@@ -40,7 +40,7 @@ const Header = () => {
   };
   return (
     <div className={`${hideNavbar && 'lg:block hidden'}`}>
-        <nav className="bg-white/90 backdrop-blur-md shadow-sm border-b border-purple-200 fixed w-full top-0 z-50">
+        <nav className="bg-white fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className={`flex ${hideNavbar ? 'justify-end' : 'justify-between'} items-center h-16`}>
             {/* Logo */}
@@ -52,12 +52,12 @@ const Header = () => {
             </div>
 
             {/* Desktop Navigation */}
-            <div className={`hidden md:flex items-center space-x-8`}>
+            <div className={`hidden md:flex items-center space-x-8 h-[42px]`}>
               <button
                 onClick={() => router.push('/jobs')}
                 className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
               >
-                Find Jobs
+                Find Job
               </button>
               <button
                 onClick={() => router.push('/companies')}
@@ -78,7 +78,7 @@ const Header = () => {
                 Blog
               </button>
               
-              {isLoggedIn ? (
+              {isLoggedIn && (
                 <div className="flex items-center space-x-4">
                   {user?.role === 'admin' &&
                     <button
@@ -95,16 +95,11 @@ const Header = () => {
                   >
                     Dashboard
                   </button>
+                </div>
+              )}
+            </div>
 
-                  {/* {user?.role === 'company' &&
-                  <button
-                    onClick={() => setIsPostJobModalOpen(true)}
-                    className="bg-[#9333E9] text-white px-6 py-2 rounded-xl transition-all duration-300 font-semibold"
-                  >
-                    Post Job
-                  </button> 
-                  } */}
-                  
+              {isLoggedIn ? (
                   <button
                     onClick={handleLogout}
                     className="p-2 flex items-center rounded-lg bg-red-600 text-white transition-colors font-medium"
@@ -112,30 +107,22 @@ const Header = () => {
                     Logout
                     <LogOut className='w-4 h-4 ms-1'/>
                   </button>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-4">
-                  {/* <button
-                    onClick={() => setIsAdminLoginModalOpen(true)}
-                    className="text-red-600 hover:text-red-700 transition-colors text-sm font-medium"
-                  >
-                    Admin
-                  </button> */}
+              ):(
+                <div className=" hidden lg:flex items-center space-x-4">
                   <button
                     onClick={() => router.push('/login')  }
                     className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
                   >
-                    Login
+                    Join now
                   </button>
                   <button
                     onClick={() => router.push('/login')}
                     className="bg-[#9333E9] text-white px-6 py-2 rounded-xl font-semibold"
                   >
-                    Sign Up
+                    Hire now
                   </button>
                 </div>
               )}
-            </div>
 
             {/* Mobile menu button */}
             <div className="md:hidden">

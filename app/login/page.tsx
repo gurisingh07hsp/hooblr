@@ -9,6 +9,7 @@ import { signIn} from "next-auth/react";
 import { FcGoogle } from "react-icons/fc";
 import {Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { usePreviousRoute } from '@/hooks/usePreviousRoute';
+import Image from 'next/image';
 
 export default function AuthModal() {
   const { setUser} = useUser();
@@ -132,10 +133,11 @@ export default function AuthModal() {
     <div className="fixed inset-0 bg-zinc-200 flex items-center justify-center z-50 p-4" style={{ zIndex: 9999 }}>
       <div className={`bg-white ${showForgot ? 'hidden' : 'block'} rounded-xl w-full max-w-md overflow-hidden`} style={{ zIndex: 10000 }}>
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <h2 className="text-2xl font-semibold text-gray-900">
+        <div className="flex items-center justify-center p-6 border-b border-gray-100">
+          {/* <h2 className="text-2xl font-semibold text-gray-900">
             Welcome to Hooblr
-          </h2>
+          </h2> */}
+           <Image src='/hooblrlogo.png' width={120} height={50} alt='logo'/>
         </div>
 
         {/* Authentication Step */}
