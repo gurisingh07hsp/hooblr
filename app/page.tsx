@@ -1,37 +1,26 @@
 'use client'
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
-  // Menu, 
-  // X, 
   Search, 
-  MapPin, 
-  Briefcase, 
-  Users, 
-  FileText, 
-  PenTool, 
-  Shield,
-  User,
-  CheckCircle,
-  Award,
-  Target,
-  Zap,
-  ArrowUpRight,
-  DiscAlbum,
   ChevronDown,
-  ArrowRight
+  ArrowRight,
+  DollarSign,
+  IndianRupee,
+  Euro
 } from 'lucide-react';
-
-// import AuthModal from '@/components/AuthModal';
-// import AdminLoginModal from '@/components/AdminLoginModal';
-// import AdminPanel from '@/components/AdminPanel';
-// import PostJobModal from '@/components/PostJobModal';
 import Footer from '@/components/Footer';
 import Image from 'next/image';
+import { Job } from '@/types/user';
+import axios from 'axios';
+
+type Salary = { min: number; max: number; currency: string; period: string };
 
 export default function Home() {
   const router = useRouter();
+  const [jobs,setJobs] = useState<Job[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   // const [isMenuOpen, setIsMenuOpen] = useState(false);
   // const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   // const [isAdminLoginModalOpen, setIsAdminLoginModalOpen] = useState(false);
@@ -43,87 +32,16 @@ export default function Home() {
   // const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
 
 
-  // const handlePostJob = (jobData: any) => {
-  //   console.log('Job posted:', jobData);
-  //   // In a real app, this would send data to an API
-  // };
 
-  // Mock blog posts data - used in BlogPage component
-  // eslint-disable-next-line no-unused-vars
-  // const mockBlogPosts = [
-  //   {
-  //     id: '1',
-  //     title: 'Interview Tips for 2024: Master the Art of Job Interviews',
-  //     author: 'Sarah Johnson',
-  //     category: 'Interview Tips',
-  //     status: 'published' as const,
-  //     published: '2024-01-15',
-  //     views: 1247,
-  //     likes: 89,
-  //     content: '<h2>Mastering Job Interviews in 2024</h2><p>This comprehensive guide covers everything you need to know about acing job interviews in 2024. From preparation strategies to common questions and answers, we\'ve got you covered.</p><h3>Preparation is Key</h3><p>Start by researching the company thoroughly. Understand their mission, values, and recent news. This will help you tailor your responses and show genuine interest.</p><h3>Common Questions to Prepare For</h3><ul><li>Tell me about yourself</li><li>Why do you want to work here?</li><li>What are your strengths and weaknesses?</li><li>Where do you see yourself in 5 years?</li></ul>',
-  //     excerpt: 'Master the art of job interviews with our comprehensive guide covering preparation strategies, common questions, and expert tips for 2024.',
-  //     tags: ['interview', 'career', 'tips', '2024', 'preparation'],
-  //     featuredImage: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800'
-  //   },
-  //   {
-  //     id: '2',
-  //     title: 'Remote Work Best Practices: Thriving in the Digital Workplace',
-  //     author: 'Mike Chen',
-  //     category: 'Workplace',
-  //     status: 'published' as const,
-  //     published: '2024-01-12',
-  //     views: 892,
-  //     likes: 67,
-  //     content: '<h2>Thriving in Remote Work</h2><p>Learn the essential best practices for remote work success. From setting up your home office to maintaining work-life balance, discover how to thrive in a remote work environment.</p><h3>Setting Up Your Workspace</h3><p>Create a dedicated workspace that minimizes distractions and promotes productivity. Invest in ergonomic furniture and proper lighting.</p><h3>Maintaining Work-Life Balance</h3><p>Set clear boundaries between work and personal time. Use time-blocking techniques and take regular breaks to avoid burnout.</p>',
-  //     excerpt: 'Discover essential strategies for remote work success, from home office setup to maintaining work-life balance.',
-  //     tags: ['remote-work', 'workplace', 'productivity', 'work-life-balance'],
-  //     featuredImage: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800'
-  //   },
-  //   {
-  //     id: '3',
-  //     title: 'Government Job Application Guide: Your Complete Roadmap',
-  //     author: 'Lisa Rodriguez',
-  //     category: 'Government Jobs',
-  //     status: 'published' as const,
-  //     published: '2024-01-10',
-  //     views: 567,
-  //     likes: 34,
-  //     content: '<h2>Navigating Government Job Applications</h2><p>A step-by-step guide to applying for government positions. Learn about the application process, required documents, and tips for standing out in government job applications.</p><h3>Understanding the Process</h3><p>Government job applications often have specific requirements and longer processing times. Be prepared for detailed forms and background checks.</p><h3>Required Documents</h3><ul><li>Resume tailored to government format</li><li>Cover letter addressing key qualifications</li><li>Transcripts and certifications</li><li>References and background information</li></ul>',
-  //     excerpt: 'Navigate the government job application process with our step-by-step guide and expert tips.',
-  //     tags: ['government', 'application', 'career', 'public-sector'],
-  //     featuredImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800'
-  //   },
-  //   {
-  //     id: '4',
-  //     title: 'Salary Negotiation Strategies: Get the Compensation You Deserve',
-  //     author: 'David Park',
-  //     category: 'Career Growth',
-  //     status: 'published' as const,
-  //     published: '2024-01-08',
-  //     views: 1234,
-  //     likes: 156,
-  //     content: '<h2>Getting the Salary You Deserve</h2><p>Master the art of salary negotiation with proven strategies that help you get the compensation you deserve without damaging relationships.</p><h3>Research and Preparation</h3><p>Before entering negotiations, research industry standards and company salary ranges. Know your worth and be prepared to articulate your value.</p><h3>Negotiation Techniques</h3><ul><li>Start with a higher anchor point</li><li>Focus on value, not just salary</li><li>Practice your pitch</li><li>Be prepared to walk away</li></ul>',
-  //     excerpt: 'Master salary negotiation with proven strategies to get the compensation you deserve.',
-  //     tags: ['salary', 'negotiation', 'career', 'compensation'],
-  //     featuredImage: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800'
-  //   },
-  //   {
-  //     id: '5',
-  //     title: 'Building Your Professional Network in the Digital Age',
-  //     author: 'Emily Thompson',
-  //     category: 'Networking',
-  //     status: 'published' as const,
-  //     published: '2024-01-05',
-  //     views: 789,
-  //     likes: 89,
-  //     content: '<h2>Networking in the Digital Age</h2><p>Networking has evolved beyond business cards and conferences. Learn how to build meaningful professional relationships online and offline.</p><h3>Online Networking</h3><p>Platforms like LinkedIn have revolutionized professional networking. Create a compelling profile and engage with industry leaders.</p><h3>Offline Networking</h3><p>Attend industry events, join professional associations, and participate in local meetups to expand your network.</p>',
-  //     excerpt: 'Build meaningful professional relationships in the digital age with effective networking strategies.',
-  //     tags: ['networking', 'linkedin', 'professional', 'relationships'],
-  //     featuredImage: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800'
-  //   }
-  // ];
+  const partnerlogos = [
+  "/partnerlogo/logo1.png",
+  "/partnerlogo/logo2.png",
+  "/partnerlogo/logo3.png",
+  "/partnerlogo/logo.png",
+  "/partnerlogo/logo4.png", // repeat for seamless loop
+];
 
-    const categories = [
+    const [categories, setCategories] = useState([
     { name: 'IT & Technology', active: true },
     { name: 'Marketing', active: false },
     { name: 'Finance', active: false },
@@ -132,88 +50,130 @@ export default function Home() {
     { name: 'Creative & Media', active: false },
     { name: 'Retail', active: false },
     { name: 'Human Resources', active: false },
-  ];
+  ]);
 
-  const jobs = [
-    {
-      title: 'Data Scientist',
-      location: 'Jakarta, Indonesia',
-      type: 'Full Time',
-      mode: 'Onsite',
-      experience: '2-4 Years',
-      posted: '3 day ago',
-      applicants: '85 Aplicants',
-      salary: '$2,3K-$5K',
-      company: 'Picave',
-      employees: '2,360-5,468',
-      highlighted: false,
-    },
-    {
-      title: 'Cybersecurity',
-      location: 'Surabaya, Indonesia',
-      type: 'Full Time',
-      mode: 'WFH',
-      experience: '3-4 Years',
-      posted: '3 day ago',
-      applicants: '145 Aplicants',
-      salary: '$2,3-$5K',
-      company: 'Devkala',
-      employees: '1,560-2,468',
-      highlighted: true,
-    },
-    {
-      title: 'AI Consultant',
-      location: 'Jakarta, Indonesia',
-      type: 'Full Time',
-      mode: 'Onsite',
-      experience: '2-4 Years',
-      posted: '4 day ago',
-      applicants: '245 Aplicants',
-      salary: '$3,5-$8K',
-      company: 'Alsix',
-      employees: '1,360-7,468',
-      highlighted: false,
-    },
-    {
-      title: 'Full Stack',
-      location: 'Jakarta, Indonesia',
-      type: 'Full Time',
-      mode: 'Onsite',
-      experience: '2-4 Years',
-      posted: '5 day ago',
-      applicants: '63 Aplicants',
-      salary: '$3,9-$8K',
-      company: 'Devvy.co',
-      employees: '360-968',
-      highlighted: false,
-    },
-    {
-      title: 'Cloud Engineer',
-      location: 'Jakarta, Indonesia',
-      type: 'Full Time',
-      mode: 'Onsite',
-      experience: '2-4 Years',
-      posted: '6 day ago',
-      applicants: '296 Aplicants',
-      salary: '$2,6-$5,2K',
-      company: 'Coudo',
-      employees: '360-568',
-      highlighted: false,
-    },
-    {
-      title: 'Machine Learning',
-      location: 'Jakarta, Indonesia',
-      type: 'Full Time',
-      mode: 'Onsite',
-      experience: '2-4 Years',
-      posted: '7 day ago',
-      applicants: '521 Aplicants',
-      salary: '$3,4-$9,2K',
-      company: 'Mech.io',
-      employees: '620-1,468',
-      highlighted: false,
-    },
-  ];
+  // const jobs = [
+  //   {
+  //     title: 'Data Scientist',
+  //     location: 'Jakarta, Indonesia',
+  //     type: 'Full Time',
+  //     mode: 'Onsite',
+  //     experience: '2-4 Years',
+  //     posted: '3 day ago',
+  //     applicants: '85 Aplicants',
+  //     salary: '$2,3K-$5K',
+  //     company: 'Picave',
+  //     employees: '2,360-5,468',
+  //     highlighted: false,
+  //   },
+  //   {
+  //     title: 'Cybersecurity',
+  //     location: 'Surabaya, Indonesia',
+  //     type: 'Full Time',
+  //     mode: 'WFH',
+  //     experience: '3-4 Years',
+  //     posted: '3 day ago',
+  //     applicants: '145 Aplicants',
+  //     salary: '$2,3-$5K',
+  //     company: 'Devkala',
+  //     employees: '1,560-2,468',
+  //     highlighted: true,
+  //   },
+  //   {
+  //     title: 'AI Consultant',
+  //     location: 'Jakarta, Indonesia',
+  //     type: 'Full Time',
+  //     mode: 'Onsite',
+  //     experience: '2-4 Years',
+  //     posted: '4 day ago',
+  //     applicants: '245 Aplicants',
+  //     salary: '$3,5-$8K',
+  //     company: 'Alsix',
+  //     employees: '1,360-7,468',
+  //     highlighted: false,
+  //   },
+  //   {
+  //     title: 'Full Stack',
+  //     location: 'Jakarta, Indonesia',
+  //     type: 'Full Time',
+  //     mode: 'Onsite',
+  //     experience: '2-4 Years',
+  //     posted: '5 day ago',
+  //     applicants: '63 Aplicants',
+  //     salary: '$3,9-$8K',
+  //     company: 'Devvy.co',
+  //     employees: '360-968',
+  //     highlighted: false,
+  //   },
+  //   {
+  //     title: 'Cloud Engineer',
+  //     location: 'Jakarta, Indonesia',
+  //     type: 'Full Time',
+  //     mode: 'Onsite',
+  //     experience: '2-4 Years',
+  //     posted: '6 day ago',
+  //     applicants: '296 Aplicants',
+  //     salary: '$2,6-$5,2K',
+  //     company: 'Coudo',
+  //     employees: '360-568',
+  //     highlighted: false,
+  //   },
+  //   {
+  //     title: 'Machine Learning',
+  //     location: 'Jakarta, Indonesia',
+  //     type: 'Full Time',
+  //     mode: 'Onsite',
+  //     experience: '2-4 Years',
+  //     posted: '7 day ago',
+  //     applicants: '521 Aplicants',
+  //     salary: '$3,4-$9,2K',
+  //     company: 'Mech.io',
+  //     employees: '620-1,468',
+  //     highlighted: false,
+  //   },
+  // ];
+
+   const formatSalary = (s: any) => `${Math.round(s.min/1000)}k - ${Math.round(s.max/1000)}k ${s.period}`;
+
+    const getCurrencyIcon = (currency: string) => {
+  switch (currency) {
+    case "USD":
+      return <DollarSign className="w-4 h-4 mr-1" />;
+    case "INR":
+      return <IndianRupee className="w-4 h-4 mr-1" />;
+    case "EUR":
+      return <Euro className="w-4 h-4 mr-1" />;
+    default:
+      return <DollarSign className="w-4 h-4 mr-1" />; // fallback
+  }
+};
+
+    const fetchJobs = async (pageNumber: number) => {
+    // if (loading) return;
+    // setLoading(true);
+
+    try {
+      const params = new URLSearchParams({
+        page: String(pageNumber),
+        limit: "20",
+        category: selectedCategory,
+      });
+
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs?${params.toString()}`
+      );
+
+      const newJobs = res.data.jobs;
+      console.log(newJobs);
+      setJobs((prev) => (pageNumber === 1 ? newJobs : [...prev, ...newJobs]));
+    } catch (err) {
+      console.error("Error fetching jobs:", err);
+    }
+  };
+
+  useEffect(()=>{
+    fetchJobs(1);
+  },[]);
 
   const HomePage = () => (
     <div className="min-h-screen bg-white">
@@ -370,11 +330,22 @@ export default function Home() {
 
 
 
-      <section className='mt-10'>
+      <section className='mt-10 overflow-hidden'>
         <div className="max-w-7xl mx-auto">
             <h2 className='lg:w-[45%] lg:text-[46px] text-3xl lg:leading-relaxed font-medium text-center mx-auto'>Trusted <span className='text-[#8A38EE]'>1000+</span> company find best jobseeker</h2>
         </div>
-        <svg className='mt-16 lg:block hidden' width="1512" height="36" viewBox="0 0 1512 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div className='flex mt-20 animate-scroll-infinite overflow-hidden'>
+          {partnerlogos.concat(partnerlogos).map((logo, index) => (
+            <div key={index} className="flex-shrink-0 w-40 mx-8">
+              <img
+                src={logo}
+                alt={`logo-${index}`}
+                className="w-full h-20 object-contain"
+              />
+            </div>
+          ))}
+        </div>
+        {/* <svg className='mt-16 lg:block hidden' width="1512" height="36" viewBox="0 0 1512 36" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M-89.9932 26.6547H-92V11.5849H-89.1862L-79.6431 21.9349V11.5849H-77.6472V26.6547H-80.4611L-89.9932 16.3151V26.6547Z" fill="#212121"/>
           <path d="M-70.5908 11.6477C-70.5908 11.9128 -70.6454 12.164 -70.7544 12.4012C-70.8562 12.6384 -70.998 12.8442 -71.1798 13.0186C-71.3615 13.193 -71.576 13.3326 -71.8232 13.4372C-72.0705 13.5349 -72.3322 13.5837 -72.6085 13.5837C-72.8848 13.5837 -73.1465 13.5349 -73.3938 13.4372C-73.6337 13.3326 -73.8446 13.193 -74.0263 13.0186C-74.2081 12.8442 -74.3535 12.6384 -74.4626 12.4012C-74.5644 12.164 -74.6153 11.9128 -74.6153 11.6477C-74.6153 11.3826 -74.5644 11.1349 -74.4626 10.9047C-74.3535 10.6674 -74.2081 10.4616 -74.0263 10.2872C-73.8446 10.1128 -73.6337 9.97674 -73.3938 9.87907C-73.1465 9.77442 -72.8848 9.72209 -72.6085 9.72209C-72.3322 9.72209 -72.0705 9.77442 -71.8232 9.87907C-71.576 9.97674 -71.3615 10.1128 -71.1798 10.2872C-70.998 10.4616 -70.8562 10.6674 -70.7544 10.9047C-70.6454 11.1349 -70.5908 11.3826 -70.5908 11.6477ZM-70.7544 26.6547H-74.4517V14.5779H-70.7544V26.6547Z" fill="#212121"/>
           <path d="M-56.8161 22.793C-56.8161 23.3233 -56.8961 23.7942 -57.056 24.2058C-57.216 24.6174 -57.4341 24.9767 -57.7104 25.2837C-57.9867 25.5837 -58.3139 25.8384 -58.692 26.0477C-59.0701 26.25 -59.4772 26.414 -59.9135 26.5395C-60.3425 26.6651 -60.7933 26.7558 -61.2659 26.8116C-61.7385 26.8674 -62.2075 26.8953 -62.6728 26.8953C-63.2981 26.8953 -63.8507 26.857 -64.3306 26.7802C-64.8105 26.7035 -65.2685 26.5814 -65.7048 26.414C-66.141 26.2395 -66.5773 26.0163 -67.0135 25.7442C-67.4425 25.4721 -67.9224 25.1407 -68.4532 24.75L-66.3046 23.0651C-66.1083 23.4209 -65.8502 23.7453 -65.5303 24.0384C-65.2031 24.3244 -64.865 24.5721 -64.516 24.7814C-64.167 24.9907 -63.8289 25.1512 -63.5017 25.2628C-63.1745 25.3744 -62.9091 25.4302 -62.7055 25.4302C-62.5383 25.4302 -62.3493 25.4267 -62.1384 25.4198C-61.9275 25.4058 -61.7131 25.3849 -61.4949 25.357C-61.2768 25.3221 -61.0623 25.2733 -60.8514 25.2105C-60.6406 25.1477 -60.4552 25.064 -60.2952 24.9593C-60.128 24.8477 -59.9971 24.7116 -59.9026 24.5512C-59.8008 24.3837 -59.7499 24.1849 -59.7499 23.9547C-59.7499 23.7174 -59.8153 23.5116 -59.9462 23.3372C-60.0698 23.1558 -60.2334 22.9988 -60.437 22.8663C-60.6406 22.7337 -60.8733 22.6221 -61.135 22.5314C-61.3968 22.4407 -61.6622 22.3605 -61.9312 22.2907C-62.1929 22.2209 -62.4474 22.1616 -62.6946 22.1128C-62.9418 22.057 -63.1563 22.0047 -63.3381 21.9558C-63.6726 21.8651 -64.0252 21.7744 -64.396 21.6837C-64.7668 21.586 -65.134 21.4779 -65.4976 21.3593C-65.8611 21.2337 -66.2101 21.0872 -66.5446 20.9198C-66.8718 20.7523 -67.1626 20.5535 -67.4171 20.3233C-67.6643 20.086 -67.8642 19.8105 -68.0169 19.4965C-68.1623 19.1756 -68.2351 18.8023 -68.2351 18.3767C-68.2351 17.5953 -68.0751 16.943 -67.7552 16.4198C-67.428 15.8895 -66.999 15.4674 -66.4682 15.1535C-65.9374 14.8326 -65.334 14.6058 -64.6578 14.4733C-63.9816 14.3407 -63.2945 14.2744 -62.5965 14.2744C-62.1166 14.2744 -61.6113 14.3233 -61.0805 14.4209C-60.5497 14.5116 -60.0335 14.6512 -59.5318 14.8395C-59.0301 15.0209 -58.5611 15.2442 -58.1249 15.5093C-57.6886 15.7744 -57.3251 16.0779 -57.0342 16.4198L-59.1828 18.1151C-59.3427 17.6965 -59.5536 17.3372 -59.8153 17.0372C-60.0698 16.7372 -60.3498 16.493 -60.6551 16.3047C-60.9532 16.1093 -61.2623 15.9663 -61.5822 15.8756C-61.8948 15.7849 -62.1857 15.7395 -62.4547 15.7395C-62.7164 15.7395 -63.0109 15.75 -63.3381 15.7709C-63.6653 15.7919 -63.9743 15.8512 -64.2651 15.9488C-64.5487 16.0465 -64.7923 16.1965 -64.9959 16.3988C-65.1922 16.5942 -65.2903 16.8663 -65.2903 17.2151C-65.2903 17.4663 -65.2322 17.6826 -65.1158 17.864C-64.9922 18.0384 -64.8323 18.1919 -64.636 18.3244C-64.4396 18.45 -64.2179 18.5581 -63.9707 18.6488C-63.7162 18.7326 -63.4581 18.8093 -63.1963 18.8791C-62.9346 18.9419 -62.6801 18.9977 -62.4329 19.0465C-62.1857 19.0953 -61.9639 19.1477 -61.7676 19.2035C-61.4331 19.2942 -61.0805 19.3884 -60.7097 19.486C-60.3316 19.5767 -59.9608 19.6849 -59.5972 19.8105C-59.2337 19.9291 -58.8847 20.0721 -58.5502 20.2395C-58.2085 20.4 -57.9104 20.5988 -57.6559 20.836C-57.4014 21.0733 -57.1978 21.3523 -57.0451 21.6733C-56.8924 21.9872 -56.8161 22.3605 -56.8161 22.793Z" fill="#212121"/>
@@ -445,7 +416,7 @@ export default function Home() {
           <path d="M1572.81 16.095C1571.55 16.035 1570.62 16 1570.02 15.99V21.12C1570.63 21.11 1571.56 21.075 1572.81 21.015V24H1563.59V21.015C1564.81 21.075 1565.73 21.11 1566.37 21.12V15.99C1565.73 16 1564.81 16.035 1563.59 16.095V13.11H1572.81V16.095Z" fill="#212121"/>
           <path d="M1587.41 13.125C1587.33 14.815 1587.3 16.625 1587.3 18.555C1587.3 20.495 1587.33 22.31 1587.41 24H1581.72L1577.88 15.81L1578.17 24H1574.09C1574.17 22.06 1574.21 20.245 1574.21 18.555C1574.21 16.875 1574.17 15.065 1574.09 13.125H1579.93L1583.79 21.54L1583.52 13.125H1587.41Z" fill="#212121"/>
           <path d="M1595.22 17.79H1602V24H1599.21L1598.87 21.345C1598.55 22.295 1597.99 23 1597.17 23.46C1596.36 23.92 1595.36 24.15 1594.19 24.15C1593.12 24.15 1592.17 23.925 1591.33 23.475C1590.5 23.025 1589.85 22.38 1589.38 21.54C1588.91 20.7 1588.68 19.72 1588.68 18.6C1588.68 16.81 1589.24 15.395 1590.38 14.355C1591.51 13.315 1593.27 12.795 1595.66 12.795C1597.03 12.795 1598.23 13.005 1599.27 13.425C1600.32 13.845 1601.21 14.495 1601.94 15.375C1601.46 15.605 1600.53 16.065 1599.14 16.755L1598.74 16.965C1598.33 16.575 1597.85 16.285 1597.3 16.095C1596.75 15.895 1596.17 15.795 1595.55 15.795C1594.54 15.795 1593.78 16.05 1593.28 16.56C1592.79 17.06 1592.54 17.68 1592.54 18.42C1592.54 19.22 1592.8 19.865 1593.33 20.355C1593.87 20.845 1594.69 21.09 1595.79 21.09C1596.27 21.09 1596.73 21.025 1597.17 20.895C1597.63 20.765 1598.01 20.54 1598.32 20.22H1595.22V17.79Z" fill="#212121"/>
-        </svg>
+        </svg> */}
       </section>
 
       <section className="py-20 px-4 bg-white mt-14">
@@ -524,28 +495,33 @@ export default function Home() {
                 {job.type}
               </span>
               <span className={`px-3 py-1 rounded-full text-xs font-medium group-hover:bg-white group-hover:bg-opacity-20 group-hover:text-white bg-gray-100 text-gray-700`}>
-                {job.mode}
+                {job.experience}
               </span>
               <span className={`px-3 py-1 rounded-full text-xs font-medium group-hover:bg-white group-hover:bg-opacity-20 group-hover:text-white bg-gray-100 text-gray-700`}>
-                {job.experience}
+                {job.education}
               </span>
             </div>
 
             {/* Posted & Applicants */}
             <div className={`flex items-center gap-2 text-sm mb-6 group-hover:text-purple-100 text-gray-600`}>
-              <span>{job.posted}</span>
+              <span>{new Date(job.createdAt).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}</span>
               <span>•</span>
-              <span>{job.applicants}</span>
+              <span>{job?.applications?.length || 0}</span>
             </div>
 
             {/* Apply Button & Salary */}
             <div className="flex items-center justify-between mb-6 pb-6 border-b border-dashed border-gray-300">
-              <button className={`px-6 py-2 rounded-full font-semibold transition-all hover:scale-105 group-hover:bg-white group-hover:text-purple-600 hover:shadow-lg bg-purple-600 text-white`}>
+              <button onClick={() => router.push(`/jobs/${job._id}`)} className={`px-6 py-2 rounded-full font-semibold transition-all hover:scale-105 group-hover:bg-white group-hover:text-purple-600 hover:shadow-lg bg-purple-600 text-white`}>
                 Apply Now
               </button>
-              <div className={`text-right group-hover:text-white text-purple-600`}>
-                <span className="text-lg font-bold">{job.salary}</span>
-                <span className="text-sm">/m</span>
+              <div className={`text-right group-hover:text-white flex items-center text-purple-600`}>
+                <p>{getCurrencyIcon(job.salary.currency)}</p>
+                <p className="text-lg font-bold">{`${formatSalary(job.salary)}`}</p>
+                {/* <span className="text-lg font-bold">{job?.salary.min}</span> */}
               </div>
             </div>
 
@@ -554,11 +530,11 @@ export default function Home() {
               <div className={`w-12 h-12 rounded-full group-hover:bg-white group-hover:bg-opacity-20 bg-gray-200`}></div>
               <div>
                 <p className={`font-semibold group-hover:text-white text-gray-900`}>
-                  {job.company}
+                  {job?.company?.name}
                 </p>
-                <p className={`text-sm group-hover:text-purple-100 text-gray-500`}>
-                  {job.employees}
-                </p>
+                {/* <p className={`text-sm group-hover:text-purple-100 text-gray-500`}>
+                  {job.employees.l}
+                </p> */}
               </div>
             </div>
           </div>

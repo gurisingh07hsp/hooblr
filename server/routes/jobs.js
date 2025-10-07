@@ -90,7 +90,7 @@ router.get(
       const skip = (page - 1) * limit;
 
       const jobs = await Job.find(filter)
-        .populate("company", "name location")
+        .populate("company", "name location logo")
         .sort(sortObj)
         .skip(skip)
         .limit(parseInt(limit));

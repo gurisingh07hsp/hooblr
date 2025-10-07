@@ -6,3 +6,21 @@
 .bg-cus-purple{
     color: #9333E9;
 }
+
+@keyframes scroll-infinite {
+    from {
+    transform: translateX(0);
+    }
+    to {
+    transform: translateX(calc(-100% / 2));
+    }
+}
+
+.animate-scroll-infinite {
+    animation: scroll-infinite 10s linear infinite;
+    width: fit-content;
+}
+
+/* .animate-scroll-infinite:hover {
+    animation-play-state: paused;
+} */

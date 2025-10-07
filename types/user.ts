@@ -50,11 +50,25 @@ export interface Company {
 }
 
 export interface Job {
-  _id?: string;
+  _id: string;
   title: string;
+  company: {logo: string, name: string};
   location: string;
-  type: "full-time" | "part-time" | "contract" | "internship" | "remote";
+  type: string;
+  salary: {min: string, max: string, currency: string, period: string};
   description: string;
+  requirements: string[];
+  benefits: string[];
+  posted: string;
+  category: string;
+  urgent?: boolean;
+  featured?: boolean;
+  companyLogo?: string;
+  rating?: number;
+  experience: string;
+  education: string;
+  applications: [];
+  createdAt: Date;
 }
 
 export interface User {
