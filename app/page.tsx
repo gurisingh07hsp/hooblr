@@ -25,13 +25,13 @@ export default function Home() {
 
 
   const partnerlogos = [
-  "/partnerlogo/logo1.png",
-  "/partnerlogo/logo2.png",
-  "/partnerlogo/logo3.png",
-  "/partnerlogo/logo.png",
-  "/partnerlogo/logo4.png", 
-  "/partnerlogo/logo3.png",
-  "/partnerlogo/logo.png", // repeat for seamless loop
+  "/logo1.png",
+  "/logo2.png",
+  "/logo3.png",
+  "/logo.png",
+  "/logo4.png", 
+  "/logo3.png",
+  "/logo.png", // repeat for seamless loop
 ];
 
     const [categories, setCategories] = useState([
