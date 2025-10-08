@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useUser } from '@/context/UserContext';
 import { 
   HomeIcon, 
@@ -57,6 +57,8 @@ const UserDashboard = () => {
   const [showChat, setShowChat] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState('');
   const [text, setText] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const sidebarItems: SidebarItem[] = [
     { id: 'dashboard', name: 'Dashboard', icon: HomeIcon },
@@ -109,6 +111,24 @@ const UserDashboard = () => {
       markMessagesAsSeen(id, userId);
     }
 
+      const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+    handleSeen(selectedConversation, user?._id);
+  }, [messages,selectedConversation]);
+
+  useEffect(() => {
+  // Small timeout to ensure messages are rendered
+  setTimeout(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
+  }, 0);
+}, [selectedConversation]);
+
   const renderContent = () => {
     switch (activeTab) {
       case 'profile':
@@ -136,18 +156,6 @@ const UserDashboard = () => {
                     <div className='flex justify-between'>
                       <p className='font-semibold text-slate-800'>{messages.find((msg) => msg.id === selectedConversation)?.receiverName }</p>
                     </div>
-                    {/* <p className='text-xs text-slate-500'>
-                            {selectedConversation.texts[selectedConversation?.texts?.length - 1 ].timestamp 
-        ? new Date(selectedConversation.texts[selectedConversation?.texts?.length - 1 ].timestamp  * 1000).toLocaleString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-          })
-        : 'Just now'
-      }
-                    </p> */}
                   </div>
                 </div>
         <button
@@ -159,7 +167,7 @@ const UserDashboard = () => {
           </svg>
         </button>
       </div>
-      <div className='h-[75%] overflow-y-auto'>
+      <div ref={scrollContainerRef} className='h-[75%] overflow-y-auto'>
       {messages.find((msg) => msg.id === selectedConversation)?.texts.map((m,index)=> (
         <div key={index} className={`flex ${m.sender == user?._id ? 'justify-end' : 'justify-start'}`}>
           <div className={`ml-13 p-3 inline-block max-w-[40%] ${m.sender == user?._id ? 'mr-10 border-r-2 border-blue-200 text-right bg-slate-100' : 'ms-8 border-l-2 border-blue-200'} bg-slate-100 mt-4 py-2 `}>
@@ -168,6 +176,7 @@ const UserDashboard = () => {
           <br />
         </div>
       ))}
+        <div ref={messagesEndRef} />
       </div>
       <div className='bg-slate-400 py-2 absolute bottom-0 w-full flex justify-center gap-4'>
         <input type="text"

@@ -1,7 +1,7 @@
 // components/CompanyJobs.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@/context/UserContext';
 import JobForm from './JobForm';
 import axios from 'axios';
@@ -85,8 +85,11 @@ const CompanyJobs = () => {
   const [resume, setResume] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [showChat, setShowChat] = useState(false);
+  const [notifications, setNotifications] = useState<Message[]>([]);
   const [selectedConversation, setSelectedConversation] = useState('');
   const [text, setText] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchJobs();
@@ -121,6 +124,25 @@ const CompanyJobs = () => {
   useEffect(()=>{
     console.log("messge : ", messages);
   },[messages])
+
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+    handleSeen(selectedConversation, selectedJob?._id);
+  }, [messages,selectedConversation]);
+
+  useEffect(() => {
+  // Small timeout to ensure messages are rendered
+  setTimeout(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
+  }, 0);
+}, [selectedConversation]);
 
   const handleJobSaved = () => {
     setShowJobForm(false);
@@ -167,6 +189,15 @@ const CompanyJobs = () => {
     const handleSeen = (id: string, userId: string = '') => {
       markMessagesAsSeen(id, userId);
     }
+
+    useEffect(()=>{
+      if (!jobs) return;
+      for(let i=0; i<jobs?.flat().length; i++){
+        listenToMessages(jobs?.flat()[i]?._id, (msgs: any) => {
+        setNotifications(msgs);
+      })
+    }
+    },[jobs])
 
 
   const getStatusColor = (status: string) => {
@@ -456,18 +487,6 @@ if(showChat){
                     <div className='flex justify-between'>
                       <p className='font-semibold text-slate-800'>{messages.find((msg) => msg.id === selectedConversation)?.texts?.[0]?.senderName }</p>
                     </div>
-                    {/* <p className='text-xs text-slate-500'>
-                            {selectedConversation.texts[selectedConversation?.texts?.length - 1 ].timestamp 
-        ? new Date(selectedConversation.texts[selectedConversation?.texts?.length - 1 ].timestamp  * 1000).toLocaleString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-          })
-        : 'Just now'
-      }
-                    </p> */}
                   </div>
                 </div>
         <button
@@ -479,7 +498,7 @@ if(showChat){
           </svg>
         </button>
       </div>
-      <div className='h-[75%] overflow-y-auto'>
+      <div ref={scrollContainerRef} className='h-[75%] overflow-y-auto'>
       {messages.find((msg) => msg.id === selectedConversation)?.texts.map((m,index)=> (
         <div key={index} className={`flex ${m.sender == selectedJob?._id ? 'justify-end' : 'justify-start'}`}>
           <div className={`ml-13 p-3 inline-block max-w-[40%] ${m.sender == selectedJob?._id ? 'mr-10 border-r-2 border-blue-200 text-right bg-slate-100' : 'ms-8 border-l-2 border-blue-200'} bg-slate-100 mt-4 py-2 `}>
@@ -488,6 +507,7 @@ if(showChat){
           <br />
         </div>
       ))}
+      <div ref={messagesEndRef} />
       </div>
       <div className='bg-slate-400 py-2 absolute bottom-0 w-full flex justify-center gap-4'>
         <input type="text"
@@ -624,6 +644,9 @@ if(showChat){
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2">
+                    <div className='flex justify-between'>
+                      <p className={`w-8 h-8 ${notifications.filter((n)=> n.participants[1] == job._id && n.texts?.some((m)=> m.isSeen == false && n.senderId != job._id )).length == 0 ? 'hidden' : 'flex'} justify-center items-center bg-green-600 text-white rounded-full mr-4`}>{notifications.filter((n)=> n.participants[1] == job._id && n.texts.some((m)=> m.isSeen == false && m.sender != job?._id)).length}</p>
+                    </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(job.status)}`}>
                       {job.status}
                     </span>

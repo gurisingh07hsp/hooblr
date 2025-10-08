@@ -27,6 +27,7 @@ router.get('/', optionalAuth, [
       page = 1,
       limit = 20,
       industry,
+      location,
       size,
       search,
       sort = 'createdAt',
@@ -44,6 +45,9 @@ router.get('/', optionalAuth, [
         { 'description': { $regex: search, $options: 'i' } }
       ];
     }
+  if (location){
+      filter['location'] = { $regex: location, $options: 'i' };    
+  }
 
     // Build sort object
     const sortObj = {};

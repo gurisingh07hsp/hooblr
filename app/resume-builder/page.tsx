@@ -20,6 +20,7 @@ import {
   FileText,
   EyeOff
 } from 'lucide-react';
+import Image from 'next/image';
 
 interface ResumeSection {
   id: string;
@@ -299,17 +300,14 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm shadow-sm border-b border-purple-200 fixed w-full top-0 z-50">
+      <header className="bg-white backdrop-blur-sm shadow-sm border-b border-purple-200 fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div 
-              className="flex items-center cursor-pointer"
+              className={`flex items-center cursor-pointer`}
               onClick={() => router.push('/')}
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg mr-3">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-gray-900">Hooblr</span>
+            <Image src='/hooblrlogo.png' width={120} height={50} alt='logo'/>
             </div>
             
             <div className="flex items-center space-x-4">

@@ -8,28 +8,19 @@ import {
   ArrowRight,
   DollarSign,
   IndianRupee,
-  Euro
+  Euro,
+  ChevronUp
 } from 'lucide-react';
 import Footer from '@/components/Footer';
 import Image from 'next/image';
 import { Job } from '@/types/user';
 import axios from 'axios';
 
-type Salary = { min: number; max: number; currency: string; period: string };
-
 export default function Home() {
   const router = useRouter();
   const [jobs,setJobs] = useState<Job[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  // const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  // const [isAdminLoginModalOpen, setIsAdminLoginModalOpen] = useState(false);
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
-  // // eslint-disable-next-line no-unused-vars
-  // const [user, setUser] = useState<any>(null);
-
-  // const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
-  // const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
+  const [seeJobs, setSeeJobs] = useState(6);
+  const [selectedCategory, setSelectedCategory] = useState('Technology & IT');
 
 
 
@@ -38,100 +29,20 @@ export default function Home() {
   "/partnerlogo/logo2.png",
   "/partnerlogo/logo3.png",
   "/partnerlogo/logo.png",
-  "/partnerlogo/logo4.png", // repeat for seamless loop
+  "/partnerlogo/logo4.png", 
+  "/partnerlogo/logo3.png",
+  "/partnerlogo/logo.png", // repeat for seamless loop
 ];
 
     const [categories, setCategories] = useState([
-    { name: 'IT & Technology', active: true },
-    { name: 'Marketing', active: false },
-    { name: 'Finance', active: false },
+    { name: 'Technology & IT', active: true },
+    { name: 'Finance & Banking', active: false },
     { name: 'Healthcare', active: false },
     { name: 'Education', active: false },
-    { name: 'Creative & Media', active: false },
-    { name: 'Retail', active: false },
+    { name: 'Design & Creative', active: false },
+    { name: 'Sales & Marketing', active: false },
     { name: 'Human Resources', active: false },
   ]);
-
-  // const jobs = [
-  //   {
-  //     title: 'Data Scientist',
-  //     location: 'Jakarta, Indonesia',
-  //     type: 'Full Time',
-  //     mode: 'Onsite',
-  //     experience: '2-4 Years',
-  //     posted: '3 day ago',
-  //     applicants: '85 Aplicants',
-  //     salary: '$2,3K-$5K',
-  //     company: 'Picave',
-  //     employees: '2,360-5,468',
-  //     highlighted: false,
-  //   },
-  //   {
-  //     title: 'Cybersecurity',
-  //     location: 'Surabaya, Indonesia',
-  //     type: 'Full Time',
-  //     mode: 'WFH',
-  //     experience: '3-4 Years',
-  //     posted: '3 day ago',
-  //     applicants: '145 Aplicants',
-  //     salary: '$2,3-$5K',
-  //     company: 'Devkala',
-  //     employees: '1,560-2,468',
-  //     highlighted: true,
-  //   },
-  //   {
-  //     title: 'AI Consultant',
-  //     location: 'Jakarta, Indonesia',
-  //     type: 'Full Time',
-  //     mode: 'Onsite',
-  //     experience: '2-4 Years',
-  //     posted: '4 day ago',
-  //     applicants: '245 Aplicants',
-  //     salary: '$3,5-$8K',
-  //     company: 'Alsix',
-  //     employees: '1,360-7,468',
-  //     highlighted: false,
-  //   },
-  //   {
-  //     title: 'Full Stack',
-  //     location: 'Jakarta, Indonesia',
-  //     type: 'Full Time',
-  //     mode: 'Onsite',
-  //     experience: '2-4 Years',
-  //     posted: '5 day ago',
-  //     applicants: '63 Aplicants',
-  //     salary: '$3,9-$8K',
-  //     company: 'Devvy.co',
-  //     employees: '360-968',
-  //     highlighted: false,
-  //   },
-  //   {
-  //     title: 'Cloud Engineer',
-  //     location: 'Jakarta, Indonesia',
-  //     type: 'Full Time',
-  //     mode: 'Onsite',
-  //     experience: '2-4 Years',
-  //     posted: '6 day ago',
-  //     applicants: '296 Aplicants',
-  //     salary: '$2,6-$5,2K',
-  //     company: 'Coudo',
-  //     employees: '360-568',
-  //     highlighted: false,
-  //   },
-  //   {
-  //     title: 'Machine Learning',
-  //     location: 'Jakarta, Indonesia',
-  //     type: 'Full Time',
-  //     mode: 'Onsite',
-  //     experience: '2-4 Years',
-  //     posted: '7 day ago',
-  //     applicants: '521 Aplicants',
-  //     salary: '$3,4-$9,2K',
-  //     company: 'Mech.io',
-  //     employees: '620-1,468',
-  //     highlighted: false,
-  //   },
-  // ];
 
    const formatSalary = (s: any) => `${Math.round(s.min/1000)}k - ${Math.round(s.max/1000)}k ${s.period}`;
 
@@ -144,7 +55,7 @@ export default function Home() {
     case "EUR":
       return <Euro className="w-4 h-4 mr-1" />;
     default:
-      return <DollarSign className="w-4 h-4 mr-1" />; // fallback
+      return <DollarSign className="w-4 h-4 mr-1" />;
   }
 };
 
@@ -173,7 +84,7 @@ export default function Home() {
 
   useEffect(()=>{
     fetchJobs(1);
-  },[]);
+  },[selectedCategory]);
 
   const HomePage = () => (
     <div className="min-h-screen bg-white">
@@ -310,7 +221,7 @@ export default function Home() {
       <div className='w-[65%] h-[470px] absolute bottom-0 right-20 bg-[#C4C4C4]'>
             <div className='bg-white absolute top-20 left-10 w-36 h-28 rounded-[20px] flex flex-col gap-y-1 justify-center items-center'>
               <p className='text-center font-medium'><span className='text-[#8A38EE]'>Free</span> Create Resume</p>
-              <button className='px-4 py-1 bg-[#8A38EE] text-white rounded-2xl cursor-pointer'>Create</button>
+              <button onClick={()=>router.push('/resume-builder')} className='px-4 py-1 bg-[#8A38EE] text-white rounded-2xl cursor-pointer z-40'>Create</button>
             </div>
 
             <div className='bg-white flex items-center absolute bottom-28 right-5 gap-3 w-48 rounded-3xl px-4 py-2'>
@@ -427,15 +338,15 @@ export default function Home() {
             <div className='flex gap-x-4 mt-10'>
               <div className='w-40 h-28 bg-[#F5F5F5] rounded-2xl flex flex-col justify-center items-center'>
                 <p className='lg:text-[40px] text-2xl font-medium'>86<span className='text-[#8A38EE]'>M+</span></p>
-                <p className='text-[#5F5270] text-sm lg:text-[16px]'>Availabe Jobs</p>
+                <p className='text-[#5F5270] text-sm lg:text-[16px] mt-2'>Availabe Jobs</p>
               </div>
               <div className='w-40 h-28 bg-[#F5F5F5] rounded-2xl flex flex-col justify-center items-center'>
                 <p className='lg:text-[40px] text-2xl font-medium'>256<span className='text-[#8A38EE]'>+</span></p>
-                <p className='text-[#5F5270] text-sm lg:text-[16px]'>Free Course</p>
+                <p className='text-[#5F5270] text-sm lg:text-[16px] mt-2'>Free Course</p>
               </div>
               <div className='w-40 h-28 bg-[#F5F5F5] rounded-2xl flex flex-col justify-center items-center'>
                 <p className='lg:text-[40px] text-2xl font-medium'>5,7<span className='text-[#8A38EE]'>M+</span></p>
-                <p className='text-[#5F5270] text-sm lg:text-[16px] text-center'>Alumni has worked</p>
+                <p className='text-[#5F5270] text-sm lg:text-[16px] text-center mt-2'>Alumni has worked</p>
               </div>
             </div>
           </div>
@@ -460,6 +371,7 @@ export default function Home() {
       <div className="flex flex-wrap gap-3 mb-8 bg-[#F5F5F5] rounded-3xl px-2 py-2">
         {categories.map((category, index) => (
           <button
+          onClick={()=> {setCategories(categories.map((cat, idx) => idx === index ? {...cat, active: true} : {...cat, active: false})); setSelectedCategory(category.name)}}
             key={index}
             className={`px-5 py-1 rounded-full font-medium transition-all ${
               category.active
@@ -474,7 +386,7 @@ export default function Home() {
 
       {/* Job Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {jobs.map((job, index) => (
+        {jobs.slice(0,seeJobs).map((job, index) => (
           <div
             key={index}
             className={`rounded-3xl p-6 border transition-all hover:shadow-lg hover:text-white hover:bg-gradient-to-br from-purple-600 to-purple-500 border-[#B683F5] group`}
@@ -510,7 +422,7 @@ export default function Home() {
                       day: 'numeric' 
                     })}</span>
               <span>•</span>
-              <span>{job?.applications?.length || 0}</span>
+              <span>{job?.applications?.length || 0} Aplicants</span>
             </div>
 
             {/* Apply Button & Salary */}
@@ -527,7 +439,9 @@ export default function Home() {
 
             {/* Company Info */}
             <div className="flex items-center gap-3">
-              <div className={`w-12 h-12 rounded-full group-hover:bg-white group-hover:bg-opacity-20 bg-gray-200`}></div>
+              <div className={`w-12 h-12 rounded-full flex justify-center items-center group-hover:bg-white group-hover:bg-opacity-20 bg-gray-200`}>
+                <img className={`${job?.company?.logo ? 'block' : 'hidden'} rounded-full`} src={job?.company?.logo} alt="company logo" />
+              </div>
               <div>
                 <p className={`font-semibold group-hover:text-white text-gray-900`}>
                   {job?.company?.name}
@@ -543,10 +457,21 @@ export default function Home() {
 
       {/* See More Button */}
       <div className="flex justify-center">
-        <button className="flex items-center gap-2 px-8 py-3 bg-purple-600 text-white rounded-full font-semibold hover:bg-purple-700 transition-all hover:shadow-lg">
+        {jobs?.length > 6 ? (
+        <button onClick={()=>setSeeJobs(9)} className="flex items-center gap-2 px-8 py-3 bg-purple-600 text-white rounded-full font-semibold hover:bg-purple-700 transition-all hover:shadow-lg">
           See More Jobs
           <ChevronDown className="w-5 h-5" />
         </button>
+        ) : (
+          <div>
+            {seeJobs == 9 && (
+              <button onClick={()=>setSeeJobs(6)} className="flex items-center gap-2 px-8 py-3 bg-purple-600 text-white rounded-full font-semibold hover:bg-purple-700 transition-all hover:shadow-lg">
+                See More Jobs
+                 <ChevronUp className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+        )} 
       </div>
     </div>
       </section>
@@ -574,7 +499,7 @@ export default function Home() {
             <p className="text-gray-600 text-sm mb-6">Availabe Jobs</p>
             <div className="bg-white rounded-2xl p-4 shadow-sm">
               <p className="text-gray-700 text-sm font-medium mb-3">Free Create Resume</p>
-              <button className="w-full bg-purple-600 text-white py-2 px-4 rounded-full font-semibold hover:bg-purple-700 transition-all">
+              <button onClick={()=>router.push('/resume-builder')} className="w-full bg-purple-600 text-white py-2 px-4 rounded-full font-semibold hover:bg-purple-700 transition-all">
                 Create
               </button>
             </div>
@@ -664,7 +589,7 @@ export default function Home() {
               Verified Job<br />
               Listings Now!
             </h2>
-            <button className="flex items-center gap-3 bg-purple-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-purple-700 hover:shadow-xl transition-all hover:scale-105">
+            <button onClick={()=>router.push('/jobs')} className="flex items-center gap-3 bg-purple-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-purple-700 hover:shadow-xl transition-all hover:scale-105">
               Find Your Job
               <div className="bg-white bg-opacity-20 rounded-full p-1">
                 <ArrowRight className="w-5 h-5" />

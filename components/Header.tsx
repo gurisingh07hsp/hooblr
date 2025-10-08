@@ -42,7 +42,7 @@ const Header = () => {
     <div className={`${hideNavbar && 'lg:block hidden'}`}>
         <nav className="bg-white fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`flex ${hideNavbar ? 'justify-end' : 'justify-between'} items-center h-16`}>
+          <div className={`flex ${hideNavbar ? 'justify-end gap-7' : 'justify-between'} items-center h-16`}>
             {/* Logo */}
             <div 
               className={`${hideNavbar ? 'hidden' : 'flex'} items-center cursor-pointer`}
