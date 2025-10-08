@@ -248,9 +248,11 @@ export default function Home() {
         <div className='flex mt-20 animate-scroll-infinite overflow-hidden'>
           {partnerlogos.concat(partnerlogos).map((logo, index) => (
             <div key={index} className="flex-shrink-0 w-40 mx-8">
-              <img
+              <Image
                 src={logo}
                 alt={`logo-${index}`}
+                width={200}
+                height={80}
                 className="w-full h-20 object-contain"
               />
             </div>
