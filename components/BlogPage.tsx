@@ -63,23 +63,20 @@ export default function BlogPage({ posts }: BlogPageProps) {
   const regularPosts = filteredPosts;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl"></div>
-        
+      <div className="relative overflow-hidden bg-white">
+        <div className="absolute inset-0"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
-            <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-medium mb-4">
+            <div className="inline-flex items-center space-x-2 bg-[#8A38EE] backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium mb-4">
               <Sparkles className="w-3 h-3" />
               <span>Expert Career Insights</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            <h1 className="text-3xl md:text-4xl font-bold text-black mb-4">
               Career Insights & Tips
             </h1>
-            <p className="text-lg mb-6 text-purple-100 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg mb-6 text-[#8A38EE] max-w-3xl mx-auto leading-relaxed">
               Expert advice, industry trends, and practical tips to accelerate your career growth
             </p>
             
@@ -87,19 +84,19 @@ export default function BlogPage({ posts }: BlogPageProps) {
             <div className="max-w-4xl mx-auto">
               <div className="flex flex-col md:flex-row gap-4 mb-8">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5" />
                   <input
                     type="text"
                     placeholder="Search articles, topics, or authors..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-lg bg-white/90 backdrop-blur-sm"
+                    className="w-full pl-12 pr-4 py-4 bg-[#F6F6F6] border border-gray-200 rounded-xl focus:outline-none"
                   />
                 </div>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-6 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-lg bg-white/90 backdrop-blur-sm"
+                  className="px-6 py-4 border border-gray-200 bg-[#F6F6F6] rounded-xl focus:outline-none"
                 >
                   {categories.map(category => (
                     <option key={category} value={category}>

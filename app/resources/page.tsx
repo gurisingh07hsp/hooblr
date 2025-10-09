@@ -11,7 +11,7 @@ export default function ResourcesPageRoute() {
   // const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
+    <div className="min-h-screen bg-white">
       {/* Main Content */}
       <main className="pt-16">
         <ResourcesPage />

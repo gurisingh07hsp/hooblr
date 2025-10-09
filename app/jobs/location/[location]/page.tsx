@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { useUser } from '@/context/UserContext';
+import Footer from '@/components/Footer';
+import { useSearchParams } from 'next/navigation';
 
 interface Job {
   _id: string;
@@ -43,23 +45,32 @@ interface Job {
   createdAt: Date;
 }
 
-interface FindJobsPageProps {
-  initialCategory?: string;
+interface PageProps {
+  params: {
+    location: string;
+  };
 }
 
-export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
+export default function FindJobsPage({ params }: PageProps) {
   const router = useRouter();
   const {user} = useUser();
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory || '');
-  const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedType, setSelectedType] = useState('');
   const [selectedSalaryRange, setSelectedSalaryRange] = useState('');
   const [sortBy, setSortBy] = useState('recent');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [isApplied, setIsApplied] = useState<string[]>([]); 
+  const [isApplied, setIsApplied] = useState<string[]>([]);
+  
+  
+  const searchParams = useSearchParams();
+  const category = searchParams.get("category")?.replace(/-/g, ' ').replace(/@/g, '&');
+  const [selectedCategory, setSelectedCategory] = useState(category || '');
+  
+  const location = decodeURIComponent(params.location.replace(/-/g, ' '));
+  const [selectedLocation, setSelectedLocation] = useState(location ||'');
+
 
   const [filters, setFilters] = useState({
     type: "",
@@ -96,24 +107,6 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
     'Non-Profit & NGO',
     'Consulting'
   ];
-
-  const locations = [
-    'San Francisco, CA',
-    'New York, NY',
-    'Washington, DC',
-    'Austin, TX',
-    'Seattle, WA',
-    'Chicago, IL',
-    'Boston, MA',
-    'Los Angeles, CA',
-    'Remote'
-  ];
-
-  // const jobTypes = ['Full-time', 'Part-time', 'Contract', 'Temporary', 'Internship'];
-  // const salaryRanges = ['$0-50k', '$50k-100k', '$100k-150k', '$150k+'];
-
-
-
 
 
   // Fetch jobs with filters
@@ -153,7 +146,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
   useEffect(() => {
     setPage(1);
     fetchJobs(1, filters);
-  }, [filters,selectedCategory, selectedLocation]);
+  }, [filters, selectedCategory, selectedLocation]);
 
   // Infinite scroll
   useEffect(() => {
@@ -243,60 +236,11 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
 };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-16">
       {/* Header Section */}
       <div className="bg-white border-b border-black/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* <h1 className="text-3xl font-bold text-gray-900 mb-4">Find Your Dream Job</h1>
-          <p className="text-lg text-gray-600 mb-8">
-            Discover thousands of opportunities from top companies and government organizations
-          </p> */}
-          
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">          
           {/* Advanced Search */}
-          {/* <div className="bg-white backdrop-blur-sm rounded-xl p-6 border border-purple-200 shadow-lg">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-purple-400" />
-                <input
-                  type="text"
-                  placeholder="Job title, keywords, or company"
-                  value={filters.search}
-                  onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                  className="w-full pl-10 pr-4 py-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white/50"
-                />
-              </div>
-              
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-purple-400" />
-                <select
-                  value={selectedLocation}
-                  onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none bg-white/50"
-                >
-                  <option value="">All Locations</option>
-                  {locations.map(location => (
-                    <option key={location} value={location}>{location}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-purple-400" />
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none bg-white/50"
-                >
-                  <option value="">All Categories</option>
-                  {categories.map(category => (
-                    <option key={category} value={category}>{category}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div> */}
-
-
             <div>
                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="relative flex items-center">
@@ -336,8 +280,6 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
               </div>
             </div>
             </div>
-
-
         </div>
       </div>
 
@@ -345,110 +287,6 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-[#f8fafc]">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters */}
-          {/* <div className="lg:w-1/4">
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-200 p-6 sticky top-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <Filter className="w-5 h-5 mr-2 text-purple-600" />
-                  Filters
-                </h3>
-                <button
-                  onClick={clearFilters}
-                  className="text-purple-600 hover:text-purple-700 text-sm font-medium"
-                >
-                  Clear All
-                </button>
-              </div>
-
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">Job Type</label>
-          {["Full-time", "Part-time", "Contract", "Temporary", "Internship"].map(
-            (t) => (
-              <label key={t} className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
-                <input
-                  type="radio"
-                  name="jobType"
-                  value={t}
-                  checked={filters.type === t}
-                  onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-                />
-                <span className="ml-2 text-sm text-gray-700">{t}</span>
-              </label>
-            )
-          )}
-        </div>
-
-
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Salary Range</label>
-          <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
-            <input
-              type="radio"
-              name="salary"
-              onChange={() =>
-                setFilters({ ...filters, minSalary: "0", maxSalary: "50000" })
-              }
-              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-            />
-            <span className="ml-2 text-sm text-gray-700">$0–50k</span>
-          </label>
-          <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
-            <input
-              type="radio"
-              name="salary"
-              onChange={() =>
-                setFilters({ ...filters, minSalary: "50000", maxSalary: "100000" })
-              }
-              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-            />
-            <span className="ml-2 text-sm text-gray-700">$50k–100k</span>
-          </label>
-          <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
-            <input
-              type="radio"
-              name="salary"
-              onChange={() =>
-                setFilters({ ...filters, minSalary: "100000", maxSalary: "150000" })
-              }
-              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-            />
-            <span className="ml-2 text-sm text-gray-700">$100k–150k</span>
-          </label>
-          <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
-            <input
-              type="radio"
-              name="salary"
-              onChange={() =>
-                setFilters({ ...filters, minSalary: "150000", maxSalary: "9999999" })
-              }
-              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-            />
-            <span className="ml-2 text-sm text-gray-700">$150k+</span>
-          </label>
-        </div>
-
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Experience</label>
-          {["Entry-level", "Mid-level", "Senior-level", "Executive"].map((exp) => (
-            <label key={exp} className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
-              <input
-                type="radio"
-                name="experience"
-                checked={filters.experience === exp}
-                onChange={() => setFilters({ ...filters, experience: exp })}
-                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-              />
-               <span className="ml-2 text-sm text-gray-700">{exp}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-    </div> */}
-
-
-
             <div className="hidden lg:block lg:w-1/5">
             <div className="bg-white rounded-xl border p-6 sticky top-6">
               <div className="flex items-center justify-between mb-6">
@@ -554,119 +392,6 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
         </div>
       </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-    {/* Sidebar Filters - Desktop */}
-          {/* <div className="hidden lg:block lg:w-1/4">
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-200 p-6 sticky top-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <Filter className="w-5 h-5 mr-2 text-purple-600" />
-                  Filters
-                </h3>
-                <button
-                  onClick={clearFilters}
-                  className="text-purple-600 hover:text-purple-700 text-sm font-medium"
-                >
-                  Clear All
-                </button>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">Job Type</label>
-                {["Full-time", "Part-time", "Contract", "Temporary", "Internship"].map(
-                  (t) => (
-                    <label key={t} className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="jobType"
-                        value={t}
-                        checked={filters.type === t}
-                        onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-                        className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">{t}</span>
-                    </label>
-                  )
-                )}
-              </div>
-
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-3">Salary Range</label>
-                <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="salary"
-                    onChange={() =>
-                      setFilters({ ...filters, minSalary: "0", maxSalary: "50000" })
-                    }
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">$0–50k</span>
-                </label>
-                <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="salary"
-                    onChange={() =>
-                      setFilters({ ...filters, minSalary: "50000", maxSalary: "100000" })
-                    }
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">$50k–100k</span>
-                </label>
-                <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="salary"
-                    onChange={() =>
-                      setFilters({ ...filters, minSalary: "100000", maxSalary: "150000" })
-                    }
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">$100k–150k</span>
-                </label>
-                <label className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="salary"
-                    onChange={() =>
-                      setFilters({ ...filters, minSalary: "150000", maxSalary: "9999999" })
-                    }
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">$150k+</span>
-                </label>
-              </div>
-
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-3">Experience</label>
-                {["Entry-level", "Mid-level", "Senior-level", "Executive"].map((exp) => (
-                  <label key={exp} className="flex items-center p-2 rounded-lg hover:bg-purple-50 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="experience"
-                      checked={filters.experience === exp}
-                      onChange={() => setFilters({ ...filters, experience: exp })}
-                      className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">{exp}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div> */}
-
           {/* Mobile Filters - Horizontal Scroll */}
           <div className="lg:hidden mb-6">
             <div className="flex items-center justify-between mb-4 px-4">
@@ -763,7 +488,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
           <div className="lg:w-3/4">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
-                {filteredJobs.length} Jobs Found
+                Jobs in {selectedLocation}
               </h2>
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-600">Sort by:</span>
@@ -779,98 +504,6 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
                 </select>
               </div>
             </div>
-
-            {/* <div className="space-y-6">
-              {filteredJobs.map((job) => (
-                <div
-                  key={job._id}
-                  className={`bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 p-6 transition-all duration-300 ${
-                    job.featured ? 'ring-2 ring-purple-500 ring-opacity-20' : ''
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3
-                          onClick={() => router.push(`/jobs/${job._id}`)}
-                          className="text-xl font-semibold text-gray-900 hover:text-purple-600 cursor-pointer transition-colors"
-                        >
-                          {job.title}
-                        </h3>
-                        {job.featured && (
-                          <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                            Featured
-                          </span>
-                        )}
-                        {job.urgent && (
-                          <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                            Urgent
-                          </span>
-                        )}
-                      </div>
-                      
-                      <div className="flex flex-wrap items-center space-x-4 text-gray-600 mb-3">
-                        <div className="flex items-center">
-                          <Building2 className="w-4 h-4 mr-1 text-purple-500" />
-                          <span>{job.company?.name}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <MapPin className="w-4 h-4 mr-1 text-purple-500" />
-                          <span>{job.location}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1 text-purple-500" />
-                          <span>{job.type}</span>
-                        </div>
-                        <div className="flex items-center">
-                          {getCurrencyIcon(job.salary.currency)}
-                          <span>{`${job.salary.min} - ${job.salary.max} ${job.salary.period}`}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2 mb-3">
-                        <span className="bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full">
-                          {job.category}
-                        </span>
-                      </div>
-                      
-                      <p className="text-gray-700 mb-4 line-clamp-2">
-                        {job.description}
-                      </p>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                           <button onClick={() => router.push(`/jobs/${job._id}`)} className={`${isApplied.includes(job._id) ? 'bg-green-600' : 'bg-purple-600'} flex justify-center items-center text-white px-5 py-2 rounded-lg`}>
-                            {isApplied.includes(job._id) ? 'Applied' : 'Apply Now'}
-                            {isApplied.includes(job._id) && <CheckCircle className='ms-1 w-4 h-4'/>}
-                            </button>
-                          <button
-                            onClick={() => router.push(`/jobs/${job._id}`)}
-                            className="text-purple-600 hover:text-purple-700 font-medium flex items-center transition-colors"
-                          >
-                            View Details
-                            <ChevronRight className="w-4 h-4 ml-1" />
-                          </button>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <button className="p-2 text-gray-400 hover:text-red-500 transition-colors">
-                            <Heart className="w-5 h-5" />
-                          </button>
-                          <button className="p-2 text-gray-400 hover:text-purple-500 transition-colors">
-                            <Share2 className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {loading && <p>Loading...</p>}
-              <div id="load-more" className="h-10"></div>
-              {!hasMore && <p className="text-gray-500 ms-4">No more jobs</p>}
-            </div> */}
-
 
             <section className='grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-5 bg-[#f8fafc]'>
               {filteredJobs.map((job) => (
@@ -930,10 +563,10 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
                   </div>
 
                   <div className='flex justify-between items-center mt-6 pb-2 px-2'>
-                    <button  onClick={() => router.push(`/jobs/${job._id}`)} className={`px-4 py-1 flex items-center border rounded-3xl text-[#6D47F1]`}>
-                      {isApplied.includes(job._id) ? 'Applied' : 'Apply Now'}
-                      {isApplied.includes(job._id) && <CheckCircle className='ms-1 w-4 h-4'/>}
-                    </button>
+                      <button  onClick={() => router.push(`/jobs/${job._id}`)} className={`px-4 py-1 flex items-center border rounded-3xl text-[#6D47F1]`}>
+                        {isApplied.includes(job._id) ? 'Applied' : 'Apply Now'}
+                        {isApplied.includes(job._id) && <CheckCircle className='ms-1 w-4 h-4'/>}
+                      </button>
                     <p className='text-neutral-500 text-sm'>{new Date(job.createdAt).toLocaleDateString('en-US', { 
                       year: 'numeric', 
                       month: 'long', 
@@ -946,7 +579,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
             </section>
               {loading && <p>Loading...</p>}
               <div id="load-more" className="h-10"></div>
-              {!hasMore && <p className="text-gray-500 ms-4">No more jobs</p>}
+              {!hasMore && <p className="text-gray-500 ms-4">No jobs Found.</p>}
 
             {loading && filteredJobs.length === 0 && (
               <div className="text-center py-12">
@@ -966,6 +599,7 @@ export default function FindJobsPage({initialCategory }: FindJobsPageProps) {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

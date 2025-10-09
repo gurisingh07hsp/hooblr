@@ -102,7 +102,7 @@ const Header = () => {
               {isLoggedIn ? (
                   <button
                     onClick={handleLogout}
-                    className="p-2 flex items-center rounded-lg bg-red-600 text-white transition-colors font-medium"
+                    className="hidden p-2 lg:flex items-center rounded-lg bg-red-600 text-white transition-colors font-medium"
                   >
                     Logout
                     <LogOut className='w-4 h-4 ms-1'/>

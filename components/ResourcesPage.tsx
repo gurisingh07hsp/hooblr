@@ -119,37 +119,37 @@ export default function ResourcesPage() {
   }, [selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700">
-        <div className="absolute inset-0 bg-black/10"></div>
+      <div className="relative overflow-hidden bg-white border-b">
+        {/* <div className="absolute inset-0 bg-black/10"></div>
         <div className="absolute top-0 right-0 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl"></div> */}
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
-            <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-medium mb-4">
+            <div className="inline-flex items-center space-x-2 bg-[#8A38EE] backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium mb-4">
               <Sparkles className="w-3 h-3" />
               <span>Free Career Resources</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Accelerate Your Career
+            <h1 className="text-3xl flex justify-center items-center md:text-4xl font-bold text-black mb-4">
+              <span className='text-4xl text-[#8A38EE]'>Accelerate</span> Your Career
             </h1>
-            <p className="text-lg mb-6 text-purple-100 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg mb-6 text-black max-w-3xl mx-auto leading-relaxed">
               Free guides, templates, and tools to help you land your dream job and advance your career
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
               <div className="text-center">
-                <div className="text-2xl font-bold text-white mb-1">50+</div>
-                <div className="text-purple-200 text-sm">Resources</div>
+                <div className="text-2xl font-bold text-black mb-1">50+</div>
+                <div className="text-[#8A38EE] text-sm">Resources</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-white mb-1">100K+</div>
-                <div className="text-purple-200 text-sm">Downloads</div>
+                <div className="text-2xl font-bold text-black mb-1">100K+</div>
+                <div className="text-[#8A38EE] text-sm">Downloads</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-white mb-1">4.8★</div>
-                <div className="text-purple-200 text-sm">Average Rating</div>
+                <div className="text-2xl font-bold text-black mb-1">4.8★</div>
+                <div className="text-[#8A38EE] text-sm">Average Rating</div>
               </div>
             </div>
           </div>
@@ -169,7 +169,7 @@ export default function ResourcesPage() {
             {resources.filter(resource => resource.featured).map((resource) => {
               const IconComponent = resource.icon;
               return (
-                <div key={resource.id} className="group bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 p-6 transition-all duration-300 transform hover:-translate-y-1">
+                <div key={resource.id} className="group bg-white/80 backdrop-blur-sm rounded-xl border border-[#8A38EE] p-6 transition-all duration-300 transform hover:-translate-y-1">
                   <div className="flex items-start space-x-4">
                     <div className={`w-12 h-12 bg-gradient-to-br ${resource.color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                       <IconComponent className="w-6 h-6 text-white" />
@@ -184,7 +184,7 @@ export default function ResourcesPage() {
                           Featured
                         </span>
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">{resource.title}</h3>
+                      <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#8A38EE] transition-colors">{resource.title}</h3>
                       <p className="text-gray-600 mb-4 text-sm leading-relaxed">{resource.description}</p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4 text-xs text-gray-500">
@@ -201,7 +201,7 @@ export default function ResourcesPage() {
                             {resource.downloads.toLocaleString()}
                           </div>
                         </div>
-                        <button className="bg-[#9333E9] text-white px-4 py-2 rounded-lg transition-all duration-300 font-semibold flex items-center transform hover:-translate-y-1 text-sm">
+                        <button className="bg-[#8A38EE] text-white px-4 py-2 rounded-lg transition-all duration-300 font-semibold flex items-center transform hover:-translate-y-1 text-sm">
                           Access Now
                           <ArrowRight className="w-4 h-4 ml-2" />
                         </button>
@@ -218,7 +218,7 @@ export default function ResourcesPage() {
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Categories Sidebar */}
           <div className="lg:w-1/4">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-purple-200 p-6 sticky top-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border p-6 sticky top-6">
               <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
                 <BookOpen className="w-5 h-5 mr-2 text-purple-600" />
                 Categories
@@ -232,8 +232,8 @@ export default function ResourcesPage() {
                       onClick={() => setSelectedCategory(category.name)}
                       className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 flex items-center justify-between group ${
                         selectedCategory === category.name
-                          ? 'bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 font-semibold shadow-md'
-                          : 'text-gray-600 hover:bg-purple-50 hover:text-purple-600'
+                          ? 'bg-gradient-to-r from-purple-100 to-indigo-100 text-[#8A38EE] font-semibold shadow-md'
+                          : 'text-gray-600 hover:bg-[#F5F5F5] hover:text-purple-600'
                       }`}
                     >
                       <div className="flex items-center">
@@ -282,7 +282,7 @@ export default function ResourcesPage() {
                             {resource.category}
                           </span>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">{resource.title}</h3>
+                        <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#8A38EE] transition-colors">{resource.title}</h3>
                         <p className="text-gray-600 text-sm mb-4 leading-relaxed">{resource.description}</p>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4 text-xs text-gray-500">
@@ -306,7 +306,7 @@ export default function ResourcesPage() {
                             <button className="p-2 text-gray-400 hover:text-purple-600 transition-colors">
                               <Share2 className="w-4 h-4" />
                             </button>
-                            <button className="text-purple-600 hover:text-purple-700 font-semibold text-sm flex items-center transition-colors">
+                            <button className="text-[#8A38EE] hover:text-purple-700 font-semibold text-sm flex items-center transition-colors">
                               Access
                               <ArrowRight className="w-4 h-4 ml-1" />
                             </button>
