@@ -16,6 +16,7 @@ const SearchComponent = () => {
     const [showLocationDropdown, setShowLocationDropdown] = React.useState(false);
     const [filteredCities, setFilteredCities] = React.useState<string[]>([]);
     const locationRef = React.useRef<HTMLDivElement>(null);
+    const categoryRef = React.useRef<HTMLDivElement>(null);
     
     const categories = [
       'Law Enforcement',
@@ -51,6 +52,8 @@ const SearchComponent = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (locationRef.current && !locationRef.current.contains(event.target as Node)) {
         setShowLocationDropdown(false);
+      }
+      if (categoryRef.current && !categoryRef.current.contains(event.target as Node)) {
         setShowSearchSuggestions(false);
       }
     };
@@ -147,7 +150,7 @@ const SearchComponent = () => {
               )}
             </div>
 
-              <div onClick={(e) => e.stopPropagation()} className="relative flex border-r min-w-0" ref={locationRef}>
+              <div onClick={(e) => e.stopPropagation()} className="relative flex border-r min-w-0" ref={categoryRef}>
               <input
                 type="text"
                 placeholder="ex. Graphic Designer"
