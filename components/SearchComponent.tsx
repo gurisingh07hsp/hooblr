@@ -1,11 +1,21 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { Briefcase, Search } from 'lucide-react';
+import { ChevronDown, Search } from 'lucide-react';
+
+interface place_data {
+  class: string;
+  type: string;
+  display_place: string;
+}
+
 const SearchComponent = () => {
     const router = useRouter();
     const [location, setLocation] = React.useState('');
     const [category, setCategory] = React.useState('');
     const [showSearchSuggestions, setShowSearchSuggestions] = React.useState(false);
+    const [showLocationDropdown, setShowLocationDropdown] = React.useState(false);
+    const [filteredCities, setFilteredCities] = React.useState<string[]>([]);
+    const locationRef = React.useRef<HTMLDivElement>(null);
     
     const categories = [
       'Law Enforcement',
@@ -36,6 +46,53 @@ const SearchComponent = () => {
     ];
     const [suggestions, setSuggestions] = React.useState<string[]>(categories);
 
+
+      React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (locationRef.current && !locationRef.current.contains(event.target as Node)) {
+        setShowLocationDropdown(false);
+        setShowSearchSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleLocationSelect = (selectedCity: string) => {
+    setLocation(selectedCity);
+    setShowLocationDropdown(false);
+  };
+
+  const handleLocationFocus = () => {
+    setShowLocationDropdown(true);
+  };
+
+  const handleLocationChange = async(e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocation(e.target.value);
+    if(e.target.value !== ' ' && e.target.value !== ''){ 
+      try{
+        const response = await fetch(
+        `https://api.locationiq.com/v1/autocomplete?key=${process.env.NEXT_PUBLIC_LOCATIONIQ_KEY}&q=${e.target.value}&limit=5&dedupe=1&countrycodes=in`
+        );
+        const data = await response.json();
+        console.log(data);
+        setFilteredCities(
+          data
+          ?.filter((place: place_data) => (place.class === "place" || place.class === 'boundary'))
+          .map((place: place_data) => place.display_place)
+        );
+      }catch(error){
+        console.error("Error fetching location data: ", error);
+      }
+    }
+    setShowLocationDropdown(true);
+  };
+
+
+
     const fetchSuggestions = (value: string) => {
     try{
       setShowSearchSuggestions(true)
@@ -56,40 +113,48 @@ const SearchComponent = () => {
 
 
   return (
-    <div className="flex border-2 lg:w-[33rem] mt-12 items-center px-2 lg:gap-x-3 gap-x-2 h-[74px] rounded-[37px] bg-[#F5F5F5]">
+    <div className="flex border-2 lg:w-[33rem] mt-12 items-center px-2 lg:gap-x-3 gap-x-2 lg:h-[74px] h-[55px] rounded-[37px] bg-[#F5F5F5]">
 
       {/* Search Input */}
-      <div className="border-r">
-        <input
-          type="text"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder="Enter Location"
-          className="lg:px-2 px-1 bg-[#F5F5F5] lg:w-36 w-24 border-none placeholder:text-sm placeholder-gray-400 focus:outline-none"
-        />
-      </div>
 
-
-       {/* <div className="border-r">
-        <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="lg:px-2 px-1 bg-[#F5F5F5] lg:w-40 w-28 border-none placeholder:text-sm placeholder-gray-400 focus:outline-none"
-        >
-            <option className='bg-white' value="">Categories</option>
-            {categories.map(category => (
-            <option className='bg-white' key={category} value={category}>{category}</option>
-            ))}
-        </select>
-        </div> */}
-              <div onClick={(e) => e.stopPropagation()} className="relative flex-1 border-r min-w-0">
+            <div className="relative flex min-w-0" ref={locationRef}>
               <input
                 type="text"
-                placeholder="What are you looking for?"
+                placeholder={"Enter Location"}
+                value={location}
+                onChange={handleLocationChange}
+                onFocus={handleLocationFocus}
+                className="lg:px-2 px-1 bg-[#F5F5F5] lg:w-36 w-24 text-[10px] lg:text-[16px] placeholder:lg:text-sm placeholder:text-[10px] border-r placeholder-gray-400 focus:outline-none"
+              />
+              
+              {/* Location Dropdown */}
+              {showLocationDropdown && (
+                <div className="absolute top-full left-0 border-none right-0 mt-1 w-[130px] lg:w-[200px] bg-white rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                  {filteredCities.length > 0 && (
+                    filteredCities.filter((city, index, arr) => arr.indexOf(city) === index).map((city, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleLocationSelect(city)}
+                        className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                      >
+                        <div className="flex items-center">
+                          <span className="text-gray-800">{city}</span>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+              <div onClick={(e) => e.stopPropagation()} className="relative flex border-r min-w-0" ref={locationRef}>
+              <input
+                type="text"
+                placeholder="ex. Graphic Designer"
                 onFocus={()=>setShowSearchSuggestions(true)}
                 value={category}
                 onChange={(e) => fetchSuggestions(e.target.value)}
-                className="lg:px-2 px-1 bg-[#F5F5F5] lg:w-40 w-28 border-none placeholder:text-sm placeholder-gray-400 focus:outline-none"
+                className="lg:px-2 px-1 bg-[#F5F5F5] lg:w-40 w-28 border-r text-[10px] lg:text-[16px] placeholder:lg:text-sm placeholder:text-[10px] placeholder-gray-400 focus:outline-none"
               />
 
               {showSearchSuggestions && (

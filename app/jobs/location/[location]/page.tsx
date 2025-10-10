@@ -326,54 +326,79 @@ export default function FindJobsPage({ params }: PageProps) {
           </div>
         </div>
 
-
-        <div className="mt-4 border-t-2 pt-4">
-          <label className="block text-sm font-semibold mb-3">Salary Range</label>
-          <label className="flex items-center p-2 rounded-lg hover:bg-[#FAFAFA] cursor-pointer">
-            <input
-              type="radio"
-              name="salary"
-              onChange={() =>
-                setFilters({ ...filters, minSalary: "0", maxSalary: "50000" })
-              }
-              className="h-5 w-5 accent-[#6D47F1] border-gray-300"
-            />
-            <span className="ml-2 text-sm">$0–50k</span>
-          </label>
-          <label className="flex items-center p-2 rounded-lg hover:bg-[#FAFAFA]  cursor-pointer">
-            <input
-              type="radio"
-              name="salary"
-              onChange={() =>
-                setFilters({ ...filters, minSalary: "50000", maxSalary: "100000" })
-              }
-              className="h-5 w-5 accent-[#6D47F1] border-gray-300"
-            />
-            <span className="ml-2 text-sm">$50k–100k</span>
-          </label>
-          <label className="flex items-center p-2 rounded-lg hover:bg-[#FAFAFA]  cursor-pointer">
-            <input
-              type="radio"
-              name="salary"
-              onChange={() =>
-                setFilters({ ...filters, minSalary: "100000", maxSalary: "150000" })
-              }
-              className="h-5 w-5 accent-[#6D47F1] border-gray-300"
-            />
-            <span className="ml-2 text-sm">$100k–150k</span>
-          </label>
-          <label className="flex items-center p-2 rounded-lg hover:bg-[#FAFAFA] cursor-pointer">
-            <input
-              type="radio"
-              name="salary"
-              onChange={() =>
-                setFilters({ ...filters, minSalary: "150000", maxSalary: "9999999" })
-              }
-              className="h-5 w-5 accent-[#6D47F1] border-gray-300"
-            />
-            <span className="ml-2 text-sm">$150k+</span>
-          </label>
-        </div>
+              <div className="mt-4 border-t-2 pt-4">
+                <label className="block text-sm font-semibold mb-3">
+                  Salary Range
+                </label>
+                <label className="flex items-center p-2 rounded-lg hover:bg-[#FAFAFA] cursor-pointer">
+                  <input
+                    type="radio"
+                    name="salary"
+                    checked={selectedSalaryRange === "0-50000"}
+                    onChange={() => {
+                      setSelectedSalaryRange("0-50000");
+                      setFilters({
+                        ...filters,
+                        minSalary: "0",
+                        maxSalary: "50000",
+                      })
+                    }}
+                    className="h-5 w-5 accent-[#6D47F1] border-gray-300"
+                  />
+                  <span className="ml-2 text-sm">$0–50k</span>
+                </label>
+                <label className="flex items-center p-2 rounded-lg hover:bg-[#FAFAFA]  cursor-pointer">
+                  <input
+                    type="radio"
+                    name="salary"
+                    checked={selectedSalaryRange === "50000-100000"}
+                    onChange={() => {
+                      setSelectedSalaryRange("50000-100000");
+                      setFilters({
+                        ...filters,
+                        minSalary: "50000",
+                        maxSalary: "100000",
+                      })
+                    }}
+                    className="h-5 w-5 accent-[#6D47F1] border-gray-300"
+                  />
+                  <span className="ml-2 text-sm">$50k–100k</span>
+                </label>
+                <label className="flex items-center p-2 rounded-lg hover:bg-[#FAFAFA]  cursor-pointer">
+                  <input
+                    type="radio"
+                    name="salary"
+                    checked={selectedSalaryRange === "100000-150000"}
+                    onChange={() => {
+                      setSelectedSalaryRange("100000-150000");
+                      setFilters({
+                        ...filters,
+                        minSalary: "100000",
+                        maxSalary: "150000",
+                      })
+                    }}
+                    className="h-5 w-5 accent-[#6D47F1] border-gray-300"
+                  />
+                  <span className="ml-2 text-sm">$100k–150k</span>
+                </label>
+                <label className="flex items-center p-2 rounded-lg hover:bg-[#FAFAFA] cursor-pointer">
+                  <input
+                    type="radio"
+                    name="salary"
+                    checked={selectedSalaryRange === "150000+"}
+                    onChange={() => {
+                      setSelectedSalaryRange("150000+");
+                      setFilters({
+                        ...filters,
+                        minSalary: "150000",
+                        maxSalary: "9999999",
+                      })
+                    }}
+                    className="h-5 w-5 accent-[#6D47F1] border-gray-300"
+                  />
+                  <span className="ml-2 text-sm">$150k+</span>
+                </label>
+              </div>
 
         <div className="mt-4 border-t-2 pt-4">
           <label className="block text-sm font-semibold mb-3">Experience</label>
