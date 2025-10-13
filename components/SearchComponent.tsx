@@ -153,11 +153,11 @@ const SearchComponent = () => {
               <div onClick={(e) => e.stopPropagation()} className="relative flex border-r min-w-0" ref={categoryRef}>
               <input
                 type="text"
-                placeholder="ex. Graphic Designer"
+                placeholder="ex. Graphic Des"
                 onFocus={()=>setShowSearchSuggestions(true)}
                 value={category}
                 onChange={(e) => fetchSuggestions(e.target.value)}
-                className="lg:px-2 px-1 bg-[#F5F5F5] lg:w-40 w-28 border-r text-[10px] lg:text-[16px] placeholder:lg:text-sm placeholder:text-[10px] placeholder-gray-400 focus:outline-none"
+                className="lg:px-2 px-1 bg-[#F5F5F5] lg:w-40 w-full border-r text-[10px] lg:text-[16px] placeholder:lg:text-sm placeholder:text-[10px] placeholder-gray-400 focus:outline-none"
               />
 
               {showSearchSuggestions && (
@@ -185,7 +185,7 @@ const SearchComponent = () => {
 
         {/* Find Your Job Button */}
       <button onClick={()=> location && category ? router.push(`/jobs/location/${location.replace(/\s+/g, '-')}?category=${category.replace(/\s+/g,'-').replace('&','@')}`) : location && router.push(`/jobs/location/${location}`)} className="flex items-center lg:gap-1 gap-1 bg-[#8A38EE] text-white lg:px-4 py-4 rounded-[46px] font-semibold shadow-lg shadow-purple-300">
-        <span className="lg:text-[16px] text-[10px] lg:w-full w-20">Find Your Job</span>
+        <span className="lg:text-[16px] text-[10px] lg:w-full w-24">Find Your Job</span>
         <div className="hidden lg:w-[28px] lg:h-[24px] border-2 border-white rounded-full lg:flex justify-center items-center">
           <Search className="w-4 h-4 font-bold" />
         </div>

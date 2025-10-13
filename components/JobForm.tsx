@@ -8,7 +8,7 @@ import axios from 'axios';
 
 interface Job {
   _id?: string;
-  company?: string;
+  company?: any;
   title: string;
   description: string;
   requirements: string;
@@ -34,6 +34,7 @@ interface Job {
   tags: string[];
   featured: boolean;
   urgent: boolean;
+  thirdpartyapply?: string;
 }
 
 interface JobFormProps {
@@ -90,7 +91,8 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
     applicationDeadline: '',
     tags: [],
     featured: false,
-    urgent: false
+    urgent: false,
+    thirdpartyapply: ''
   });
 
   const jobTypes = ['Full-time', 'Part-time', 'Contract', 'Temporary', 'Internship'];
@@ -105,9 +107,11 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
   const currencies = ['USD', 'EUR', 'GBP', 'INR', 'CAD', 'AUD'];
   const salaryPeriods = ['hourly', 'monthly', 'yearly'];
   const jobCategories = [
-    'Software Development', 'Data Science', 'Product Management', 'Design (UI/UX)',
-    'Marketing', 'Sales', 'Customer Support', 'Human Resources', 'Finance',
-    'Operations', 'Engineering', 'Healthcare', 'Education', 'Legal', 'Other'
+    "Law Enforcement","Administration","Healthcare","Education","Government Jobs","Technology & IT","Government & Public Sector",
+    "Healthcare & Medical","Finance & Banking","Education & Training","Engineering","Sales & Marketing","Human Resources",
+    "Legal & Compliance","Operations & Management","Customer Service","Design & Creative","Research & Development",
+    "Manufacturing","Retail & E-commerce","Transportation & Logistics","Real Estate","Media & Communications",
+    "Non-Profit & NGO","Consulting",
   ];
   const commonBenefits = [
     'Health Insurance', 'Dental Insurance', 'Vision Insurance', '401k/Retirement Plan',
@@ -132,6 +136,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
           : ''
       });
     }
+    console.log("job : ", job);
   }, [job]);
 
   const validateStep = (step: number): boolean => {
@@ -141,7 +146,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
     stepFields.forEach(field => {
       switch (field) {
         case 'company':
-          if(!formData.company?.trim()) newErrors.company = 'Company is required';
+          if(!formData.company?.name.trim()) newErrors.company = 'Company is required';
           break;
         case 'title':
           if (!formData.title.trim()) newErrors.title = 'Job title is required';
@@ -689,6 +694,18 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
                 <p className="mt-1 text-xs text-gray-500">Leave empty for ongoing recruitment</p>
               </div>
             </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Third Party Apply</label>
+                <input
+                  type='url'
+                  name="thirdpartyapply"
+                  value={formData.thirdpartyapply}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <p className="mt-1 text-xs text-gray-500">Leave empty for easy apply</p>
+              </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>

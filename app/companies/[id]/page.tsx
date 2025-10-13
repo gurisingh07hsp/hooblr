@@ -26,7 +26,8 @@ import {
   Clock,
   DollarSign,
   IndianRupee,
-  Euro
+  Euro,
+  Bookmark
 } from 'lucide-react';
 import axios from 'axios';
 import Image from 'next/image';
@@ -250,22 +251,17 @@ export default function CompanyProfilePage() {
           </button>
 
           {/* Company Header */}
-          <div className="bg-white rounded-2xl border p-8 mb-8">
-            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
-              <div className="flex items-start space-x-6 mb-6 lg:mb-0">
-                 {company.logo ? (
-                    <img src={company.logo} alt='company logo' width={100} height={80} className='rounded-md'/>
-                  ): (
-                  <div className="w-16 hidden h-16 bg-[#9333E9] rounded-xl lg:flex items-center justify-center shadow-lg">
-                    <Building2 className="w-8 h-8 text-white" />
-                  </div>
-                  )}
-                {/* <div className="w-20 h-20 bg-[#9333E9] rounded-xl flex items-center justify-center shadow-lg">
-                  <Building2 className="w-10 h-10 text-white" />
-                </div> */}
-                <div>
+          <div className="bg-white rounded-2xl border p-4 mb-8">
+            <div>
+              <div className="flex items-start space-x-6 mb-4">
+                <div className='w-16 h-16 rounded-xl border flex justify-center items-center px-1'>
+                  <img className={company?.logo ? "block" : 'hidden'} src={company?.logo} alt='company logo'/>
+                </div>
+                <h1 className="lg:text-3xl text-lg font-bold text-gray-900">{company.name}</h1>
+              </div>
+              <hr />
+                <div className='mt-3'>
                   <div className="flex items-center space-x-3 mb-2">
-                    <h1 className="text-3xl font-bold text-gray-900">{company.name}</h1>
                     {company.featured && (
                       <span className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                         Featured
@@ -278,52 +274,32 @@ export default function CompanyProfilePage() {
                       <span className="font-medium">{company.industry}</span>
                     </div>
                     <div className="flex items-center">
-                      <MapPin className="w-4 h-4 mr-1 text-purple-600" />
-                      <span className="font-medium">{company.location}</span>
-                    </div>
-                    <div className="flex items-center">
                       <Users className="w-4 h-4 mr-1 text-purple-600" />
-                      <span className="font-medium">{company.size} employees</span>
+                      <span className="font-medium">{company.size} Employees</span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    {/* <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${
-                            i < Math.floor(company.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                          }`}
-                        />
-                      ))}
-                      <span className="ml-2 text-sm text-gray-600 font-medium">
-                        {company.rating} ({company.reviewCount} reviews)
-                      </span>
-                    </div> */}
+                   <div className="flex items-center">
+                      <MapPin className="w-4 h-4 mr-1 text-purple-600" />
+                      <span className="font-medium">{company.location}</span>
+                  </div>
+                  <div className="flex items-center space-x-4 mt-3">
                     <div className="flex items-center text-green-600 font-medium">
                       <Briefcase className="w-4 h-4 mr-1" />
                       <span className="text-sm">{jobs?.length} open jobs</span>
                     </div>
                   </div>
                 </div>
-              </div>
               
-              <div className="flex flex-col space-y-3">
-                {/* <button className="bg-[#9333E9] text-white px-6 py-3 rounded-xl transition-all duration-300 font-semibold">
-                  View All Jobs
-                </button> */}
+              {/* <div className="flex flex-col space-y-3 mt-3">
                 <div className="flex space-x-3">
                   <button className="p-2 text-gray-400 hover:text-purple-600 transition-colors border border-gray-200 rounded-lg">
-                    <Heart className="w-5 h-5" />
+                    <Bookmark className="w-5 h-5" />
                   </button>
                   <button className="p-2 text-gray-400 hover:text-purple-600 transition-colors border border-gray-200 rounded-lg">
                     <Share2 className="w-5 h-5" />
                   </button>
-                  {/* <button className="p-2 text-gray-400 hover:text-purple-600 transition-colors border border-gray-200 rounded-lg">
-                    <Eye className="w-5 h-5" />
-                  </button> */}
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -337,31 +313,16 @@ export default function CompanyProfilePage() {
                 <p className="text-gray-700 leading-relaxed">{company.description}</p>
               </div>
 
-              {/* Mission & Culture */}
-              {/* <div className="bg-white rounded-2xl border p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Mission & Culture</h2>
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Our Mission</h3>
-                    <p className="text-gray-700 leading-relaxed">{company.mission}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Our Culture</h3>
-                    <p className="text-gray-700 leading-relaxed">{company.culture}</p>
-                  </div>
-                </div>
-              </div> */}
-
               {/* Open Jobs */}
               <div className="bg-white rounded-2xl border p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Open Positions</h2>
                 <div className="space-y-4">
                   {jobs?.map((job) => (
                     <div key={job._id} className="border border-gray-200 rounded-xl p-6">
-                      <div className="flex items-start justify-between">
+                      <div className="flex lg:flex-row flex-col items-start justify-between">
                         <div className="flex-1">
                           <h3 className="text-lg font-semibold text-gray-900 mb-2">{job.title}</h3>
-                          <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+                          <div className="flex lg:flex-row flex-col gap-2 lg:items-center text-sm text-gray-600 mb-3">
                             <div className="flex items-center">
                               <MapPin className="w-4 h-4 mr-1" />
                               {job.location}
@@ -384,7 +345,7 @@ export default function CompanyProfilePage() {
                           }) : "just now"}
                           </div>
                         </div>
-                        <button onClick={()=> router.push(`/jobs/${job._id}`)} className="bg-[#9333E9] text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium">
+                        <button onClick={()=> router.push(`/jobs/${job._id}`)} className="bg-[#9333E9] mt-3 lg:mt-0 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium">
                           Apply Now
                         </button>
                       </div>

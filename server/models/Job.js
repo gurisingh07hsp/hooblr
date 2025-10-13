@@ -116,6 +116,9 @@ const jobSchema = new mongoose.Schema({
   urgent: {
     type: Boolean,
     default: false
+  },
+  thirdpartyapply:{
+    type: String
   }
 }, {
   timestamps: true

@@ -2,18 +2,19 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Building2, MapPin, Clock, DollarSign, X, CheckCircle, IndianRupee, Euro, Eye, FileText, Upload } from 'lucide-react';
+import { MapPin, Clock, DollarSign, X, CheckCircle, IndianRupee, Euro, Eye, FileText, Upload, ArrowUpRightFromCircle } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import Footer from '@/components/Footer';
-import { sendMessage, listenToMessages } from "@/lib/chat";
+import { sendMessage } from "@/lib/chat";
 import axios from 'axios';
+import { ArrowTurnRightUpIcon } from '@heroicons/react/24/outline';
 
 type Salary = { min: number; max: number; currency: string; period: string };
 
 type Job = {
   _id: string;
   title: string;
-  company: { _id: string; name: string; location?: string };
+  company: { _id: string; name: string, logo:string, location?: string };
   description: string;
   requirements: string;
   responsibilities?: string;
@@ -30,6 +31,7 @@ type Job = {
   createdAt: string;
   views: number;
   applications: Array<any>;
+  thirdpartyapply?: string;
 };
 
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -94,12 +96,6 @@ export default function JobDetailsPage() {
   },[job, user])
 
 
-  //   useEffect(() => {
-  //   if (!user?._id || !job?._id) return;
-  //   const unsub = listenToMessages(user._id, setMessages);
-  //   return () => unsub();
-  // }, [user, job]);
-
   const handleSend = async () => {
     if(user?._id && user.profile?.name && job?._id && job.company.name){
       await sendMessage(user?._id, user?.profile?.name, job?._id, job.company.name, text);
@@ -156,7 +152,12 @@ export default function JobDetailsPage() {
 
   const isLoggedIn = async() => {
       if(user && user.email){
-        setShowApply(true);
+        if(job?.thirdpartyapply){
+          router.push(job.thirdpartyapply);
+        }
+        else{
+          setShowApply(true);
+        }
       }
       else{
         setShowLoginPrompt(true);
@@ -205,16 +206,6 @@ export default function JobDetailsPage() {
   }
 };
 
-  // if(showLoginPrompt){
-  //   return (
-  //     <div className="h-[40vh] w-[50vw] bg-white flex items-center justify-center">
-  //         <div className="text-center">
-  //           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto" />
-  //           <p className="mt-4 text-gray-600">Please Login to Apply the Job</p>
-  //         </div>
-  //     </div>
-  //   )
-  // }
 
   if (loading) {
     return (
@@ -282,22 +273,33 @@ export default function JobDetailsPage() {
 
       <main className="pt-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white/80 rounded-xl shadow-lg border border-purple-200 p-6 mb-8">
+          <div className="bg-white/80 rounded-xl shadow-lg border border-purple-200 p-4 mb-8">
+           <div className="flex border-b pb-4">
+              <div  className="w-14 h-14 rounded-xl border flex justify-center items-center px-1">
+                <img
+                  className={job?.company?.logo ? "block" : "hidden"}
+                  src={job?.company?.logo}
+                  alt="company logo"
+                />
+              </div>
+              <div className="ms-2">
+                <p className="font-bold text-lg">{job.title}</p>
+                <p>{job?.company?.name}</p>
+              </div>
+            </div>
             <div className="mb-4">
-              <h1 className="text-3xl font-bold text-gray-900">{job.title}</h1>
-              <div className="mt-3 flex flex-wrap items-center gap-4 text-gray-700">
-                <span className="flex items-center"><Building2 className="w-4 h-4 mr-2 text-purple-500" />{job.company.name}</span>
-                <span className="flex items-center"><MapPin className="w-4 h-4 mr-2 text-purple-500" />{job.location}</span>
+              <div className="mt-3 flex gap-3 text-gray-700">
                 <span className="flex items-center"><Clock className="w-4 h-4 mr-2 text-purple-500" />{job.type.replace('-', ' ')}</span>
                 <span className="flex items-center">{getCurrencyIcon(job.salary.currency)}{formatSalary(job.salary)}</span>
               </div>
+                <span className="flex items-center mt-2"><MapPin className="w-4 h-4 mr-2 text-purple-500" />{job.location}</span>
+                <span className="flex items-center text-gray-500 mt-2"><Eye className='w-4 h-4 mr-2 text-purple-500'/> {job.views} • Applications: {job.applications.length}</span>
             </div>
             <div className="flex items-center gap-4">
               <button onClick={isLoggedIn} disabled={isApplied} className={`${isApplied ? 'bg-green-600' : 'bg-purple-600'} flex justify-center items-center text-white px-5 py-2 rounded-lg`}>
-              {isApplied ? 'Applied' : 'Apply Now'}
+              {isApplied ? 'Applied' : job.thirdpartyapply ? <div className='flex items-center'>Apply <ArrowUpRightFromCircle className='ms-1 w-4 h-4'/></div> : 'Apply Now'}
               {isApplied && <CheckCircle className='ms-1 w-4 h-4'/>}
               </button>
-              <span className="text-sm text-gray-500">Views: {job.views} • Applications: {job.applications.length}</span>
             </div>
           </div>
 
@@ -331,7 +333,7 @@ export default function JobDetailsPage() {
               {user?._id &&
                 <div className="bg-white/80 rounded-xl shadow border border-purple-200 p-6">
                   <label>Send Message</label>
-                  <textarea rows={5} value={text} onChange={e => setText(e.target.value)} className='border rounded-lg w-full'></textarea>
+                  <textarea rows={5} value={text} onChange={e => setText(e.target.value)} className='border rounded-lg w-full p-2'></textarea>
                   <button onClick={handleSend} className="bg-purple-600 text-white px-4 py-2 rounded ms-[70%]">Send</button>
                 </div>
               }

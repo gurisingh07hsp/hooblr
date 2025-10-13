@@ -60,7 +60,7 @@ export default function FindJobsPage({ params }: PageProps) {
   const [sortBy, setSortBy] = useState('recent');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isApplied, setIsApplied] = useState<string[]>([]);
   
   
@@ -111,7 +111,6 @@ export default function FindJobsPage({ params }: PageProps) {
 
   // Fetch jobs with filters
   const fetchJobs = async (pageNumber: number, filters: any) => {
-    if (loading) return;
     setLoading(true);
 
     try {
@@ -134,9 +133,11 @@ export default function FindJobsPage({ params }: PageProps) {
       const newJobs = res.data.jobs;
       console.log(newJobs);
       setFilteredJobs((prev) => (pageNumber === 1 ? newJobs : [...prev, ...newJobs]));
+      setLoading(false);
       setHasMore(pageNumber < res.data.pagination.pages);
     } catch (err) {
       console.error("Error fetching jobs:", err);
+       setLoading(false);
     }
 
     setLoading(false);
@@ -604,21 +605,12 @@ export default function FindJobsPage({ params }: PageProps) {
             </section>
               {loading && <p>Loading...</p>}
               <div id="load-more" className="h-10"></div>
-              {!hasMore && <p className="text-gray-500 ms-4">No jobs Found.</p>}
+              {!hasMore && filteredJobs.length !== 0 && <p className="text-gray-500 ms-4">No More jobs</p>}
 
-            {loading && filteredJobs.length === 0 && (
+            {!loading && filteredJobs.length === 0 && (
               <div className="text-center py-12">
                 <Briefcase className="w-16 h-16 text-purple-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs found</h3>
-                <p className="text-gray-600 mb-4">
-                  Try adjusting your search criteria or clearing the filters.
-                </p>
-                <button
-                  onClick={clearFilters}
-                  className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 shadow-lg"
-                >
-                  Clear Filters
-                </button>
               </div>
             )}
           </div>

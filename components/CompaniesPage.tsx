@@ -151,16 +151,6 @@ export default function CompaniesPage() {
     'Consulting'
   ];
 
-  const locations = [
-    'San Francisco, CA',
-    'New York, NY',
-    'Washington, DC',
-    'Seattle, WA',
-    'Chicago, IL',
-    'Austin, TX',
-    'Remote'
-  ];
-
   const companySizes = [
     '1-10',
     '11-50',
@@ -515,7 +505,7 @@ export default function CompaniesPage() {
               {filteredCompanies.map((company) => (
                 <div key={company._id} className='w-full bg-white rounded-2xl border p-2'>
                   <div className='flex border-b pb-4'>
-                  <div className='w-14 h-14 rounded-xl border flex justify-center items-center px-1'>
+                  <div onClick={() => router.push(`/companies/${company._id}`)} className='w-14 h-14 rounded-xl border flex justify-center items-center px-1 cursor-pointer'>
                     <img className={company?.logo ? "block" : 'hidden'} src={company?.logo} alt='company logo'/>
                   </div>
                   <div className='ms-2'>
@@ -525,7 +515,6 @@ export default function CompaniesPage() {
                               Featured
                             </span>
                           )}
-                    {/* <p className='font-bold'>{company.title}</p> */}
                   </div>
                   </div>
                   <div className='mt-4'>

@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import Image from 'next/image';
 import SearchComponent from '@/components/SearchComponent';
 import HomeJobs from '@/components/HomeJobs';
+import {motion} from 'framer-motion'
 
 export default function Home() {
   const router = useRouter();
@@ -23,26 +24,55 @@ export default function Home() {
   "/Logo.png", // repeat for seamless loop
 ];
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.3,
+      },
+    },
+  };
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 40 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 1.5,
+      ease: 'easeOut' as const,
+    },
+  },
+} as const;
+
 
   const HomePage = () => (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative pt-20 pb-16 px-4 overflow-hidden">
-        <div className="relative max-w-7xl px-4 mx-auto flex lg:flex-row flex-col gap-y-8">
-          <div>
-          <div className='font-medium text-[16px] flex items-center gap-x-6'>
+      <section className="relative lg:pt-20 pt-10 pb-16 px-4 overflow-hidden">
+        <div className="relative max-w-7xl px-4 mx-auto flex md:flex-row flex-col gap-y-8">
+          <motion.div
+            variants={container}
+            initial="hidden"
+            animate="show">
+          <motion.div
+            variants={fadeUp}
+           className='font-medium text-[16px] flex items-center gap-x-6'>
             <Image src='/Metric Container.png' alt='Metric Container' width={38} height={38}/>
             Inclusive workplaces for all.
-            </div>
+            </motion.div>
           <div className='lg:w-[676px] mt-6'>
-            <div className='lg:text-[64px] text-4xl text-center lg:text-left font-semibold leading-tight'><span className='text-[#8A38EE]'>Job Finder</span> with Diversity Focus.</div>
+            <motion.div variants={fadeUp} className='lg:text-[64px] text-4xl text-center lg:text-left font-semibold leading-tight'><span className='text-[#8A38EE]'>Job Finder</span> with Diversity Focus.</motion.div>
           </div>
-        <div className='lg:w-[27rem] text-[#5F5270] text-[20px] mt-8'>
+        <motion.div variants={fadeUp} className='lg:w-[27rem] text-[#5F5270] text-[20px] mt-8'>
           <p className='text-center lg:text-left'>Find jobs at companies focused on diversity and inclusion that match your values.</p>
-        </div>
-
+        </motion.div>
+        <motion.div variants={fadeUp}>
         <SearchComponent/>
-    </div>
+        </motion.div>
+    </motion.div>
 
     <div className='flex relative w-full'>
       <div className='absolute z-30'>

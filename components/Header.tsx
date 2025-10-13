@@ -138,7 +138,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-purple-200">
+          <div className="md:hidden h-[100vh] bg-white border-t border-purple-200">
             <div className="px-2 pt-2 pb-3 space-y-1">
               <button
                 onClick={() => {
