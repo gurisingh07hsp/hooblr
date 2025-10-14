@@ -342,8 +342,8 @@ router.get('/user/my-applications', auth, authorize('user'), async (req, res) =>
     const jobs = await Job.find({
       'applications.user': req.user._id
     })
-    .populate('company', 'name company')
-    .select('title location type applications salary')
+    .populate('company', 'name company logo')
+    .select('title location type experience education applications salary')
     .sort({ 'applications.appliedAt': -1 });
 
          const appliedJobs = jobs.map(job => {
@@ -380,7 +380,7 @@ router.get('/company/my-jobs', auth, authorize('user', 'admin'), async (req, res
     companies.map(async (company) => {
       const job = await Job.find({company: company._id})
       .populate('applications.user', 'profile.name profile.avatar')
-      .populate('company', 'name');
+      .populate('company', 'name logo');
       return job;
     })
   );

@@ -64,7 +64,7 @@ const fadeUp = {
             Inclusive workplaces for all.
             </motion.div>
           <div className='lg:w-[676px] mt-6'>
-            <motion.div variants={fadeUp} className='lg:text-[64px] text-4xl text-center lg:text-left font-semibold leading-tight'><span className='text-[#8A38EE]'>Job Finder</span> with Diversity Focus.</motion.div>
+            <motion.div variants={fadeUp} className='lg:text-[64px] text-4xl text-center lg:text-left font-semibold leading-tight'><span className='text-[#8A38EE]'>Job Finder</span> with Diversity Focus</motion.div>
           </div>
         <motion.div variants={fadeUp} className='lg:w-[27rem] text-[#5F5270] text-[20px] mt-8'>
           <p className='text-center lg:text-left'>Find jobs at companies focused on diversity and inclusion that match your values.</p>

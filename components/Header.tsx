@@ -5,12 +5,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/context/UserContext';
 import { usePathname } from "next/navigation";
+import { listenToMessages} from '@/lib/chat';
 import { 
   Menu, 
   X,  
-  LogOut
+  LogOut,
+  MessageSquareTextIcon
 } from 'lucide-react';
-import PostJobModal from './PostJobModal';
 import Image from 'next/image';
 const Header = () => {
   const router = useRouter();
@@ -18,7 +19,8 @@ const Header = () => {
   const hideNavbar = ["/dashboard"].includes(pathname);
   const {user,isLoggedIn, setIsLoggedIn,logout} = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
+  const [notifications, setNotifications] = useState<number>(0);
+  const [messages, setMessages] = useState<any[]>([]);
 
     const handleAuth = () => {
     setIsLoggedIn(true);
@@ -30,14 +32,35 @@ const Header = () => {
     }
   },[user])
 
+
+      const fetchMessages = () => {
+        if (!user?._id) return;
+          const unsub = listenToMessages(user?._id, (msgs: any) => {
+          setMessages(msgs);
+        });
+        return () => unsub();
+      }
+    
+      useEffect(() => {
+        fetchMessages();
+      }, [user]);
+    
+      useEffect(()=>{
+        console.log("messge : ", messages);
+         const totalUnseen = messages.reduce((count, msg) => {
+          const unseenInThisConversation = msg.texts?.filter((t: any) => t.isSeen === false && t.sender != user?._id).length || 0;
+          return count + unseenInThisConversation;
+        }, 0);
+        
+        setNotifications(totalUnseen);
+        console.log("Total unseen messages:", totalUnseen);
+      },[messages])
+
   const handleLogout = () => {
     logout();
   };
 
-  const handlePostJob = () => {
-    // console.log('Job posted:', jobData);
-    // In a real app, this would send data to an API
-  };
+
   return (
     <div className={`${hideNavbar && 'lg:block hidden'}`}>
         <nav className="bg-white fixed w-full top-0 z-50">
@@ -94,6 +117,14 @@ const Header = () => {
                     className="text-gray-700 border hover:border-purple-600 p-2 rounded-lg hover:text-purple-600 transition-colors font-medium"
                   >
                     Dashboard
+                  </button>
+
+                  <button
+                    onClick={() => router.push('/dashboard?tab=messages')}
+                    className='w-[40px] h-[40px] relative rounded-full border-2 flex justify-center items-center hover:border-purple-600 transition-colors'
+                  >
+                    {notifications > 0 && <div className='p-[4px] border border-white bg-red-600 rounded-full absolute right-[6px] top-2'></div>}
+                    <MessageSquareTextIcon className='text-gray-600 w-5 h-5'/>
                   </button>
                 </div>
               )}
@@ -197,17 +228,6 @@ const Header = () => {
                   >
                     Dashboard
                   </button>
-                  {/* {user?.role === 'company' &&
-                                    <button
-                    onClick={() => {
-                      setIsPostJobModalOpen(true);
-                      setIsMenuOpen(false);
-                    }}
-                    className="block px-3 py-2 bg-[#9333E9] text-white rounded-lg mx-3 my-2 text-center font-semibold"
-                  >
-                    Post Job
-                  </button> 
-                  } */}
 
                   <button
                     onClick={() => {
@@ -221,15 +241,6 @@ const Header = () => {
                 </>
               ) : (
                 <>
-                  {/* <button
-                    onClick={() => {
-                      setIsAdminLoginModalOpen(true);
-                      setIsMenuOpen(false);
-                    }}
-                    className="block px-3 py-2 text-red-600 hover:text-red-700 transition-colors w-full text-left font-medium"
-                  >
-                    Admin
-                  </button> */}
                   <button
                     onClick={() => {
                       router.push('/login');
@@ -254,12 +265,6 @@ const Header = () => {
           </div>
         )}
       </nav>
-
-        <PostJobModal
-        isOpen={isPostJobModalOpen}
-        onClose={() => setIsPostJobModalOpen(false)}
-        onSubmit={handlePostJob}
-        />
 
     </div>
   )

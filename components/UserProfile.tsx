@@ -199,7 +199,7 @@ const UserProfile = () => {
                 onClick={() => setActiveSection(section.id)}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeSection === section.id
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[#6D47F1] text-[#6D47F1]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -237,7 +237,7 @@ const UserProfile = () => {
                     name="phone"
                     value={profileData.phone}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D47F1] focus:border-transparent"
                   />
                 </div>
 
@@ -251,7 +251,7 @@ const UserProfile = () => {
                     name="location"
                     value={profileData.location}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D47F1] focus:border-transparent"
                     placeholder="e.g., New York, NY"
                   />
                 </div>
@@ -266,16 +266,16 @@ const UserProfile = () => {
                     type="file"
                     accept=".pdf,.doc,.docx"
                     onChange={(e) => setResume(e.target.files?.[0] || null)}
-                    className="w-full px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D47F1] focus:border-transparent"
                   />
                   <span className='text-[12px] text-gray-600'>DOC, DOCX and PDF (2 MB)</span>
                 </div>
                 : (
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 transition-colors">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-[#6D47F1] transition-colors">
           <div>
             <div className='flex gap-2 items-center'>
             <div className="bg-blue-100 p-4 rounded-full mb-3">
-              <FileText className="w-6 h-6 text-blue-600" />
+              <FileText className="w-6 h-6 text-[#6D47F1]" />
             </div>
             
             <div>
@@ -285,7 +285,7 @@ const UserProfile = () => {
             <div className="flex gap-3">
               <button
                 onClick={(e) => {e.preventDefault(); setShowModal(true)}}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-[#6D47F1] text-white rounded-lg transition-colors text-sm font-medium"
                 >
                 <Eye className="w-4 h-4" />
                 View
@@ -323,7 +323,7 @@ const UserProfile = () => {
                   rows={4}
                   value={profileData.bio}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D47F1] focus:border-transparent"
                   placeholder="Tell us about yourself..."
                 />
               </div>
@@ -338,7 +338,7 @@ const UserProfile = () => {
                   name="skills"
                   value={profileData.skills.join(', ')}
                   onChange={handleSkillsChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D47F1] focus:border-transparent"
                   placeholder="e.g., JavaScript, React, Node.js (separate with commas)"
                 />
               </div>
@@ -372,7 +372,7 @@ const UserProfile = () => {
                     name="education"
                     value={profileData.education}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D47F1] focus:border-transparent"
                   >
                     <option value="">Select education level</option>
                     <option value="high-school">High School</option>
@@ -388,7 +388,7 @@ const UserProfile = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-2 bg-[#6D47F1] text-white font-medium rounded-lg focus:outline-none focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Saving...' : 'Save Changes'}
                 </button>
@@ -412,7 +412,7 @@ const UserProfile = () => {
                       name="currentPassword"
                       value={profileData.currentPassword}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D47F1] focus:border-transparent"
                       required
                     />
                   </div>
@@ -427,7 +427,7 @@ const UserProfile = () => {
                       name="newPassword"
                       value={profileData.newPassword}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D47F1] focus:border-transparent"
                       minLength={6}
                       required
                     />
@@ -443,7 +443,7 @@ const UserProfile = () => {
                       name="confirmPassword"
                       value={profileData.confirmPassword}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D47F1] focus:border-transparent"
                       minLength={6}
                       required
                     />
@@ -454,7 +454,7 @@ const UserProfile = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-2 bg-[#6D47F1] text-white font-medium rounded-lg focus:outline-none focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? 'Updating...' : 'Update Password'}
                   </button>

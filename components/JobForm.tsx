@@ -146,7 +146,8 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
     stepFields.forEach(field => {
       switch (field) {
         case 'company':
-          if(!formData.company?.name.trim()) newErrors.company = 'Company is required';
+          console.log("company name : ", formData);
+          if(!formData.company) newErrors.company = 'Company is required';
           break;
         case 'title':
           if (!formData.title.trim()) newErrors.title = 'Job title is required';
@@ -891,7 +892,7 @@ const TagsInput = ({
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-gray-200">
         <div className="flex-1">
-          <div className="flex items-center gap-4">
+          <div className="flex lg:flex-row flex-col lg:items-center gap-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
                 {job?._id ? 'Edit Job' : 'Create New Job'}

@@ -435,7 +435,7 @@ export default function FindJobsPage({ initialCategory }: FindJobsPageProps) {
           </div>
 
           {/* Mobile Filters - Horizontal Scroll */}
-          <div className="lg:hidden mb-6">
+          <div className="lg:hidden md:mb-6 mb-2">
             <div className="flex items-center justify-between mb-4 px-4">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                 <Filter className="w-5 h-5 mr-2 text-purple-600" />
@@ -552,8 +552,8 @@ export default function FindJobsPage({ initialCategory }: FindJobsPageProps) {
 
           {/* Job Listings */}
           <div className="lg:w-3/4">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
+            <div className="flex lg:flex-row flex-col gap-3 lg:items-center justify-between mb-6">
+              <h2 className="md:text-2xl text-xl font-bold text-gray-900">
                 {filteredJobs.length} Jobs Found
               </h2>
               <div className="flex items-center space-x-4">
@@ -718,7 +718,10 @@ export default function FindJobsPage({ initialCategory }: FindJobsPageProps) {
                 </div>
               ))}
             </section>
-            {loading && <p>Loading...</p>}
+            {loading &&  <div className="text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#6D47F1] mx-auto" />
+              <p className="mt-4 text-gray-600">Loading Jobs…</p>
+            </div>}
             <div id="load-more" className="h-10"></div>
             {!hasMore && filteredJobs.length !== 0 && <p className="text-gray-500 ms-4">No more jobs</p>}
 

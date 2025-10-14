@@ -6,11 +6,14 @@ import { useUser } from '@/context/UserContext';
 import UserDashboard from '@/components/UserDashboard';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 
 const Dashboard = () => {
   const { user,setUser } = useUser();
   const router = useRouter();
+    const searchParams = useSearchParams();
+    const tab = searchParams.get("tab");
 
     const getProfile = async() =>{
     try{
@@ -43,7 +46,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-    <UserDashboard />
+    <UserDashboard tab={tab} />
     </div>
   );
 };

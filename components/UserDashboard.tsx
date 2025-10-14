@@ -19,7 +19,7 @@ import UserJobs from './UserJobs';
 import CompanyProfile from './CompanyProfile';
 import CompanyJobs from './CompanyJobs';
 import axios from 'axios';
-import { BellIcon, ChartBarIcon, User } from 'lucide-react';
+import { ChartBarIcon, MessageSquareTextIcon, User } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { listenToMessages, markMessagesAsSeen, sendMessage } from '@/lib/chat';
@@ -47,10 +47,10 @@ interface Message {
   text: string;
 }
 
-const UserDashboard = () => {
+const UserDashboard = ({tab}: any) => {
   const { user, logout } = useUser();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(tab || 'dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState<number>(0);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -67,7 +67,7 @@ const UserDashboard = () => {
     { id: 'Company profile', name: 'Company Profile', icon: BuildingOfficeIcon },
     { id: 'job Management', name: 'Job Management', icon: BriefcaseIcon },
     { id: 'Company analytics', name: 'Company Analytics', icon: ChartBarIcon },
-    { id: 'notifications', name: 'Notifications', icon: BellIcon, count: notifications },
+    { id: 'messages', name: 'Messages', icon: MessageSquareTextIcon, count: notifications },
     { id: 'settings', name: 'Settings', icon: Cog6ToothIcon },
     { id: 'help', name: 'Help & Support', icon: QuestionMarkCircleIcon },
   ];
@@ -141,7 +141,7 @@ const UserDashboard = () => {
         return <CompanyJobs />;
       case 'dashboard':
         return <DashboardOverview />;
-      case 'notifications':
+      case 'messages':
 
         if(showChat){
   return (
@@ -290,7 +290,7 @@ const UserDashboard = () => {
           <input
             type="text"
             placeholder="Search..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D47F1] focus:border-transparent"
           />
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -310,7 +310,7 @@ const UserDashboard = () => {
               onClick={() => handleTabChange(item.id)}
               className={`w-full flex items-center px-3 py-2 mb-1 text-sm font-medium rounded-lg transition-colors ${
                 activeTab === item.id
-                  ? 'bg-blue-100 text-blue-700'
+                  ? 'bg-[#8A38EE] text-white'
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
             >
