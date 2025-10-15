@@ -443,7 +443,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     errors.location ? 'border-red-300' : 'border-gray-300'
                   }`}
-                  placeholder="e.g., New York, NY"
+                  placeholder="e.g., Bengaluru, Pune"
                 />
                 {errors.location && <p className="mt-1 text-sm text-red-600">{errors.location}</p>}
               </div>
@@ -461,7 +461,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
                 <span className="ml-2 text-sm text-gray-700">Remote Work Available</span>
               </label>
               
-              <label className="flex items-center">
+              {/* <label className="flex items-center">
                 <input
                   type="checkbox"
                   name="isGovernment"
@@ -470,7 +470,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
                   className="rounded border-gray-300 text-blue-600"
                 />
                 <span className="ml-2 text-sm text-gray-700">Government Position</span>
-              </label>
+              </label> */}
             </div>
           </div>
         );
@@ -697,7 +697,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Third Party Apply</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Apply On Company Website</label>
                 <input
                   type='url'
                   name="thirdpartyapply"

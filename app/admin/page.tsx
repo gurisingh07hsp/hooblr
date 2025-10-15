@@ -2,12 +2,21 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Shield, LogOut, ArrowLeft, X, Save, Plus, Eye, Edit, Trash2, Building, Briefcase, Users, Settings, BarChart3, FileText, Menu, Search } from 'lucide-react';
+import { Shield, LogOut, ArrowLeft, X, Save, Plus, Eye, Edit, Trash2, Building, Briefcase, Users, Settings, BarChart3, FileText, Menu, Search, BriefcaseBusiness } from 'lucide-react';
 import BlogPostEditor from '../../components/BlogPostEditor';
 import Footer from '@/components/Footer';
 import { useUser } from '@/context/UserContext';
 import axios from 'axios';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
+
+// Dynamically import ReactQuill to avoid SSR issues
+const ReactQuill = dynamic(() => import('react-quill'), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-gray-100 rounded-lg animate-pulse"></div>
+});
+
+import 'react-quill/dist/quill.snow.css';
 
 // Enhanced interfaces
 interface Company {
@@ -131,12 +140,35 @@ export default function AdminPage() {
   // Data states
   const [companies, setCompanies] = useState<Company[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [govtJobs, setGovtJobs] = useState<any[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+
+
+
+    // Quill editor configuration
+  const quillModules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'align': [] }],
+      ['link', 'image', 'blockquote', 'code-block'],
+      ['clean']
+    ],
+  };
+
+  const quillFormats = [
+    'header', 'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet', 'color', 'background', 'align',
+    'link', 'image', 'blockquote', 'code-block'
+  ];
+
   
   // Modal states
   const [modalState, setModalState] = useState({
-    type: null as 'company' | 'job' | 'blog' | 'user' | null,
+    type: null as 'company' | 'job' | 'govtjob' | 'blog' | 'user' | null,
     mode: null as 'create' | 'edit' | 'view' | null,
     isOpen: false,
     data: null as any
@@ -152,7 +184,8 @@ export default function AdminPage() {
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     { id: 'companies', label: 'Companies', icon: Building },
-    { id: 'jobs', label: 'Jobs', icon: Briefcase },
+    { id: 'jobs', label: 'Jobs', icon: BriefcaseBusiness },
+    { id: 'govtjobs', label: 'Govt Jobs', icon: Briefcase},
     { id: 'blog', label: 'Blog', icon: FileText },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'settings', label: 'Settings', icon: Settings },
@@ -173,6 +206,7 @@ export default function AdminPage() {
       await Promise.all([
         fetchCompanies(),
         fetchJobs(),
+        fetchGovtJobs(),
         fetchBlogPosts(),
         fetchUsers()
       ]);
@@ -217,6 +251,15 @@ export default function AdminPage() {
       console.error('Error fetching jobs:', error);
     }
   };
+  const fetchGovtJobs = async () => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/govtjobs/`);
+      const data = await response.data  ;
+      setGovtJobs(data.jobs || []);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
 
   const fetchBlogPosts = async () => {
     try {
@@ -245,7 +288,7 @@ export default function AdminPage() {
     fetchBlogPosts();
   },[setBlogEditorState])
 
-  const openModal = (type: 'company' | 'job' | 'blog' | 'user', mode: 'create' | 'edit' | 'view', data?: any) => {
+  const openModal = (type: 'company' | 'job' | 'govtjob' | 'blog' | 'user', mode: 'create' | 'edit' | 'view', data?: any) => {
     setModalState({ type, mode, isOpen: true, data });
   };
 
@@ -287,6 +330,20 @@ export default function AdminPage() {
             closeModal();
           }
         }
+      } else if(type === 'govtjob'){
+        if(mode === 'create'){
+           const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/govtjobs/`, data, {withCredentials: true});
+          if(response.status === 200){
+            fetchGovtJobs();
+            closeModal();
+          }
+        } else if(mode === 'edit'){
+          const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/govtjobs/${data._id}`, data, {withCredentials: true});
+          if (response.status === 200) {
+            setGovtJobs(prev => prev.map(j => j._id === data._id ? response.data.job : j));
+            closeModal();
+          }
+        }
       }
       
       closeModal();
@@ -312,6 +369,11 @@ export default function AdminPage() {
         const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs/${id}`, {withCredentials:true});
         if(response.status === 200){
           setJobs(prev => prev.filter(j => j._id !== id));
+        }
+      } else if (type === 'govtjob') {
+        const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/govtjobs/${id}`, {withCredentials:true});
+        if(response.status === 200){
+          setGovtJobs(prev => prev.filter(j => j._id !== id));
         }
       } else if (type === 'blog-post') {
          const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/blog/${id}`, {withCredentials:true});
@@ -634,10 +696,7 @@ export default function AdminPage() {
               })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="USD">USD</option>
               <option value="INR">INR</option>
-              <option value="EUR">EUR</option>
-              <option value="GBP">GBP</option>
             </select>
           </div>
           <div>
@@ -748,7 +807,7 @@ export default function AdminPage() {
             />
             <span className="text-sm text-gray-700">Remote Work</span>
           </label>
-          <label className="flex items-center space-x-2">
+          {/* <label className="flex items-center space-x-2">
             <input
               type="checkbox"
               checked={formData.isGovernment}
@@ -756,7 +815,7 @@ export default function AdminPage() {
               className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
             <span className="text-sm text-gray-700">Government Job</span>
-          </label>
+          </label> */}
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
@@ -796,6 +855,213 @@ export default function AdminPage() {
       </form>
     );
   };
+
+
+
+   const GovtJobForm = ({ govtjob, onSave, onCancel }: { 
+    govtjob?: any; 
+    onSave: (data: any) => void; 
+    onCancel: () => void; 
+  }) => {
+    const [formData, setFormData] = useState({
+      title: govtjob?.title || '',
+      officialLink: govtjob?.officialLink || '',
+      state: govtjob?.state || '',
+      category: govtjob?.category || '',
+      eligibilityCriteria: govtjob?.eligibilityCriteria || '',
+      ageLimit: govtjob?.ageLimit || '',
+      salary: govtjob?.salary || '',
+      applicationFees: govtjob?.applicationFees || '',
+      selectionProcess: govtjob?.selectionProcess || '',
+      howToApply: govtjob?.howToApply || '',
+      lastDateToApply: govtjob?.lastDateToApply || '',
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      onSave({ ...govtjob, ...formData });
+    };
+    return (
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Job Title *</label>
+            <input
+              type="text"
+              required
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Official Link *</label>
+            <input
+              type="text"
+              required
+              value={formData.officialLink}
+              onChange={(e) => setFormData({ ...formData, officialLink: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
+            <input
+              type="text"
+              required
+              value={formData.state}
+              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Job Category *</label>
+             <input
+              type="text"
+              required
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        {/* Salary Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Salary *</label>
+            <input
+              type="text"
+              required
+              value={formData.salary}
+              onChange={(e) => setFormData({ ...formData, salary: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Age Limit *</label>
+            <input
+              type="text"
+              required
+              value={formData.ageLimit}
+              onChange={(e) => setFormData({ ...formData, ageLimit: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        {/* Text Areas */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Selection Process *</label>
+            {/* <textarea
+              required
+              rows={4}
+              value={formData.selectionProcess}
+              onChange={(e) => setFormData({ ...formData, selectionProcess: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            /> */}
+            <div className="rounded-lg pb-10">
+          <ReactQuill
+            value={formData.selectionProcess}
+            onChange={(selectionProcess) => setFormData({ ...formData, selectionProcess})}
+            modules={quillModules}
+            formats={quillFormats}
+            placeholder="Write your job selection process here....."
+            style={{ height: '200px' }}
+          />
+        </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Eligibility Criteria *</label>
+            {/* <textarea
+              required
+              rows={4}
+              value={formData.eligibilityCriteria}
+              onChange={(e) => setFormData({ ...formData, eligibilityCriteria: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            /> */}
+            <div className="rounded-lg pb-10">
+            <ReactQuill
+            value={formData.eligibilityCriteria}
+            onChange={(eligibilityCriteria) => setFormData({ ...formData, eligibilityCriteria})}
+            modules={quillModules}
+            formats={quillFormats}
+            placeholder="Write your job eligibility criteria here....."
+            style={{ height: '200px' }}
+          />
+          </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">How To Apply *</label>
+            {/* <textarea
+              required
+              rows={4}
+              value={formData.howToApply}
+              onChange={(e) => setFormData({ ...formData, howToApply: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            /> */}
+            <div className="rounded-lg pb-10">
+            <ReactQuill
+            value={formData.howToApply}
+            onChange={(howToApply) => setFormData({ ...formData, howToApply})}
+            modules={quillModules}
+            formats={quillFormats}
+            placeholder="Write your job Apply process here....."
+            style={{ height: '200px' }}
+          />
+          </div>
+          </div>
+        </div>
+
+        {/* Additional Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Application Fees *</label>
+              <input
+                type="text"
+                required
+                value={formData.applicationFees}
+                onChange={(e) => setFormData({ ...formData, applicationFees: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Last Date To Apply *</label>
+             <input
+              type='date'
+              required
+              value={formData.lastDateToApply}
+              onChange={(e) => setFormData({ ...formData, lastDateToApply: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end space-x-3 pt-4">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          >
+            <Save className="w-4 h-4" />
+            <span>Save Job</span>
+          </button>
+        </div>
+      </form>
+    );
+  };
+
+
+
+
+
 
   // View Details Component
   const ViewDetails = ({ data, type }: { data: any; type: string }) => {
@@ -933,6 +1199,71 @@ export default function AdminPage() {
         </div>
       );
     }
+    if (type === 'govtjob') {
+      return (
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{data.title}</h2>
+            <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+              <span>{data.state}</span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Job Details</h3>
+              <div className="space-y-2 text-sm">
+                <div><span className="font-medium">Category:</span> {data.category}</div>
+                <div><span className="font-medium">Official Link:</span> {data.officialLink}</div>
+                <div><span className="font-medium">Age Limit:</span> {data.ageLimit}</div>
+                <div><span className="font-medium">Application Fees:</span> {data.applicationFees}</div>
+                <div><span className="font-medium">Salary:</span> {data.salary}</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Eligibility Criteria</h3>
+            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: data.eligibilityCriteria }} />
+            {/* <div className="prose max-w-none">
+              <p className="text-gray-700 leading-relaxed">{data.eligibilityCriteria}</p>
+            </div> */}
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">selectionProcess</h3>
+             <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: data.selectionProcess }} />
+            {/* <div className="prose max-w-none">
+              <p className="text-gray-700 leading-relaxed">{data.selectionProcess}</p>
+            </div> */}
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">how To Apply</h3>
+             <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: data.howToApply }} />
+            {/* <div className="prose max-w-none">
+              <p className="text-gray-700 leading-relaxed">{data.howToApply}</p>
+            </div> */}
+          </div>
+
+          {data.skills && data.skills.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Required Skills</h3>
+              <div className="flex flex-wrap gap-2">
+                {data.skills.map((skill: string, index: number) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
     if(type === "blog"){
       return (
             <div className="prose max-w-none">
@@ -996,6 +1327,7 @@ export default function AdminPage() {
     if (!modalState.isOpen) return null;
 
     const { type, mode, data } = modalState;
+    console.log(data);
     const title = `${mode === 'create' ? 'Create' : mode === 'edit' ? 'Edit' : 'View'} ${type?.charAt(0).toUpperCase()}${type?.slice(1)}`;
 
     return (
@@ -1018,6 +1350,8 @@ export default function AdminPage() {
               <CompanyForm company={data} onSave={handleSave} onCancel={closeModal} />
             ) : type === 'job' ? (
               <JobForm job={data} onSave={handleSave} onCancel={closeModal} />
+            ) : type === 'govtjob' ? (   
+              <GovtJobForm govtjob={data} onSave={handleSave} onCancel={closeModal} />
             ) : (
               <div>Form for {type} not implemented</div>
             )}
@@ -1339,6 +1673,120 @@ export default function AdminPage() {
       )}
     </div>
   );
+
+  const renderGovtJobsManagement = () => (
+        <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-2xl font-bold text-gray-900">Govt Job Management</h2>
+        <button
+          onClick={() => openModal('govtjob', 'create')}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Post Govt Job</span>
+        </button>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Search jobs..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+        {/* <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="draft">Draft</option>
+          <option value="paused">Paused</option>
+          <option value="closed">Closed</option>
+        </select> */}
+      </div>
+
+      {/* Jobs Table */}
+      <div className="bg-white w-[80vw] lg:w-full rounded-lg border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Job</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age Limit</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Posted</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {govtJobs
+                .filter(job => 
+                  job.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+                  (filterStatus === 'all' || job.status === filterStatus)
+                )
+                .map((job) => (
+                <tr key={job._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">{job.title}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.category}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.state}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.ageLimit}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(job.createdAt).toLocaleDateString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex items-center space-x-2">
+                      <button 
+                        onClick={() => openModal('govtjob', 'view', job)}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => openModal('govtjob', 'edit', job)}
+                        className="text-green-600 hover:text-green-900"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete('govtjob', job._id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {jobs.length === 0 && (
+        <div className="text-center py-12">
+          <Briefcase className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs found</h3>
+          <p className="text-gray-600 mb-4">Create a company first, then post your first job.</p>
+          <button
+            onClick={() => companies.length > 0 ? openModal('job', 'create') : openModal('company', 'create')}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+          >
+            {companies.length > 0 ? 'Post Job' : 'Create Company First'}
+          </button>
+        </div>
+      )}
+    </div>
+  )
 
   if (!isAuthenticated) {
     return (
@@ -1840,6 +2288,7 @@ export default function AdminPage() {
                     {activeTab === 'dashboard' && renderDashboard()}
                     {activeTab === 'companies' && renderCompaniesManagement()}
                     {activeTab === 'jobs' && renderJobsManagement()}
+                    {activeTab === 'govtjobs' && renderGovtJobsManagement()}
                     {activeTab === 'blog' && renderBlogManagement()}
                     {activeTab === 'users' && renderUserManagement()}
                     {activeTab === 'settings' && renderSettings()}

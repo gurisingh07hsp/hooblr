@@ -206,21 +206,6 @@ router.put('/:id', auth, authorize('user', 'admin'), jobValidation, async (req, 
   }
 });
 
-// router.put('/applications/change-status', auth, async(req,res) => {
-//   try{
-//     const {jobId, userId, value} = req.body;
-
-//     const job = Job.findByIdAndUpdate(
-//       jobId,
-//       {applications: {user: userId}},
-//       { status: value },
-//       { new: true, runValidators: true }
-//     );
-//     res.status(200).json('Done');
-//   }catch(error){
-//     res.status(500).json({error: 'Server error'});
-//   }
-// })
 
 router.put('/applications/change-status', auth, async (req, res) => {
   try {

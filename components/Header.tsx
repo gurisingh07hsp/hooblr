@@ -83,6 +83,12 @@ const Header = () => {
                 Find Job
               </button>
               <button
+                onClick={() => router.push('/govtjobs')}
+                className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
+              >
+                Govt Jobs
+              </button>
+              <button
                 onClick={() => router.push('/companies')}
                 className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
               >
@@ -170,7 +176,7 @@ const Header = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden h-[100vh] bg-white border-t border-purple-200">
-            <div className="px-2 pt-2 pb-3 space-y-1">
+            <div className="px-2 pt-2 pb-3 space-y-2">
               <button
                 onClick={() => {
                   router.push('/jobs');
@@ -224,19 +230,33 @@ const Header = () => {
 
                 <button
                     onClick={() => router.push('/dashboard')}
-                    className="text-gray-700 px-3 py-2 hover:text-purple-600 transition-colors font-medium"
+                    className="text-gray-700 ms-2 border rounded-lg px-3 py-2 hover:text-purple-600 transition-colors font-medium"
                   >
                     Dashboard
+                </button>
+
+
+                <button onClick={() => router.push('/dashboard?tab=messages')} className='flex items-center gap-2 mt-4'>
+                  <p className='ms-3'>Messages</p>
+                 <div
+                    className='w-[35px] h-[35px] relative rounded-full border-2 flex justify-center items-center hover:border-purple-600 transition-colors'
+                  >
+                    {notifications > 0 && <div className='p-[4px] border border-white bg-red-600 rounded-full absolute right-[6px] top-2'></div>}
+                    <MessageSquareTextIcon className='text-gray-600 w-5 h-5'/>
+                  </div>
                   </button>
 
-                  <button
+
+
+                   <button
                     onClick={() => {
                       handleLogout();
                       setIsMenuOpen(false);
                     }}
-                    className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors w-full text-left font-medium"
+                    className="p-2 ms-3 mt-3 flex items-center rounded-lg bg-red-600 text-white transition-colors font-medium"
                   >
                     Logout
+                    <LogOut className='w-4 h-4 ms-1'/>
                   </button>
                 </>
               ) : (
