@@ -2,6 +2,7 @@ const express = require('express');
 const { validationResult, query } = require('express-validator');
 const GovtJob = require('../models/GovtJobs');
 const { auth, authorize, optionalAuth } = require('../middleware/auth');
+const { title } = require('process');
 
 const router = express.Router();
 
@@ -28,6 +29,7 @@ router.get(
         limit = 20,
         category,
         search,
+        state,
         sort = "createdAt",
         order = "desc",
         salary,
@@ -38,6 +40,10 @@ router.get(
       if (category) filter.category = category;
     //   if (state) filter.state = { $regex: location, $options: "i" };
       if (search) filter.title = { $regex: search, $options: "i" };
+
+      if(state && state !== 'All India'){
+        filter['state'] = state ? state : {};
+      }
 
 
       // Salary filter
@@ -73,6 +79,22 @@ router.get(
   }
 );
 
+
+router.get('/:title', async (req, res) => {
+  try {
+    const title = req.params.title;
+    const job = await GovtJob.findOne({title});
+
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+
+    res.json({ job });
+  } catch (error) {
+    console.error('Get job error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 
 router.post('/', auth, authorize('admin'), async (req, res) => {

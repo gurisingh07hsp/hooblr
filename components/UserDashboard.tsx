@@ -196,7 +196,7 @@ const UserDashboard = ({tab}: any) => {
 
 
         return (
-          <div className='h-[85vh] bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl shadow-lg overflow-hidden'>
+          <div className='h-[85vh] lg:w-[60vw] mx-auto bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl shadow-lg overflow-hidden'>
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
         <div>
@@ -443,7 +443,7 @@ const DashboardOverview = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {stats.map((stat) => (
           <div key={stat.label} className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">

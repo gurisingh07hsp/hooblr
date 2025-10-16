@@ -352,7 +352,7 @@ const CompanyJobs = () => {
             <div className="flex gap-3">
               <button
                 onClick={(e) => {e.preventDefault(); setResume(app.resume); setShowModal(true)}}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-[#6D47F1]  text-white rounded-lg transition-colors text-sm font-medium"
                 >
                 <Eye className="w-4 h-4" />
                 View
@@ -405,7 +405,7 @@ const CompanyJobs = () => {
 
   if(showMessages){
   return (
-    <div className='h-[85vh] bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl shadow-lg overflow-hidden'>
+    <div className='h-[85vh] lg:w-[60vw] mx-auto bg-zinc-50 rounded-xl shadow-lg overflow-hidden'>
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
         <div>

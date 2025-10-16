@@ -866,16 +866,62 @@ export default function AdminPage() {
     const [formData, setFormData] = useState({
       title: govtjob?.title || '',
       officialLink: govtjob?.officialLink || '',
-      state: govtjob?.state || '',
+      applyLink: govtjob?.applyLink || '',
+      notificationLink: govtjob?.notificationLink || '',
+      state: govtjob?.state || 'All India',
       category: govtjob?.category || '',
       eligibilityCriteria: govtjob?.eligibilityCriteria || '',
       ageLimit: govtjob?.ageLimit || '',
+      totalPosts: govtjob?.totalPosts || '',
       salary: govtjob?.salary || '',
       applicationFees: govtjob?.applicationFees || '',
       selectionProcess: govtjob?.selectionProcess || '',
       howToApply: govtjob?.howToApply || '',
+      startDateToApply: govtjob?.startDateToApply || '',
       lastDateToApply: govtjob?.lastDateToApply || '',
     });
+
+    const indianStates = [
+  // States
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+
+  // Union Territories
+  "Andaman and Nicobar Islands",
+  "Chandigarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi",
+  "Jammu and Kashmir",
+  "Ladakh",
+  "Lakshadweep",
+  "Puducherry"
+];
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
@@ -897,25 +943,54 @@ export default function AdminPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Official Link *</label>
             <input
-              type="text"
+              type="url"
               required
               value={formData.officialLink}
               onChange={(e) => setFormData({ ...formData, officialLink: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
+           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Apply Link *</label>
+             <input
+              type="url"
+              required
+              value={formData.applyLink}
+              onChange={(e) => setFormData({ ...formData, applyLink: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Notification Link *</label>
+             <input
+              type="text"
+              required
+              value={formData.notificationLink}
+              onChange={(e) => setFormData({ ...formData, notificationLink: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
-            <input
+            {/* <input
               type="text"
               required
               value={formData.state}
               onChange={(e) => setFormData({ ...formData, state: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+            /> */}
+            <select 
+              value={formData.state}
+              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option className='bg-white' value="All India">All India</option>
+              {indianStates.map((state)=>(
+                <option key={state} className='bg-white' value={state}>{state}</option>
+              ))}
+            </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Job Category *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Recruitment Board *</label>
              <input
               type="text"
               required
@@ -924,6 +999,7 @@ export default function AdminPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
+         
         </div>
 
         {/* Salary Section */}
@@ -947,6 +1023,30 @@ export default function AdminPage() {
               onChange={(e) => setFormData({ ...formData, ageLimit: e.target.value})}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+          </div>
+        </div>
+
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Total Posts *</label>
+            <input
+              type="text"
+              required
+              value={formData.totalPosts}
+              onChange={(e) => setFormData({ ...formData, totalPosts: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+            <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Application Fees *</label>
+              <input
+                type="text"
+                required
+                value={formData.applicationFees}
+                onChange={(e) => setFormData({ ...formData, applicationFees: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
           </div>
         </div>
 
@@ -1017,12 +1117,12 @@ export default function AdminPage() {
         {/* Additional Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Application Fees *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Start Date To Apply *</label>
               <input
-                type="text"
+                type="Date"
                 required
-                value={formData.applicationFees}
-                onChange={(e) => setFormData({ ...formData, applicationFees: e.target.value})}
+                value={formData.startDateToApply}
+                onChange={(e) => setFormData({ ...formData, startDateToApply: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
           </div>
@@ -1215,9 +1315,14 @@ export default function AdminPage() {
               <div className="space-y-2 text-sm">
                 <div><span className="font-medium">Category:</span> {data.category}</div>
                 <div><span className="font-medium">Official Link:</span> {data.officialLink}</div>
+                <div><span className="font-medium">Apply Link:</span> {data.applyLink}</div>
+                <div><span className="font-medium">Notification Link:</span> {data.notificationLink}</div>
                 <div><span className="font-medium">Age Limit:</span> {data.ageLimit}</div>
+                <div><span className="font-medium">Total Posts:</span> {data.totalPosts}</div>
                 <div><span className="font-medium">Application Fees:</span> {data.applicationFees}</div>
                 <div><span className="font-medium">Salary:</span> {data.salary}</div>
+                <div><span className="font-medium">Start Date To Apply:</span> {data.startDateToApply}</div>
+                <div><span className="font-medium">Last Date To Apply:</span> {data.lastDateToApply}</div>
               </div>
             </div>
           </div>
@@ -1245,22 +1350,6 @@ export default function AdminPage() {
               <p className="text-gray-700 leading-relaxed">{data.howToApply}</p>
             </div> */}
           </div>
-
-          {data.skills && data.skills.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Required Skills</h3>
-              <div className="flex flex-wrap gap-2">
-                {data.skills.map((skill: string, index: number) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       );
     }

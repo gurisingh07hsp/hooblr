@@ -368,75 +368,7 @@ const CompanyProfile = () => {
 
           {activeSection === 'companies' && (
             <div className="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 gap-5">
-              {user?.companies && user?.companies?.length > 0 ? ( user?.companies?.map((company,index) => (
-                // <div
-                //   key={index}
-                //   className={`bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200 p-6 transition-all duration-300 transform hover:-translate-y-1`}
-                // >
-                //   <div className="flex items-start justify-between">
-                //     <div className="flex flex-col lg:flex-row items-start space-x-4 flex-1">
-                //       {company.logo ? (
-                //         <img src={company.logo} alt='company logo' width={64} height={64} className='rounded-md'/>
-                //       ): (
-                //       <div className="w-16 hidden h-16 bg-[#9333E9] rounded-xl lg:flex items-center justify-center shadow-lg">
-                //         <Building2 className="w-8 h-8 text-white" />
-                //       </div>
-                //       )}
-                      
-                //       <div className="flex-1">
-                //         <div className="flex items-center space-x-3 mb-2">
-                //           <h3 className="text-xl font-bold text-gray-900 hover:text-purple-600 cursor-pointer transition-colors">
-                //             {company?.name}
-                //           </h3>
-                //         </div>
-                        
-                //         <div className="flex lg:flex-row flex-col lg:items-center lg:space-x-4 text-gray-600 mb-3">
-                //           <div className="flex items-center">
-                //             <Award className="w-4 h-4 mr-1 text-purple-600" />
-                //             <span className="font-medium text-sm">{company?.industry}</span>
-                //           </div>
-                //           <div className="flex items-center">
-                //             <MapPin className="w-4 h-4 mr-1 text-purple-600" />
-                //             <span className="font-medium text-sm">{company?.location}</span>
-                //           </div>
-                //           <div className="flex items-center">
-                //             <Users className="w-4 h-4 mr-1 text-purple-600" />
-                //             <span className="font-medium text-sm">{company?.size} employees</span>
-                //           </div>
-                //         </div>
-                //         <p className="text-gray-700 mb-4 text-sm leading-relaxed">
-                //           {company?.description}
-                //         </p>
-                //            <div className="flex gap-1">
-                //       <button
-                //         onClick={(e) => {
-                //           e.stopPropagation();
-                //           handleEditCompany(company);
-                //         }}
-                //         className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                //       >
-                //         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                //           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                //         </svg>
-                //       </button>
-                //       <button
-                //         onClick={(e) => {
-                //           e.stopPropagation();
-                //           handleDeleteCompnay(company._id);
-                //         }}
-                //         className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                //       >
-                //         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                //           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                //         </svg>
-                //       </button>
-                //     </div>
-                //       </div>
-                //     </div>
-                //   </div>
-                // </div>
-
-
+              {user?.companies && user?.companies?.length > 0 ? ( user?.companies?.map((company) => (
                 <div key={company._id} className='w-full bg-white rounded-2xl border p-2'>
                   <div className='flex border-b pb-4'>
                   <div onClick={() => router.push(`/companies/${company._id}`)} className='w-14 h-14 rounded-xl border flex justify-center items-center px-1 cursor-pointer'>

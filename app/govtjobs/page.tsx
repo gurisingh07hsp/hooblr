@@ -10,14 +10,18 @@ interface GovtJob {
   _id: string;
   title: string;
   officialLink: string;
+  applyLink: string;
+  notificationLink: string;
   state: string;
   category: string;
   eligibilityCriteria: string;
   ageLimit: string;
+  totalPosts: string;
   salary: string;
   applicationFees: string;
   selectionProcess: string;
   howToApply: string;
+  startDateToApply: string;
   lastDateToApply: string;
   createdAt: string;
 }
@@ -56,10 +60,47 @@ const GovtJobsPortal = () => {
     'Police/Defence Jobs'
   ];
 
-  const states = [
-    'AP', 'AS', 'BR', 'CG', 'DL', 'GJ', 'HP', 'HR', 'JH', 'KA', 
-    'KL', 'MH', 'MP', 'OD', 'PB', 'RJ', 'TN', 'TS', 'UK', 'UP', 'WB'
-  ];
+const indianStates = [
+  // States
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+
+  // Union Territories
+  "Andaman and Nicobar Islands",
+  "Chandigarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi",
+  "Jammu and Kashmir",
+  "Ladakh",
+  "Lakshadweep",
+  "Puducherry"
+];
 
   // Mock data for demonstration
 //   const mockJobs: GovtJob[] = [
@@ -131,18 +172,18 @@ const GovtJobsPortal = () => {
       
       // Mock API response
       setTimeout(() => {
-        const filteredJobs = data.filter((job: GovtJob) => {
-          const matchesCategory = !selectedCategory || job.category === selectedCategory;
-          const matchesState = !selectedState || job.state === selectedState || job.state === 'All India';
-          const matchesSearch = !searchQuery || job.title.toLowerCase().includes(searchQuery.toLowerCase());
-          return matchesCategory && matchesState && matchesSearch;
-        });
+        // const filteredJobs = data.filter((job: GovtJob) => {
+        //   // const matchesCategory = !selectedCategory || job.category === selectedCategory;
+        //   // const matchesState = !selectedState || job.state === selectedState || job.state === 'All India';
+        //   // const matchesSearch = !searchQuery || job.title.toLowerCase().includes(searchQuery.toLowerCase());
+        //   // return matchesCategory && matchesState && matchesSearch;
+        // });
         
-        setJobs(filteredJobs);
+        setJobs(data);
         setPagination(prev => ({
           ...prev,
-          total: filteredJobs.length,
-          pages: Math.ceil(filteredJobs.length / prev.limit)
+          total: data.length,
+          pages: Math.ceil(data.length / prev.limit)
         }));
         setLoading(false);
       }, 500);
@@ -167,132 +208,76 @@ const GovtJobsPortal = () => {
 
   return (
     <div className="min-h-screen mt-16 bg-gray-50">
-      {/* Header */}
-      <header className="bg-[#6D47F1] text-white shadow-lg">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-white p-2 rounded">
-                <BriefcaseBusiness className="w-8 h-8 text-[#6D47F1]" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold">Goverment Jobs</h1>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Navigation */}
-      <nav className="bg-gray-50 shadow">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-wrap gap-2 py-3">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat === selectedCategory ? '' : cat)}
-                className={`px-4 py-2 rounded font-medium transition-colors ${
-                  selectedCategory === cat
-                    ? 'bg-[#6D47F1] text-white'
-                    : 'border'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-2 pb-3">
-            {states.map((state) => (
-              <button
-                key={state}
-                onClick={() => setSelectedState(state === selectedState ? '' : state)}
-                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
-                  selectedState === state
-                    ? 'bg-[#6D47F1] text-white'
-                    : 'border'
-                }`}
-              >
-                {state}
-              </button>
-            ))}
-          </div>
+      <nav className="bg-white py-10 border-b">
+        <div className="container mx-auto max-w-7xl px-4">
+
+                    <div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div className="relative flex items-center">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-black" />
+                          <input
+                            type="text"
+                            placeholder="Find Job"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 bg-[#F6F6F6] text-black placeholder:text-black rounded-3xl focus:outline-none"
+                          />
+                        </div>
+          
+                        <div className="relative flex items-center">
+                          <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-black" />
+                          {/* <input
+                            type="text"
+                            placeholder="Enter State"
+                            // value={selectedLocation}
+                            // onChange={(e) => setSelectedLocation(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 bg-[#F6F6F6] text-black placeholder:text-black rounded-3xl focus:outline-none"
+                          /> */}
+                          <select 
+                          value={selectedState}
+                          onChange={(e)=> setSelectedState(e.target.value)}
+                          className='w-full pl-10 pr-4 py-3 bg-[#F6F6F6] text-black placeholder:text-black rounded-3xl focus:outline-none'>
+                            <option className='bg-white' value="All India">All India</option>
+                            {indianStates.map((state)=>(
+                              <option key={state} className='bg-white' value={state}>{state}</option>
+                            ))}
+                          </select>
+                        </div>
+          
+                        <div className="relative flex items-center">
+                          <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-black" />
+                          <select
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 bg-[#F6F6F6] text-black placeholder:text-black rounded-3xl focus:outline-none"
+                          >
+                            <option className="bg-white" value="">
+                              Recruitment Board
+                            </option>
+                            {categories.map((category) => (
+                              <option
+                                className="bg-white"
+                                key={category}
+                                value={category}
+                              >
+                                {category}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
         </div>
       </nav>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 h-[100vh]">
         <div className="max-w-7xl mx-auto">
-          {/* Sidebar */}
-          {/* <aside className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow p-4 sticky top-4">
-              <h3 className="font-bold text-lg mb-4 text-blue-700">Notifications</h3>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#" className="text-blue-600 hover:underline flex items-center">
-                    <span className="mr-2">📢</span> Latest Notifications
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-blue-600 hover:underline flex items-center">
-                    <span className="mr-2">💼</span> Employment News
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-blue-600 hover:underline flex items-center">
-                    <span className="mr-2">🔍</span> Search Jobs
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-blue-600 hover:underline flex items-center">
-                    <span className="mr-2">🏛️</span> Sarkari Job
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </aside> */}
 
           {/* Job Listings */}
           <main>
-            {/* Search Bar */}
-            <div className="bg-white rounded-lg shadow p-4 mb-6">
-              <div className="flex gap-3">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    placeholder="Search jobs by title, category, or keyword..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6D47F1] focus:border-transparent"
-                  />
-                </div>
-                <button 
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="px-6 py-3 bg-[#6D47F1] text-white rounded-lg flex items-center gap-2"
-                >
-                  <Filter className="w-5 h-5" />
-                  Filters
-                </button>
-              </div>
-            </div>
-
-            {/* Active Filters */}
-            {(selectedCategory || selectedState) && (
-              <div className="mb-4 flex flex-wrap gap-2">
-                {selectedCategory && (
-                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-2">
-                    {selectedCategory}
-                    <button onClick={() => setSelectedCategory('')} className="hover:text-blue-900">×</button>
-                  </span>
-                )}
-                {selectedState && (
-                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center gap-2">
-                    {selectedState}
-                    <button onClick={() => setSelectedState('')} className="hover:text-blue-900">×</button>
-                  </span>
-                )}
-              </div>
-            )}
 
             {/* Job Cards */}
             {loading ? (
@@ -304,7 +289,7 @@ const GovtJobsPortal = () => {
                 <p className="text-gray-500 text-lg">No jobs found matching your criteria</p>
               </div>
             ) : (
-              <div className="grid lg:grid-cols-2 grid-cols-1 gap-4">
+              <div className="grid lg:grid-cols-3 grid-cols-1 gap-4">
                 {jobs.map((job) => {
                   const daysRemaining = getDaysRemaining(job.lastDateToApply);
                   return (
@@ -312,7 +297,7 @@ const GovtJobsPortal = () => {
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex-1">
                           <h2 className="text-xl font-bold text-gray-900 mb-2 hover:text-[#6D47F1] cursor-pointer">
-                            <a href={job.officialLink} target="_blank" rel="noopener noreferrer">{job.title}</a>
+                            <a href={job.applyLink} target="_blank" rel="noopener noreferrer">{job.title}</a>
                           </h2>
                           <div className="flex flex-wrap gap-3 text-sm text-gray-600">
                             <span className="flex items-center gap-1">
@@ -335,15 +320,17 @@ const GovtJobsPortal = () => {
                         )}
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm">
-                        {/* <div>
-                          <p className="text-gray-600"><strong>Eligibility:</strong> {job.eligibilityCriteria}</p>
-                        </div> */}
+                      <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4 text-sm">
                         <div>
                           <p className="text-gray-600"><strong>Age Limit:</strong> {job.ageLimit}</p>
                         </div>
                         <div>
                           <p className="text-gray-600"><strong>Application Fee:</strong> {job.applicationFees}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">
+                            <strong>Start Date:</strong> {formatDate(job.startDateToApply)}
+                          </p>
                         </div>
                         <div>
                           <p className="text-gray-600">
@@ -355,27 +342,29 @@ const GovtJobsPortal = () => {
                       <div className="mb-4">
                         <p className="text-sm text-gray-600 flex items-center gap-2">
                           <strong>Salary: </strong>
-                          <div className='flex items-center'>
+                          <span className='flex items-center'>
                             <IndianRupee className="w-4 h-4" />
                             {job.salary}
-                          </div>
+                          </span>
                         </p>
-                         {/* <span className="flex items-center">
-                              <IndianRupee className="w-4 h-4" />
-                              {job.salary}
-                        </span> */}
+                        <p className="text-sm text-gray-600 mt-4 flex items-center gap-2">
+                          <strong>Total Posts: </strong>
+                          <span className='flex items-center'>
+                            {job.totalPosts}
+                          </span>
+                        </p>
                       </div>
 
                       <div className="flex gap-3">
                         <a
-                          href={job.officialLink}
+                          href={job.applyLink}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-6 py-2 bg-[#6D47F1] text-white rounded-lg transition-colors font-medium"
                         >
                           Apply Now
                         </a>
-                        <button className="px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium">
+                        <button onClick={()=> router.push(`/govtjobs/${job.title.replace(/\s+/g, '-')}`)} className="px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium">
                           View Details
                         </button>
                       </div>

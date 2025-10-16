@@ -9,6 +9,7 @@ import Image from 'next/image';
 import SearchComponent from '@/components/SearchComponent';
 import HomeJobs from '@/components/HomeJobs';
 import {motion} from 'framer-motion'
+import HomeGovtJobs from '@/components/HomeGovtJob';
 
 export default function Home() {
   const router = useRouter();
@@ -163,6 +164,7 @@ const fadeUp = {
 
       <HomeJobs />
 
+      <HomeGovtJobs/>
 
       <section>
         <div className="max-w-7xl mx-auto px-8 py-12">

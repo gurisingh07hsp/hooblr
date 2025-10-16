@@ -8,7 +8,14 @@ const govtjobSchema = new mongoose.Schema({
   },
   officialLink: {
     type: String,
-    required: true, // Link to official notification or website
+    required: true, // Link to official website
+  },
+  applyLink: {
+    type: String,
+    required: true,
+  },
+  notificationLink: {
+    type: String,
   },
   state:{
     type: String,
@@ -21,6 +28,10 @@ const govtjobSchema = new mongoose.Schema({
   eligibilityCriteria: {
     type: String,
     required: true, // Detailed eligibility (e.g., educational qualification)
+  },
+  totalPosts:{
+    type: String,
+    required: true
   },
   ageLimit: {
     type: String,
@@ -42,13 +53,29 @@ const govtjobSchema = new mongoose.Schema({
     type: String,
     required: true, // Step-by-step guide for applying
   },
+  startDateToApply:{
+    type: Date, // starting date
+  },
   lastDateToApply: {
     type: Date, // Optional but useful
   },
+  expiryDate: { type: Date },
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
+
+govtjobSchema.pre("save", function (next) {
+  if (this.lastDateToApply) {
+    const expiry = new Date(this.lastDateToApply);
+    expiry.setDate(expiry.getDate() + 5);
+    this.expiryDate = expiry;
+  }
+  next();
+});
+
+govtjobSchema.index({ expiryDate: 1 }, { expireAfterSeconds: 0 });
+
 
 module.exports = mongoose.model('GovtJob', govtjobSchema); 

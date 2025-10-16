@@ -236,16 +236,10 @@ const Header = () => {
                 </button>
 
 
-                <button onClick={() => router.push('/dashboard?tab=messages')} className='flex items-center gap-2 mt-4'>
+                <button onClick={() => router.push('/dashboard?tab=messages')} className='relative py-2 flex justify-center items-center transition-colors'>
                   <p className='ms-3'>Messages</p>
-                 <div
-                    className='w-[35px] h-[35px] relative rounded-full border-2 flex justify-center items-center hover:border-purple-600 transition-colors'
-                  >
-                    {notifications > 0 && <div className='p-[4px] border border-white bg-red-600 rounded-full absolute right-[6px] top-2'></div>}
-                    <MessageSquareTextIcon className='text-gray-600 w-5 h-5'/>
-                  </div>
+                  {notifications > 0 && <div className='p-[4px] border border-white bg-red-600 rounded-full ms-1'></div>}
                   </button>
-
 
 
                    <button
@@ -253,7 +247,7 @@ const Header = () => {
                       handleLogout();
                       setIsMenuOpen(false);
                     }}
-                    className="p-2 ms-3 mt-3 flex items-center rounded-lg bg-red-600 text-white transition-colors font-medium"
+                    className="p-2 ms-3 mt-4 flex items-center rounded-lg bg-red-600 text-white transition-colors font-medium"
                   >
                     Logout
                     <LogOut className='w-4 h-4 ms-1'/>
