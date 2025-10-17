@@ -25,6 +25,21 @@ export default function Home() {
   "/Logo.png", // repeat for seamless loop
 ];
 
+  const Categories = [
+    'Banking',
+    'Work From Home',
+    'Human Resources',
+    'Sales',
+    'Accounting',
+    'Customer Support',
+    'Event Management',
+    'IT',
+    'SQL',
+    'Oracle',
+    'Graphic Design',
+    'Digital Marketing'
+  ]
+
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -131,6 +146,21 @@ const fadeUp = {
               />
             </div>
           ))}
+        </div>
+      </section>
+
+      <section>
+        <div className='max-w-6xl mx-auto mt-24'>
+          <h2 className='text-3xl font-semibold'>Popular Categories</h2>
+          <div className='overflow-x-auto mt-6'>
+          <div className='grid grid-cols-6 gap-4 min-w-max'>
+            {Categories.map((category, index)=> (
+              <button key={index} onClick={()=>router.push(`jobs/search/${category.replace(/\s+/g, '-') +' jobs'.replace(/\s+/g, '-')}`)} className='border h-10 px-4 text-sm py-2 rounded-lg whitespace-nowrap text-left'>
+                {category}
+              </button>
+            ))}
+          </div>
+          </div>
         </div>
       </section>
 

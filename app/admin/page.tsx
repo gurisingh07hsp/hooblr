@@ -17,6 +17,7 @@ const ReactQuill = dynamic(() => import('react-quill'), {
 });
 
 import 'react-quill/dist/quill.snow.css';
+import { categories } from '@/types/utils';
 
 // Enhanced interfaces
 interface Company {
@@ -415,16 +416,39 @@ export default function AdminPage() {
     const [formData, setFormData] = useState({
       name: company?.name || '',
       companyemail: company?.companyemail || '',
+      logo: company?.logo || '',
       size: company?.size || '1-10' as Company['size'],
       industry: company?.industry || '',
       website: company?.website || '',
       description: company?.description || '',
       location: company?.location || ''
     });
+    const [loading,setLoading] = useState(false);
+
+      const handleUpload = async (e: any) => {
+    setLoading(true);
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "hooblr");
+
+    const res = await fetch("https://api.cloudinary.com/v1_1/dtjobqhxb/image/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    setFormData(prev => ({ ...prev, logo: data.secure_url }));
+    setLoading(false);
+  };
 
     const handleSubmit = (e: React.FormEvent) => {
+      setLoading(true);
       e.preventDefault();
       onSave({ ...company, ...formData });
+      setLoading(false);
     };
 
     return (
@@ -438,6 +462,18 @@ export default function AdminPage() {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Upload Logo
+            </label>
+            <input
+              type="file"
+              id="logo"
+              name="companylogo"
+              onChange={handleUpload}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D47F1] focus:border-transparent"
             />
           </div>
           <div>
@@ -512,10 +548,11 @@ export default function AdminPage() {
           </button>
           <button
             type="submit"
+            disabled={loading}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
           >
             <Save className="w-4 h-4" />
-            <span>Save Company</span>
+            <span>{loading ? 'Saving...' : 'Save Changes'}</span>
           </button>
         </div>
       </form>
@@ -638,13 +675,26 @@ export default function AdminPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-            <input
+            {/* <input
               type="text"
               required
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+            /> */}
+            <select
+              required
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Select Category</option>
+              {categories.map((category, index) => (
+                <option key={index} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Department *</label>
@@ -1330,25 +1380,16 @@ export default function AdminPage() {
           <div>
             <h3 className="text-lg font-semibold mb-2">Eligibility Criteria</h3>
             <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: data.eligibilityCriteria }} />
-            {/* <div className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed">{data.eligibilityCriteria}</p>
-            </div> */}
           </div>
 
           <div>
             <h3 className="text-lg font-semibold mb-2">selectionProcess</h3>
              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: data.selectionProcess }} />
-            {/* <div className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed">{data.selectionProcess}</p>
-            </div> */}
           </div>
 
           <div>
             <h3 className="text-lg font-semibold mb-2">how To Apply</h3>
              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: data.howToApply }} />
-            {/* <div className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed">{data.howToApply}</p>
-            </div> */}
           </div>
         </div>
       );

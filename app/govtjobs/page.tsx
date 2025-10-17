@@ -48,16 +48,15 @@ const GovtJobsPortal = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedState, setSelectedState] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
 
   const categories = [
-    'All India Govt Jobs',
     'State Govt Jobs',
     'Bank Jobs',
     'Teaching Jobs',
     'Engineering Jobs',
     'Railway Jobs',
-    'Police/Defence Jobs'
+    'Police Jobs',
+    'Defence Jobs'
   ];
 
 const indianStates = [
@@ -170,14 +169,7 @@ const indianStates = [
       const data = await response.data.jobs;
       console.log(data);
       
-      // Mock API response
       setTimeout(() => {
-        // const filteredJobs = data.filter((job: GovtJob) => {
-        //   // const matchesCategory = !selectedCategory || job.category === selectedCategory;
-        //   // const matchesState = !selectedState || job.state === selectedState || job.state === 'All India';
-        //   // const matchesSearch = !searchQuery || job.title.toLowerCase().includes(searchQuery.toLowerCase());
-        //   // return matchesCategory && matchesState && matchesSearch;
-        // });
         
         setJobs(data);
         setPagination(prev => ({
@@ -210,9 +202,25 @@ const indianStates = [
     <div className="min-h-screen mt-16 bg-gray-50">
 
       {/* Navigation */}
-      <nav className="bg-white py-10 border-b">
+      <nav className="bg-white py-5 border-b">
         <div className="container mx-auto max-w-7xl px-4">
-
+          <div className=' overflow-x-auto'>
+            <div className="flex gap-2 py-3 min-w-max">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat === selectedCategory ? '' : cat)}
+                className={`px-4 py-2 rounded font-medium whitespace-nowrap transition-colors ${
+                  selectedCategory === cat
+                    ? 'bg-blue-600 text-white'
+                    : 'border'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          </div>
                     <div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <div className="relative flex items-center">
@@ -228,13 +236,6 @@ const indianStates = [
           
                         <div className="relative flex items-center">
                           <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-black" />
-                          {/* <input
-                            type="text"
-                            placeholder="Enter State"
-                            // value={selectedLocation}
-                            // onChange={(e) => setSelectedLocation(e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 bg-[#F6F6F6] text-black placeholder:text-black rounded-3xl focus:outline-none"
-                          /> */}
                           <select 
                           value={selectedState}
                           onChange={(e)=> setSelectedState(e.target.value)}
@@ -297,7 +298,7 @@ const indianStates = [
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex-1">
                           <h2 className="text-xl font-bold text-gray-900 mb-2 hover:text-[#6D47F1] cursor-pointer">
-                            <a href={job.applyLink} target="_blank" rel="noopener noreferrer">{job.title}</a>
+                            <p onClick={()=> router.push(`/govtjobs/${job.title}`)}>{job.title}</p>
                           </h2>
                           <div className="flex flex-wrap gap-3 text-sm text-gray-600">
                             <span className="flex items-center gap-1">

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { useUser } from "@/context/UserContext";
+import { categories } from "@/types/utils";
 
 interface Job {
   _id: string;
@@ -64,34 +65,6 @@ export default function FindJobsPage({ initialCategory }: FindJobsPageProps) {
     maxSalary: "",
     search: "",
   });
-
-  const categories = [
-    "Law Enforcement",
-    "Administration",
-    "Healthcare",
-    "Education",
-    "Government Jobs",
-    "Technology & IT",
-    "Government & Public Sector",
-    "Healthcare & Medical",
-    "Finance & Banking",
-    "Education & Training",
-    "Engineering",
-    "Sales & Marketing",
-    "Human Resources",
-    "Legal & Compliance",
-    "Operations & Management",
-    "Customer Service",
-    "Design & Creative",
-    "Research & Development",
-    "Manufacturing",
-    "Retail & E-commerce",
-    "Transportation & Logistics",
-    "Real Estate",
-    "Media & Communications",
-    "Non-Profit & NGO",
-    "Consulting",
-  ];
 
   // Fetch jobs with filters
   const fetchJobs = async (pageNumber: number, filters: any) => {

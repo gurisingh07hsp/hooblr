@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Footer from '@/components/Footer';
 import { 
-  Shield, 
   Menu, 
   X,
   Building2,
@@ -14,20 +13,15 @@ import {
   Globe,
   Briefcase,
   Award,
-  Heart,
-  Eye,
-  Share2,
   Calendar,
   Mail,
   Phone,
   ExternalLink,
   ArrowLeft,
-  CheckCircle,
   Clock,
   DollarSign,
   IndianRupee,
   Euro,
-  Bookmark
 } from 'lucide-react';
 import axios from 'axios';
 import Image from 'next/image';
@@ -71,6 +65,7 @@ export default function CompanyProfilePage() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [company, setCompany] = useState<Company | null>(null);
   const [jobs,setJobs] = useState<Job[] | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const getCompany = async() => {
     try{
@@ -81,6 +76,7 @@ export default function CompanyProfilePage() {
     }catch(error){  
       console.log(error);
     }
+    setLoading(false);
   }
 
   useEffect(()=>{
@@ -104,7 +100,15 @@ export default function CompanyProfilePage() {
   if (!company) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
-        <div className="pt-20 pb-8">
+        {loading ? (
+          <div className="h-[100vh] w-[100%] flex justify-center items-center text-center">
+            <div>
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#6D47F1] mx-auto" />
+              <p className="mt-4 text-gray-600">Loading Jobs…</p>
+            </div>
+          </div>
+        ) : (
+                  <div className="pt-20 pb-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-16">
               <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -119,6 +123,8 @@ export default function CompanyProfilePage() {
             </div>
           </div>
         </div>
+        )}
+
       </div>
     );
   }
@@ -133,10 +139,6 @@ export default function CompanyProfilePage() {
               className="flex items-center cursor-pointer"
               onClick={() => router.push('/')}
             >
-              {/* <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg mr-3">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-gray-900">Hooblr</span> */}
               <Image src='/hooblrlogo.png' width={120} height={50} alt='logo'/>
             </div>
             
@@ -289,17 +291,6 @@ export default function CompanyProfilePage() {
                     </div>
                   </div>
                 </div>
-              
-              {/* <div className="flex flex-col space-y-3 mt-3">
-                <div className="flex space-x-3">
-                  <button className="p-2 text-gray-400 hover:text-purple-600 transition-colors border border-gray-200 rounded-lg">
-                    <Bookmark className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 text-gray-400 hover:text-purple-600 transition-colors border border-gray-200 rounded-lg">
-                    <Share2 className="w-5 h-5" />
-                  </button>
-                </div>
-              </div> */}
             </div>
           </div>
 

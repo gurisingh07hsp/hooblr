@@ -15,7 +15,6 @@ import {
 import axios from 'axios';
 import { useUser } from '@/context/UserContext';
 import Footer from '@/components/Footer';
-import { useSearchParams } from 'next/navigation';
 import { categories } from '@/types/utils';
 
 interface Job {
@@ -42,7 +41,7 @@ interface Job {
 
 interface PageProps {
   params: {
-    location: string;
+    category: string;
   };
 }
 
@@ -57,14 +56,12 @@ export default function FindJobsPage({ params }: PageProps) {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
   const [isApplied, setIsApplied] = useState<string[]>([]);
+
   
-  
-  const searchParams = useSearchParams();
-  const category = searchParams.get("category")?.replace(/-/g, ' ').replace(/@/g, '&');
+  const category = decodeURIComponent(params.category.replace(/-/g, ' ').split(' jobs')[0]);
+  console.log(category);
   const [selectedCategory, setSelectedCategory] = useState(category || '');
-  
-  const location = decodeURIComponent(params.location.replace(/-/g, ' '));
-  const [selectedLocation, setSelectedLocation] = useState(location ||'');
+  const [selectedLocation, setSelectedLocation] = useState('');
 
 
   const [filters, setFilters] = useState({
@@ -74,6 +71,8 @@ export default function FindJobsPage({ params }: PageProps) {
     maxSalary: "",
     search: "",
   });
+
+
 
 
   // Fetch jobs with filters
@@ -481,7 +480,7 @@ export default function FindJobsPage({ params }: PageProps) {
           <div className="lg:w-3/4">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
-                Jobs in {selectedLocation}
+                Jobs in {selectedCategory}
               </h2>
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-600">Sort by:</span>

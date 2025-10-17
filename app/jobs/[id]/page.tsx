@@ -7,7 +7,6 @@ import { useUser } from '@/context/UserContext';
 import Footer from '@/components/Footer';
 import { sendMessage } from "@/lib/chat";
 import axios from 'axios';
-import { ArrowTurnRightUpIcon } from '@heroicons/react/24/outline';
 
 type Salary = { min: number; max: number; currency: string; period: string };
 

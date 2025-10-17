@@ -186,6 +186,17 @@ const Header = () => {
               >
                 Find Jobs
               </button>
+
+              <button
+                onClick={() => {
+                  router.push('/govtjobs');
+                  setIsMenuOpen(false);
+                }}
+                className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors w-full text-left font-medium"
+              >
+                Govt Jobs
+              </button>
+
               <button
                 onClick={() => {
                   router.push('/companies');

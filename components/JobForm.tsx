@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@/context/UserContext';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
+import { categories } from '@/types/utils';
 
 interface Job {
   _id?: string;
@@ -106,13 +107,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
   ];
   const currencies = ['USD', 'EUR', 'GBP', 'INR', 'CAD', 'AUD'];
   const salaryPeriods = ['hourly', 'monthly', 'yearly'];
-  const jobCategories = [
-    "Law Enforcement","Administration","Healthcare","Education","Government Jobs","Technology & IT","Government & Public Sector",
-    "Healthcare & Medical","Finance & Banking","Education & Training","Engineering","Sales & Marketing","Human Resources",
-    "Legal & Compliance","Operations & Management","Customer Service","Design & Creative","Research & Development",
-    "Manufacturing","Retail & E-commerce","Transportation & Logistics","Real Estate","Media & Communications",
-    "Non-Profit & NGO","Consulting",
-  ];
+  const jobCategories = categories;
   const commonBenefits = [
     'Health Insurance', 'Dental Insurance', 'Vision Insurance', '401k/Retirement Plan',
     'Flexible Hours', 'Remote Work', 'Paid Time Off', 'Professional Development',
@@ -267,10 +262,6 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
         status: isDraft ? 'draft' : formData.status,
         applicationDeadline: formData.applicationDeadline || undefined
       };
-
-        console.log("submit Data : ", submitData);
-      // const url = job?._id ? `/api/company/jobs/${job._id}` : '/api/company/jobs';
-      // const method = job?._id ? 'PUT' : 'POST';
 
       if(!job?._id){
         try{
@@ -460,17 +451,6 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
                 />
                 <span className="ml-2 text-sm text-gray-700">Remote Work Available</span>
               </label>
-              
-              {/* <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="isGovernment"
-                  checked={formData.isGovernment}
-                  onChange={handleInputChange}
-                  className="rounded border-gray-300 text-blue-600"
-                />
-                <span className="ml-2 text-sm text-gray-700">Government Position</span>
-              </label> */}
             </div>
           </div>
         );
