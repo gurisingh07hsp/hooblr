@@ -57,9 +57,10 @@ export default function FindJobsPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [isApplied, setIsApplied] = useState<string[]>([]);
 
-  
-  const category = decodeURIComponent(params.category.replace(/-/g, ' ').split(' jobs')[0]);
-  console.log(category);
+  const category = capitalizeWords(
+  decodeURIComponent(params.category.replace(/-/g, ' ').split(' jobs')[0])
+);
+  // const category = decodeURIComponent(params.category.replace(/-/g, ' ').split(' jobs')[0]);
   const [selectedCategory, setSelectedCategory] = useState(category || '');
   const [selectedLocation, setSelectedLocation] = useState('');
 
@@ -73,7 +74,15 @@ export default function FindJobsPage({ params }: PageProps) {
   });
 
 
-
+  function capitalizeWords(str: string) {
+    if(str == 'it'){
+      return 'IT';
+    }
+    else if(str == 'sql'){
+      return 'SQL';
+    }
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+}
 
   // Fetch jobs with filters
   const fetchJobs = async (pageNumber: number, filters: any) => {
@@ -478,11 +487,11 @@ export default function FindJobsPage({ params }: PageProps) {
 
           {/* Job Listings */}
           <div className="lg:w-3/4">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex lg:flex-row flex-col lg:items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
                 Jobs in {selectedCategory}
               </h2>
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-y-2 space-x-4">
                 <span className="text-sm text-gray-600">Sort by:</span>
                 <select 
                   value={sortBy}

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useUser } from "@/context/UserContext";
 import { useRouter } from 'next/navigation';
@@ -31,11 +31,6 @@ export default function AuthModal() {
     companySize: '',
     industry: ''
   });
-
-
-  // useEffect(()=>{
-  //   setFormData((prev) => ({ ...prev, role: selectedRole }));
-  // },[selectedRole]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

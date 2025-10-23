@@ -2,10 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { MapPin, Clock, DollarSign, X, CheckCircle, IndianRupee, Euro, Eye, FileText, Upload, ArrowUpRightFromCircle, Building2, User, SquareArrowOutUpRight } from 'lucide-react';
+import { MapPin, CheckCircle, Building2, User, SquareArrowOutUpRight } from 'lucide-react';
 import Footer from '@/components/Footer';
-
-type Salary = { min: number; max: number; currency: string; period: string };
 
 interface GovtJob {
   _id: string;
@@ -36,7 +34,6 @@ export default function GovtJobDetailsPage() {
 
   const [job, setJob] = useState<GovtJob | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
 
@@ -48,7 +45,6 @@ export default function GovtJobDetailsPage() {
        const data = await res.json();
        setJob(data.job);
      } catch (e) {
-       setError('Failed to load job');
      } finally {
        setLoading(false);
      }
@@ -122,12 +118,11 @@ export default function GovtJobDetailsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
+          <div className="flex lg:flex-row flex-col-reverse gap-6">
+            <div className="space-y-6 w-full">
                 {job.eligibilityCriteria && 
                 <section className="bg-white/80 rounded-xl shadow border border-purple-200 p-6">
                     <h2 className="text-xl font-semibold mb-3">Eligibility Criteria</h2>
-                    {/* <p className="text-gray-700 leading-relaxed whitespace-pre-line">{job.description}</p> */}
                     <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: job.eligibilityCriteria }} />
                 </section>
                 }

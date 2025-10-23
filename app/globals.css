@@ -20,7 +20,3 @@
     animation: scroll-infinite 10s linear infinite;
     width: fit-content;
 }
-
-/* .animate-scroll-infinite:hover {
-    animation-play-state: paused;
-} */

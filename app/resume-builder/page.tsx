@@ -136,11 +136,6 @@ export default function ResumeBuilderPage() {
     setExperiences(experiences.filter(exp => exp.id !== id));
   };
 
-  // const updateExperience = (id: string, field: keyof Experience, value: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-  //   setExperiences(experiences.map(exp => 
-  //     exp.id === id ? { ...exp, [field]: value } : exp
-  //   ));
-  // };
 
   const updateExperience = (
   id: string,
@@ -168,12 +163,6 @@ export default function ResumeBuilderPage() {
     setEducation(education.filter(edu => edu.id !== id));
   };
 
-  // const updateEducation = (id: string, field: keyof Education, value: any) => {
-  //   setEducation(education.map(edu => 
-  //     edu.id === id ? { ...edu, [field]: value } : edu
-  //   ));
-  // };
-
   const updateEducation = (
   id: string,
   field: keyof Education,
@@ -191,19 +180,6 @@ export default function ResumeBuilderPage() {
   const removeSkill = (id: string) => {
     setSkills(skills.filter(skill => skill.id !== id));
   };
-
-  // const updateSkill = (id: string, field: keyof Skill, value: any) => {
-  //   setSkills(skills.map(skill => 
-  //     skill.id === id ? { ...skill, [field]: value } : skill
-  //   ));
-  // };
-  // const updateSection = (id: string, field: keyof ResumeSection, value: any) => {
-  //   setSections(prevSections => 
-  //     prevSections.map(section => 
-  //       section.id === id ? { ...section, [field]: value } : section
-  //     )
-  //   );
-  // };
 
 
 const updateSkill = <K extends keyof Skill>(id: string, field: K, value: Skill[K]) => {

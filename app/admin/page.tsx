@@ -209,7 +209,7 @@ export default function AdminPage() {
         fetchJobs(),
         fetchGovtJobs(),
         fetchBlogPosts(),
-        fetchUsers()
+        // fetchUsers()
       ]);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -275,15 +275,15 @@ export default function AdminPage() {
     }
   };
 
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch('/api/admin/users');
-      const data = await response.json();
-      setUsers(data.users || []);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
-  };
+  // const fetchUsers = async () => {
+  //   try {
+  //     const response = await fetch('/api/admin/users');
+  //     const data = await response.json();
+  //     setUsers(data.users || []);
+  //   } catch (error) {
+  //     console.error('Error fetching users:', error);
+  //   }
+  // };
 
   useEffect(()=>{
     fetchBlogPosts();
@@ -675,13 +675,6 @@ export default function AdminPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-            {/* <input
-              type="text"
-              required
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            /> */}
             <select
               required
               value={formData.category}
@@ -857,15 +850,6 @@ export default function AdminPage() {
             />
             <span className="text-sm text-gray-700">Remote Work</span>
           </label>
-          {/* <label className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              checked={formData.isGovernment}
-              onChange={(e) => setFormData({ ...formData, isGovernment: e.target.checked })}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <span className="text-sm text-gray-700">Government Job</span>
-          </label> */}
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
@@ -1022,13 +1006,6 @@ export default function AdminPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
-            {/* <input
-              type="text"
-              required
-              value={formData.state}
-              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            /> */}
             <select 
               value={formData.state}
               onChange={(e) => setFormData({ ...formData, state: e.target.value })}
@@ -1104,13 +1081,6 @@ export default function AdminPage() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Selection Process *</label>
-            {/* <textarea
-              required
-              rows={4}
-              value={formData.selectionProcess}
-              onChange={(e) => setFormData({ ...formData, selectionProcess: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            /> */}
             <div className="rounded-lg pb-10">
           <ReactQuill
             value={formData.selectionProcess}
@@ -1124,13 +1094,6 @@ export default function AdminPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Eligibility Criteria *</label>
-            {/* <textarea
-              required
-              rows={4}
-              value={formData.eligibilityCriteria}
-              onChange={(e) => setFormData({ ...formData, eligibilityCriteria: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            /> */}
             <div className="rounded-lg pb-10">
             <ReactQuill
             value={formData.eligibilityCriteria}
@@ -1144,13 +1107,6 @@ export default function AdminPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">How To Apply *</label>
-            {/* <textarea
-              required
-              rows={4}
-              value={formData.howToApply}
-              onChange={(e) => setFormData({ ...formData, howToApply: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            /> */}
             <div className="rounded-lg pb-10">
             <ReactQuill
             value={formData.howToApply}
@@ -1829,17 +1785,6 @@ export default function AdminPage() {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
-        {/* <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        >
-          <option value="all">All Status</option>
-          <option value="active">Active</option>
-          <option value="draft">Draft</option>
-          <option value="paused">Paused</option>
-          <option value="closed">Closed</option>
-        </select> */}
       </div>
 
       {/* Jobs Table */}

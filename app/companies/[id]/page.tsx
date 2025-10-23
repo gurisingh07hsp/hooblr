@@ -9,7 +9,6 @@ import {
   Building2,
   MapPin,
   Users,
-  Star,
   Globe,
   Briefcase,
   Award,
@@ -352,10 +351,6 @@ export default function CompanyProfilePage() {
               <div className="bg-white rounded-2xl border p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Company Information</h3>
                 <div className="space-y-3">
-                  {/* <div className="flex items-center">
-                    <Calendar className="w-4 h-4 text-purple-600 mr-3" />
-                    <span className="text-gray-700">Founded {company.founded}</span>
-                  </div> */}
                   {company.website && <div className="flex items-center">
                     <Globe className="w-4 h-4 text-purple-600 mr-3" />
                     <a href={`https://${company.website}`} className="text-purple-600 hover:text-purple-700 flex items-center">
@@ -374,19 +369,6 @@ export default function CompanyProfilePage() {
                   </div>
                 </div>
               </div>
-
-              {/* Benefits */}
-              {/* <div className="bg-white rounded-2xl border p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Benefits & Perks</h3>
-                <div className="space-y-2">
-                  {company.benefits.map((benefit, index) => (
-                    <div key={index} className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      <span className="text-gray-700 text-sm">{benefit}</span>
-                    </div>
-                  ))}
-                </div>
-              </div> */}
 
               {/* Contact */}
               {company.contact && (
@@ -414,79 +396,6 @@ export default function CompanyProfilePage() {
               )}
             </div>
           </div>
-
-          {/* Similar Companies */}
-          {/* <div className="mt-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Similar Companies</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {companies
-                .filter(c => c.id !== company.id && c.industry === company.industry)
-                .slice(0, 3)
-                .map((relatedCompany) => (
-                  <div 
-                    key={relatedCompany.id}
-                    className="bg-white rounded-xl p-6 transition-shadow cursor-pointer border"
-                    onClick={() => router.push(`/companies/${nameToSlug(relatedCompany.name)}`)}
-                  >
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-[#9333E9] rounded-lg flex items-center justify-center">
-                        <Building2 className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <h3 className="font-semibold text-gray-900">{relatedCompany.name}</h3>
-                          {relatedCompany.featured && (
-                            <span className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                              Featured
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center space-x-3 text-sm text-gray-600 mb-3">
-                          <div className="flex items-center">
-                            <MapPin className="w-3 h-3 mr-1 text-purple-600" />
-                            <span>{relatedCompany.location}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <Users className="w-3 h-3 mr-1 text-purple-600" />
-                            <span>{relatedCompany.size}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-3 h-3 ${
-                                  i < Math.floor(relatedCompany.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                                }`}
-                              />
-                            ))}
-                            <span className="ml-1 text-xs text-gray-600">
-                              {relatedCompany.rating}
-                            </span>
-                          </div>
-                          <div className="flex items-center text-green-600 text-sm font-medium">
-                            <Briefcase className="w-3 h-3 mr-1" />
-                            <span>{relatedCompany.openJobs} jobs</span>
-                          </div>
-                        </div>
-                        <p className="text-xs text-gray-600 mt-3 line-clamp-2">
-                          {relatedCompany.description}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-            </div>
-            
-         
-            {companies.filter(c => c.id !== company.id && c.industry === company.industry).length === 0 && (
-              <div className="text-center py-8">
-                <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No similar companies found in the same industry.</p>
-              </div>
-            )}
-          </div> */}
         </div>
       </div>
 

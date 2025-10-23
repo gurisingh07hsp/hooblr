@@ -33,7 +33,13 @@ interface PaginationData {
   pages: number;
 }
 
-const GovtJobsPortal = () => {
+interface PageProps {
+  params: {
+    category: string;
+  };
+}
+
+const GovtJobsCategoryPage = ({ params }: PageProps) => {
   const router = useRouter();
   const [jobs, setJobs] = useState<GovtJob[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,9 +49,14 @@ const GovtJobsPortal = () => {
     total: 0,
     pages: 0
   });
-  
+
+  const category = capitalizeWords(
+  decodeURIComponent(params.category.replace(/-/g, ' '))
+);
+
+console.log(category);  
   // Filters
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(category || '');
   const [selectedState, setSelectedState] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -100,6 +111,10 @@ const indianStates = [
   "Lakshadweep",
   "Puducherry"
 ];
+
+  function capitalizeWords(str: string) {
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+}
 
   useEffect(() => {
     fetchJobs();
@@ -156,11 +171,11 @@ const indianStates = [
       <nav className="bg-white py-5 border-b">
         <div className="container mx-auto max-w-7xl px-4">
           <div className=' overflow-x-auto'>
-            <div className="flex justify-center gap-2 py-3 min-w-max">
+            <div className="flex justify-center mx-auto gap-2 py-3 min-w-max">
             {categories.map((cat) => (
               <button
                 key={cat}
-                onClick={()=> router.push(`govtjobs/search/${cat.replace(/\s+/g, '-').toLowerCase()}`)}
+                onClick={()=> router.push(`${cat.replace(/\s+/g, '-').toLowerCase()}`)}
                 className={`px-4 py-2 rounded font-medium whitespace-nowrap transition-colors ${
                   selectedCategory === cat
                     ? 'bg-blue-600 text-white'
@@ -245,7 +260,7 @@ const indianStates = [
                 {jobs.map((job) => {
                   const daysRemaining = getDaysRemaining(job.lastDateToApply);
                   return (
-                    <article key={job._id} className="bg-white rounded-2xl border p-6">
+                    <article key={job._id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6">
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex-1">
                           <h2 className="text-xl font-bold text-gray-900 mb-2 hover:text-[#6D47F1] cursor-pointer">
@@ -271,7 +286,7 @@ const indianStates = [
                           </div>
                         )}
                       </div>
-                        <hr className='my-4' />
+                         <hr className='my-4' />
                       <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4 text-sm">
                         <div>
                           <p className="text-gray-600"><strong>Age Limit:</strong> {job.ageLimit}</p>
@@ -371,4 +386,4 @@ const indianStates = [
   );
 };
 
-export default GovtJobsPortal;
+export default GovtJobsCategoryPage;

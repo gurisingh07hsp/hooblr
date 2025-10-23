@@ -1,9 +1,7 @@
 'use client'
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import {  
-  ArrowRight,
-} from 'lucide-react';
+import { ArrowRight, Briefcase, Calculator, CalendarDays, DatabaseIcon, Headphones, HomeIcon, Landmark, Megaphone, Monitor, Palette, RectangleHorizontal, Users } from 'lucide-react';
 import Footer from '@/components/Footer';
 import Image from 'next/image';
 import SearchComponent from '@/components/SearchComponent';
@@ -26,18 +24,18 @@ export default function Home() {
 ];
 
   const Categories = [
-    'Banking',
-    'Work From Home',
-    'Human Resources',
-    'Sales',
-    'Accounting',
-    'Customer Support',
-    'Event Management',
-    'IT',
-    'SQL',
-    'Oracle',
-    'Graphic Design',
-    'Digital Marketing'
+    {item: "Banking", icon: Landmark},
+    {item: 'Work From Home', icon: HomeIcon},
+    {item: 'Human Resources', icon: Users},
+    {item: 'Sales', icon: Briefcase},
+    {item: 'Accounting', icon: Calculator},
+    {item: 'Customer Support', icon: Headphones},
+    {item: 'Event Management', icon: CalendarDays},
+    {item: 'IT', icon: Monitor},
+    {item: 'SQL', icon: DatabaseIcon},
+    {item: 'Oracle', icon: RectangleHorizontal},
+    {item: 'Graphic Design', icon: Palette},
+    {item: 'Digital Marketing', icon: Megaphone}
   ]
 
   const container = {
@@ -155,8 +153,11 @@ const fadeUp = {
           <div className='overflow-x-auto mt-6'>
           <div className='grid grid-cols-6 gap-4 min-w-max'>
             {Categories.map((category, index)=> (
-              <button key={index} onClick={()=>router.push(`jobs/search/${category.replace(/\s+/g, '-') +' jobs'.replace(/\s+/g, '-')}`)} className='border h-10 px-4 text-sm py-2 rounded-lg whitespace-nowrap text-left'>
-                {category}
+              <button key={index} onClick={()=>router.push(`jobs/search/${category.item.replace(/\s+/g, '-').toLowerCase() +' jobs'.replace(/\s+/g, '-')}`)} className='border flex items-center h-12 px-1 py-1 text-sm rounded-lg whitespace-nowrap text-left'>
+                <div className='bg-purple-100 mr-2 w-8 flex justify-center items-center rounded-md h-full'>
+                  <category.icon className='text-purple-600'/>
+                </div>
+                {category.item}
               </button>
             ))}
           </div>
@@ -286,9 +287,6 @@ const fadeUp = {
           </div>
 
         </div>
-
-        {/* Tall Image Card */}
-        {/* <div className="lg:col-span-3 lg:row-span-2 bg-gray-300 rounded-3xl min-h-[400px] lg:min-h-full"></div> */}
       </div>
     </div>
       </section>

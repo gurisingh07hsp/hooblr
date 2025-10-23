@@ -48,7 +48,6 @@ export default function JobDetailsPage() {
   const [showApply, setShowApply] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
-  const [resume, setResume] = useState('');
   const [phone, setPhone] = useState('');
   const [location, setLocation] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -58,7 +57,6 @@ export default function JobDetailsPage() {
   const [showResumeField, setShowResumeField] = useState(false); 
   const [file, setFile] = useState<File | null>(null);
   const [text, setText] = useState("");
-  // const [messages, setMessages] = useState([]);
 
    const fetchJob = async () => {
      try {
@@ -133,7 +131,6 @@ export default function JobDetailsPage() {
       });
       if(res.status === 200){
         setCoverLetter('');
-        setResume('');
         setSubmitted(true);
         setShowApply(false);
         fetchJob();
@@ -419,8 +416,6 @@ export default function JobDetailsPage() {
               <label
                 htmlFor="resume-upload"
               >
-                {/* <Upload className="w-4 h-4" />
-                Change Resume */}
                 <input
                   id="resume-upload"
                   type="file"
