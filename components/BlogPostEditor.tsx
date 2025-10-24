@@ -1,17 +1,19 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react';
-import dynamic from 'next/dynamic';
-import { X, Save, Eye, ArrowLeft } from 'lucide-react';
+import React, { useState } from "react";
+import dynamic from "next/dynamic";
+import { X, Save, Eye, ArrowLeft } from "lucide-react";
 
 // Dynamically import ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), {
+const ReactQuill = dynamic(() => import("react-quill"), {
   ssr: false,
-  loading: () => <div className="h-64 bg-gray-100 rounded-lg animate-pulse"></div>
+  loading: () => (
+    <div className="h-64 bg-gray-100 rounded-lg animate-pulse"></div>
+  ),
 });
 
-import 'react-quill/dist/quill.snow.css';
-import axios from 'axios';
+import "react-quill/dist/quill.snow.css";
+import axios from "axios";
 
 interface BlogPost {
   _id?: string;
@@ -20,10 +22,19 @@ interface BlogPost {
   author?: string;
   content: string;
   excerpt: string;
-  category: 'Interview Tips' | 'Workplace' | 'Government Jobs' | 'Career Growth' | 'Networking' | 'Salary Guide' | 'Resume Tips' | 'Industry News' | string;
+  category:
+    | "Interview Tips"
+    | "Workplace"
+    | "Government Jobs"
+    | "Career Growth"
+    | "Networking"
+    | "Salary Guide"
+    | "Resume Tips"
+    | "Industry News"
+    | string;
   tags: string[];
   featuredImage: string;
-  status: 'draft' | 'published' | 'archived';
+  status: "draft" | "published" | "archived";
   publishedAt?: string;
   views?: number;
   likes?: number;
@@ -43,64 +54,85 @@ interface BlogPostEditorProps {
   // eslint-disable-next-line no-unused-vars
   onSave: (post: BlogPost) => void;
   onCancel: () => void;
-  mode: 'create' | 'edit';
+  mode: "create" | "edit";
 }
 
-export default function BlogPostEditor({ 
-  post, onSave, onCancel, mode 
+export default function BlogPostEditor({
+  post,
+  onSave,
+  onCancel,
+  mode,
 }: BlogPostEditorProps) {
   const initialPost = post || {};
   const [blogPost, setBlogPost] = useState<BlogPost>({
-    title: '',
-    slug: '',
-    category: 'Career Growth',
-    status: 'draft',
-    content: '',
-    excerpt: '',
+    title: "",
+    slug: "",
+    category: "Career Growth",
+    status: "draft",
+    content: "",
+    excerpt: "",
     tags: [],
-    featuredImage: '',
-    ...initialPost
+    featuredImage: "",
+    ...initialPost,
   });
 
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [newTag, setNewTag] = useState('');
+  const [newTag, setNewTag] = useState("");
 
   // Quill editor configuration
   const quillModules = {
     toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'align': [] }],
-      ['link', 'image', 'blockquote', 'code-block'],
-      ['clean']
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ color: [] }, { background: [] }],
+      [{ align: [] }],
+      ["link", "image", "blockquote", "code-block"],
+      ["clean"],
     ],
   };
 
   const quillFormats = [
-    'header', 'bold', 'italic', 'underline', 'strike',
-    'list', 'bullet', 'color', 'background', 'align',
-    'link', 'image', 'blockquote', 'code-block'
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "color",
+    "background",
+    "align",
+    "link",
+    "image",
+    "blockquote",
+    "code-block",
   ];
 
-  const handleSave = async() => {
-    try{
-      if(mode == "create"){
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/blog/`, blogPost, {withCredentials:true});
-        if(response.status == 200){
+  const handleSave = async () => {
+    try {
+      if (mode == "create") {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/blog/`,
+          blogPost,
+          { withCredentials: true }
+        );
+        if (response.status == 200) {
+          onSave(response.data.post);
+          onCancel();
+        }
+      } else {
+        const response = await axios.put(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/blog/${blogPost._id}`,
+          blogPost,
+          { withCredentials: true }
+        );
+        if (response.status == 200) {
           onSave(response.data.post);
           onCancel();
         }
       }
-      else{
-        const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/blog/${blogPost._id}`, blogPost, {withCredentials: true});
-        if(response.status == 200){
-          onSave(response.data.post);
-          onCancel();
-        }
-      }
-    }catch(error){
+    } catch (error) {
       console.error(error);
     }
   };
@@ -109,21 +141,21 @@ export default function BlogPostEditor({
     if (newTag.trim() && !blogPost.tags?.includes(newTag.trim())) {
       setBlogPost({
         ...blogPost,
-        tags: [...(blogPost.tags || []), newTag.trim()]
+        tags: [...(blogPost.tags || []), newTag.trim()],
       });
-      setNewTag('');
+      setNewTag("");
     }
   };
 
   const removeTag = (tagToRemove: string) => {
     setBlogPost({
       ...blogPost,
-      tags: blogPost.tags?.filter(tag => tag !== tagToRemove) || []
+      tags: blogPost.tags?.filter((tag) => tag !== tagToRemove) || [],
     });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       addTag();
     }
@@ -131,45 +163,51 @@ export default function BlogPostEditor({
 
   const renderPreview = () => (
     <div className="prose max-w-none">
-      <h1 className="text-3xl font-bold text-gray-900 mb-4">{blogPost.title}</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-4">
+        {blogPost.title}
+      </h1>
       <div className="flex items-center space-x-4 text-sm text-gray-600 mb-6">
         <span>By {blogPost.author}</span>
         <span>•</span>
         <span>{blogPost.category}</span>
         <span>•</span>
-        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-          blogPost.status === 'published' ? 'bg-green-100 text-green-800' :
-          blogPost.status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
-          'bg-red-100 text-red-800'
-        }`}>
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+            blogPost.status === "published"
+              ? "bg-green-100 text-green-800"
+              : blogPost.status === "draft"
+              ? "bg-yellow-100 text-yellow-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
           {blogPost.status}
         </span>
       </div>
-      
+
       {blogPost.featuredImage && (
-        <img 
-          src={blogPost.featuredImage} 
+        <img
+          src={blogPost.featuredImage}
           alt={blogPost.title}
           className="w-full h-64 object-cover rounded-lg mb-6"
         />
       )}
-      
+
       {blogPost.excerpt && (
         <div className="bg-gray-50 p-4 rounded-lg mb-6">
           <p className="text-lg text-gray-700 italic">{blogPost.excerpt}</p>
         </div>
       )}
-      
-      <div 
+
+      <div
         className="text-gray-700 leading-relaxed"
         dangerouslySetInnerHTML={{ __html: blogPost.content }}
       />
-      
+
       {blogPost.tags && blogPost.tags.length > 0 && (
         <div className="mt-8 pt-6 border-t border-gray-200">
           <div className="flex flex-wrap gap-2">
-            {blogPost.tags.map(tag => (
-              <span 
+            {blogPost.tags.map((tag) => (
+              <span
                 key={tag}
                 className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
               >
@@ -187,33 +225,31 @@ export default function BlogPostEditor({
       {/* Basic Information */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Title *
+          </label>
           <input
             type="text"
             value={blogPost.title}
-            onChange={(e) => setBlogPost({...blogPost, title: e.target.value})}
+            onChange={(e) =>
+              setBlogPost({ ...blogPost, title: e.target.value })
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Enter blog post title..."
           />
         </div>
-        {/* <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Author *</label>
-          <input
-            type="text"
-            value={blogPost.author}
-            onChange={(e) => setBlogPost({...blogPost, author: e.target.value})}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Enter author name..."
-          />
-        </div> */}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Category
+          </label>
           <select
             value={blogPost.category}
-            onChange={(e) => setBlogPost({...blogPost, category: e.target.value})}
+            onChange={(e) =>
+              setBlogPost({ ...blogPost, category: e.target.value })
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="Career Growth">Career Growth</option>
@@ -227,10 +263,17 @@ export default function BlogPostEditor({
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Status
+          </label>
           <select
             value={blogPost.status}
-            onChange={(e) => setBlogPost({...blogPost, status: e.target.value as 'draft' | 'published' | 'archived'})}
+            onChange={(e) =>
+              setBlogPost({
+                ...blogPost,
+                status: e.target.value as "draft" | "published" | "archived",
+              })
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="draft">Draft</option>
@@ -241,23 +284,29 @@ export default function BlogPostEditor({
       </div>
 
       {/* Featured Image */}
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Featured Image URL</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Featured Image URL
+          </label>
           <input
             type="url"
             value={blogPost.featuredImage}
-            onChange={(e) => setBlogPost({...blogPost, featuredImage: e.target.value})}
+            onChange={(e) =>
+              setBlogPost({ ...blogPost, featuredImage: e.target.value })
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="https://example.com/image.jpg"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Slug*</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Slug*
+          </label>
           <input
             type="text"
             value={blogPost.slug}
-            onChange={(e) => setBlogPost({...blogPost, slug: e.target.value})}
+            onChange={(e) => setBlogPost({ ...blogPost, slug: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -265,10 +314,14 @@ export default function BlogPostEditor({
 
       {/* Excerpt */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Excerpt</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Excerpt
+        </label>
         <textarea
           value={blogPost.excerpt}
-          onChange={(e) => setBlogPost({...blogPost, excerpt: e.target.value})}
+          onChange={(e) =>
+            setBlogPost({ ...blogPost, excerpt: e.target.value })
+          }
           rows={3}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="Brief description of the blog post..."
@@ -277,10 +330,12 @@ export default function BlogPostEditor({
 
       {/* Tags */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Tags
+        </label>
         <div className="flex flex-wrap gap-2 mb-2">
-          {blogPost.tags?.map(tag => (
-            <span 
+          {blogPost.tags?.map((tag) => (
+            <span
               key={tag}
               className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full flex items-center space-x-1"
             >
@@ -314,15 +369,17 @@ export default function BlogPostEditor({
 
       {/* Rich Text Editor */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Content *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Content *
+        </label>
         <div className="rounded-lg pb-10">
           <ReactQuill
             value={blogPost.content}
-            onChange={(content) => setBlogPost({...blogPost, content})}
+            onChange={(content) => setBlogPost({ ...blogPost, content })}
             modules={quillModules}
             formats={quillFormats}
             placeholder="Write your blog post content here..."
-            style={{ height: '400px' }}
+            style={{ height: "400px" }}
           />
         </div>
       </div>
@@ -343,33 +400,34 @@ export default function BlogPostEditor({
             </button>
             <div>
               <h2 className="text-xl font-bold text-gray-900">
-                {mode === 'create' ? 'Create New Blog Post' : 'Edit Blog Post'}
+                {mode === "create" ? "Create New Blog Post" : "Edit Blog Post"}
               </h2>
               <p className="text-sm text-gray-600">
-                {mode === 'create' ? 'Write a new blog post for your audience' : 'Update your blog post content'}
+                {mode === "create"
+                  ? "Write a new blog post for your audience"
+                  : "Update your blog post content"}
               </p>
             </div>
 
-               <button
+            <button
               onClick={onCancel}
               className="p-2 hover:bg-gray-100 lg:hidden block absolute right-4 top-4 rounded-full transition-colors"
             >
               <X className="w-5 h-5 text-gray-500" />
             </button>
-
           </div>
-          
+
           <div className="flex items-center mt-2 lg:mt-0 space-x-3">
             <button
               onClick={() => setIsPreviewMode(!isPreviewMode)}
               className={`px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 ${
-                isPreviewMode 
-                  ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' 
-                  : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                isPreviewMode
+                  ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  : "bg-blue-50 text-blue-700 hover:bg-blue-100"
               }`}
             >
               <Eye className="w-4 h-4" />
-              <span>{isPreviewMode ? 'Edit' : 'Preview'}</span>
+              <span>{isPreviewMode ? "Edit" : "Preview"}</span>
             </button>
             <button
               onClick={handleSave}
@@ -377,7 +435,7 @@ export default function BlogPostEditor({
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="w-4 h-4" />
-              <span>Save {mode === 'create' ? 'Post' : 'Changes'}</span>
+              <span>Save {mode === "create" ? "Post" : "Changes"}</span>
             </button>
             <button
               onClick={onCancel}
@@ -395,4 +453,4 @@ export default function BlogPostEditor({
       </div>
     </div>
   );
-} 
+}

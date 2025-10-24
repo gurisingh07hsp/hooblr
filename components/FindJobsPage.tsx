@@ -321,7 +321,7 @@ export default function FindJobsPage({ initialCategory }: FindJobsPageProps) {
                         ...filters,
                         minSalary: "0",
                         maxSalary: "50000",
-                      })
+                      });
                     }}
                     className="h-5 w-5 accent-[#6D47F1] border-gray-300"
                   />
@@ -338,7 +338,7 @@ export default function FindJobsPage({ initialCategory }: FindJobsPageProps) {
                         ...filters,
                         minSalary: "50000",
                         maxSalary: "100000",
-                      })
+                      });
                     }}
                     className="h-5 w-5 accent-[#6D47F1] border-gray-300"
                   />
@@ -355,7 +355,7 @@ export default function FindJobsPage({ initialCategory }: FindJobsPageProps) {
                         ...filters,
                         minSalary: "100000",
                         maxSalary: "150000",
-                      })
+                      });
                     }}
                     className="h-5 w-5 accent-[#6D47F1] border-gray-300"
                   />
@@ -372,7 +372,7 @@ export default function FindJobsPage({ initialCategory }: FindJobsPageProps) {
                         ...filters,
                         minSalary: "150000",
                         maxSalary: "9999999",
-                      })
+                      });
                     }}
                     className="h-5 w-5 accent-[#6D47F1] border-gray-300"
                   />
@@ -551,7 +551,10 @@ export default function FindJobsPage({ initialCategory }: FindJobsPageProps) {
                   className="w-full bg-white rounded-2xl border p-2"
                 >
                   <div className="flex border-b pb-4">
-                    <div onClick={() => router.push(`/jobs/${job._id}`)} className="w-14 h-14 rounded-xl border flex justify-center items-center px-1 cursor-pointer">
+                    <div
+                      onClick={() => router.push(`/jobs/${job._id}`)}
+                      className="w-14 h-14 rounded-xl border flex justify-center items-center px-1 cursor-pointer"
+                    >
                       <img
                         className={job?.company?.logo ? "block" : "hidden"}
                         src={job?.company?.logo}
@@ -691,12 +694,16 @@ export default function FindJobsPage({ initialCategory }: FindJobsPageProps) {
                 </div>
               ))}
             </section>
-            {loading &&  <div className="text-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#6D47F1] mx-auto" />
-              <p className="mt-4 text-gray-600">Loading Jobs…</p>
-            </div>}
+            {loading && (
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#6D47F1] mx-auto" />
+                <p className="mt-4 text-gray-600">Loading Jobs…</p>
+              </div>
+            )}
             <div id="load-more" className="h-10"></div>
-            {!hasMore && filteredJobs.length !== 0 && <p className="text-gray-500 ms-4">No more jobs</p>}
+            {!hasMore && filteredJobs.length !== 0 && (
+              <p className="text-gray-500 ms-4">No more jobs</p>
+            )}
 
             {!loading && filteredJobs.length === 0 && (
               <div className="text-center py-12">

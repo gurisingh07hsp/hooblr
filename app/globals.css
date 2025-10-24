@@ -20,3 +20,12 @@
     animation: scroll-infinite 10s linear infinite;
     width: fit-content;
 }
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}

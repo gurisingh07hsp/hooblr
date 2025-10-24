@@ -46,14 +46,13 @@ const HomeGovtJobs = () => {
         </h2>
 
         {/* Category Filters */}
-        <div className="flex flex-nowrap lg:flex-wrap w-full gap-2 lg:gap-3 mb-8 bg-[#F5F5F5] rounded-3xl px-2 py-2 overflow-x-auto overflow-y-hidden">
+        <div className="flex flex-nowrap lg:flex-wrap w-full gap-2 lg:gap-3 mb-8 bg-[#F5F5F5] rounded-3xl px-2 py-2 overflow-x-auto overflow-y-hidden scrollbar-hide">
           {[
             "Andhra Pradesh",
             "Bihar",
             "Gujarat",
             "Haryana",
             "Maharashtra",
-            "Jharkhand",
             "Punjab",
             "Rajasthan",
             "Chandigarh",

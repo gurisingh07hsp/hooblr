@@ -1,6 +1,7 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
+import {motion} from 'framer-motion'
 
 interface place_data {
   class: string;
@@ -115,53 +116,57 @@ const SearchComponent = () => {
   }
 
 
+    const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.3,
+      },
+    },
+  };
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 40 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 1.5,
+      ease: 'easeOut' as const,
+    },
+  },
+} as const;
+
+
   return (
-    <div className="flex border-2 lg:w-[33rem] mt-12 items-center px-2 lg:gap-x-3 gap-x-2 lg:h-[74px] h-[55px] rounded-[37px] bg-[#F5F5F5]">
+    <motion.section
+      variants={container}
+      initial="hidden"
+      animate="show"
+    >
+      <div
+       className='mt-8 mx-auto text-center'>
+        <motion.h1 variants={fadeUp} className='lg:text-5xl text-3xl font-semibold'>Find your dream job now</motion.h1>
+        <motion.p variants={fadeUp} className='text-2xl mt-4 font-medium'>jobs for you to explore</motion.p>
+      </div>
+    <motion.div variants={fadeUp} className="flex mx-auto border-2 mt-12 items-center px-2 lg:gap-x-3 gap-x-2 lg:h-[74px] h-[55px] rounded-[37px] bg-[#F5F5F5]">
 
       {/* Search Input */}
 
-            <div className="relative flex min-w-0" ref={locationRef}>
+            <div onClick={(e) => e.stopPropagation()} className="relative w-[50%] flex border-r min-w-0" ref={categoryRef}>
               <input
                 type="text"
-                placeholder={"Enter Location"}
-                value={location}
-                onChange={handleLocationChange}
-                onFocus={handleLocationFocus}
-                className="lg:px-2 px-1 bg-[#F5F5F5] lg:w-36 w-24 text-[10px] lg:text-[16px] placeholder:lg:text-sm placeholder:text-[10px] border-r placeholder-gray-400 focus:outline-none"
-              />
-              
-              {/* Location Dropdown */}
-              {showLocationDropdown && (
-                <div className="absolute top-full left-0 border-none right-0 mt-1 w-[130px] lg:w-[200px] bg-white rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
-                  {filteredCities.length > 0 && (
-                    filteredCities.filter((city, index, arr) => arr.indexOf(city) === index).map((city, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleLocationSelect(city)}
-                        className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
-                      >
-                        <div className="flex items-center">
-                          <span className="text-gray-800">{city}</span>
-                        </div>
-                      </button>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-
-              <div onClick={(e) => e.stopPropagation()} className="relative flex border-r min-w-0" ref={categoryRef}>
-              <input
-                type="text"
-                placeholder="ex. Graphic Des"
+                placeholder="ex. Graphic Design / Web Development / Android Development"
                 onFocus={()=>setShowSearchSuggestions(true)}
                 value={category}
                 onChange={(e) => fetchSuggestions(e.target.value)}
-                className="lg:px-2 px-1 bg-[#F5F5F5] lg:w-40 w-full border-r text-[10px] lg:text-[16px] placeholder:lg:text-sm placeholder:text-[10px] placeholder-gray-400 focus:outline-none"
+                className="lg:px-2 px-1 bg-[#F5F5F5] w-full border-r text-[10px] lg:text-[16px] placeholder:lg:text-sm placeholder:text-[10px] placeholder-gray-400 focus:outline-none"
               />
 
               {showSearchSuggestions && (
-                <div className="absolute top-full w-[200px] left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 w-[150px] lg:w-[400px] mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
                   {suggestions.length > 0 ? (
                   suggestions.map((item, index) => (
                       <button
@@ -183,15 +188,48 @@ const SearchComponent = () => {
               )}
             </div>
 
+
+            <div className="relative w-[35%] flex min-w-0" ref={locationRef}>
+              <input
+                type="text"
+                placeholder={"Enter Location / City / State"}
+                value={location}
+                onChange={handleLocationChange}
+                onFocus={handleLocationFocus}
+                className="lg:px-2 px-1 bg-[#F5F5F5] w-full text-[10px] lg:text-[16px] placeholder:lg:text-sm placeholder:text-[10px] border-r placeholder-gray-400 focus:outline-none"
+              />
+              
+              {/* Location Dropdown */}
+              {showLocationDropdown && (
+                <div className="absolute top-full left-0 border-none right-0 mt-1 w-[130px] lg:w-[400px] bg-white rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                  {filteredCities.length > 0 && (
+                    filteredCities.filter((city, index, arr) => arr.indexOf(city) === index).map((city, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleLocationSelect(city)}
+                        className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                      >
+                        <div className="flex items-center">
+                          <span className="text-gray-800">{city}</span>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+
         {/* Find Your Job Button */}
       <button onClick={()=> location && category ? router.push(`/jobs/location/${location.replace(/\s+/g, '-')}?category=${category.replace(/\s+/g,'-').replace('&','@')}`) : location && router.push(`/jobs/location/${location}`)} className="flex items-center lg:gap-1 gap-1 bg-[#8A38EE] text-white lg:px-4 py-4 rounded-[46px] font-semibold shadow-lg shadow-purple-300">
         <span className="lg:text-[16px] text-[10px] lg:w-full w-24">Find Your Job</span>
-        <div className="hidden lg:w-[28px] lg:h-[24px] border-2 border-white rounded-full lg:flex justify-center items-center">
+        <div className="hidden lg:w-[30px] lg:h-[24px] border-2 border-white rounded-full lg:flex justify-center items-center">
           <Search className="w-4 h-4 font-bold" />
         </div>
       </button>
 
-    </div>
+    </motion.div>
+    </motion.section>
   )
 }
 

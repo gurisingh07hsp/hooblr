@@ -1,11 +1,10 @@
-const express = require('express');
-const { validationResult, query } = require('express-validator');
-const GovtJob = require('../models/GovtJobs');
-const { auth, authorize, optionalAuth } = require('../middleware/auth');
-const { title } = require('process');
+const express = require("express");
+const { validationResult, query } = require("express-validator");
+const GovtJob = require("../models/GovtJobs");
+const { auth, authorize, optionalAuth } = require("../middleware/auth");
+const { title } = require("process");
 
 const router = express.Router();
-
 
 router.get(
   "/",
@@ -38,17 +37,16 @@ router.get(
       const filter = {};
 
       if (category) filter.category = category;
-    //   if (state) filter.state = { $regex: location, $options: "i" };
+      //   if (state) filter.state = { $regex: location, $options: "i" };
       if (search) filter.title = { $regex: search, $options: "i" };
 
-      if(state && state !== 'All India'){
-        filter['state'] = state ? state : {};
+      if (state && state !== "All India") {
+        filter["state"] = state ? state : {};
       }
-
 
       // Salary filter
       if (salary) {
-        filter["salary"] = salary ? { $gte: salary} : {};
+        filter["salary"] = salary ? { $gte: salary } : {};
       }
 
       const sortObj = {};
@@ -79,28 +77,26 @@ router.get(
   }
 );
 
-
-router.get('/:title', async (req, res) => {
+router.get("/:title", async (req, res) => {
   try {
     const title = req.params.title;
-    const job = await GovtJob.findOne({title});
+    const job = await GovtJob.findOne({ title });
 
     if (!job) {
-      return res.status(404).json({ error: 'Job not found' });
+      return res.status(404).json({ error: "Job not found" });
     }
 
     res.json({ job });
   } catch (error) {
-    console.error('Get job error:', error);
-    res.status(500).json({ error: 'Server error' });
+    console.error("Get job error:", error);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-
-router.post('/', auth, authorize('admin'), async (req, res) => {
+router.post("/", auth, authorize("admin"), async (req, res) => {
   try {
     const jobData = {
-      ...req.body
+      ...req.body,
     };
 
     const job = new GovtJob(jobData);
@@ -109,17 +105,16 @@ router.post('/', auth, authorize('admin'), async (req, res) => {
     const populatedJob = await GovtJob.findById(job._id);
 
     res.status(200).json({
-      message: 'Job created successfully',
-      job: populatedJob
+      message: "Job created successfully",
+      job: populatedJob,
     });
   } catch (error) {
-    console.error('Create job error:', error);
-    res.status(500).json({ error: 'Server error' });
+    console.error("Create job error:", error);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-
-router.put('/:id', auth, authorize('admin'), async (req, res) => {
+router.put("/:id", auth, authorize("admin"), async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -129,9 +124,8 @@ router.put('/:id', auth, authorize('admin'), async (req, res) => {
     const job = await GovtJob.findById(req.params.id);
 
     if (!job) {
-      return res.status(404).json({ error: 'Job not found' });
+      return res.status(404).json({ error: "Job not found" });
     }
-
 
     const updatedJob = await GovtJob.findByIdAndUpdate(
       req.params.id,
@@ -140,32 +134,31 @@ router.put('/:id', auth, authorize('admin'), async (req, res) => {
     );
 
     res.json({
-      message: 'Job updated successfully',
-      job: updatedJob
+      message: "Job updated successfully",
+      job: updatedJob,
     });
   } catch (error) {
-    console.error('Update job error:', error);
-    res.status(500).json({ error: 'Server error' });
+    console.error("Update job error:", error);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-
-router.delete('/:id', auth, authorize('admin'), async (req, res) => {
+router.delete("/:id", auth, authorize("admin"), async (req, res) => {
   try {
     const job = await GovtJob.findById(req.params.id);
     if (!job) {
-      return res.status(404).json({ error: 'Job not found' });
+      return res.status(404).json({ error: "Job not found" });
     }
 
     // Check if user owns the job or is admin
 
     await GovtJob.findByIdAndDelete(req.params.id);
 
-    res.status(200).json({ message: 'Job deleted successfully' });
+    res.status(200).json({ message: "Job deleted successfully" });
   } catch (error) {
-    console.error('Delete job error:', error);
-    res.status(500).json({ error: 'Server error' });
+    console.error("Delete job error:", error);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-module.exports = router; 
+module.exports = router;

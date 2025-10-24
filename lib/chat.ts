@@ -5,13 +5,6 @@ import { db } from "./firebase";
 export async function sendMessage(sender: string, senderName: string, receiverId: string, receiverName: string, text: string) {
   if (!text.trim()) return;
 
-  // await addDoc(collection(db, "messages"), {
-  //   senderId: sender,
-  //   senderName,
-  //   receiverId,
-  //   text,
-  //   timestamp: serverTimestamp(),
-  // });
 
   const participants = [sender, receiverId].sort(); 
   // sort ensures consistent order: ["A","B"] not ["B","A"]
@@ -59,10 +52,6 @@ export async function sendMessage(sender: string, senderName: string, receiverId
 
 
 export function listenToMessages(receiverId: string, callback: any) {
-  // const q = query(
-  //   collection(db, "messages"),
-  //   where("receiverId", "==", receiverId),
-  // );
 
     const q = query(
     collection(db, "messages"),

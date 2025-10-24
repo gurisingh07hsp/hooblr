@@ -62,11 +62,11 @@ const HomeJobs = () => {
         {/* Header */}
         <h2 className="lg:text-[48px] text-3xl font-medium mb-14">
           <span className="text-purple-600">Latest</span>{" "}
-          <span className="text-gray-900">job opportunity</span>
+          <span className="text-gray-900">Job Opportunity</span>
         </h2>
 
         {/* Category Filters */}
-        <div className="flex flex-nowrap lg:flex-wrap w-full gap-2 lg:gap-3 mb-8 bg-[#F5F5F5] rounded-3xl px-2 py-2 overflow-x-auto overflow-y-hidden">
+        <div className="flex flex-nowrap lg:flex-wrap w-full gap-2 lg:gap-3 mb-8 bg-[#F5F5F5] rounded-3xl px-2 py-2 overflow-x-auto overflow-y-hidden scrollbar-hide">
           {[
             "Technology & IT",
             "Finance & Banking",

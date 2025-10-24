@@ -35,7 +35,6 @@ const uploadResume = async (req,res,next) => {
             fileId: response.data.files[0].fileId,
             fileName: oldFileName
           });
-          console.log('Old resume deleted');
         }
       } catch (deleteErr) {
         console.error('Error deleting old resume:', deleteErr);
