@@ -77,7 +77,7 @@ export default function Home() {
   const HomePage = () => (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative lg:pt-14 pt-10 pb-16 px-4 overflow-hidden">
+      <section className="relative lg:pt-14 pt-10 pb-8 px-4 overflow-hidden">
         <div className="max-w-7xl px-4 mx-auto flex flex-col items-center gap-y-8">
           <motion.div variants={container} initial="hidden" animate="show">
             <div className="lg:w-[800px] mt-6">
@@ -107,13 +107,13 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mt-10 overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="lg:w-[45%] lg:text-[46px] px-2 lg:px-0 text-3xl lg:leading-relaxed font-medium text-center mx-auto">
+      <section className="mt-2 overflow-hidden">
+        <motion.div variants={container} initial="hidden" animate="show" className="max-w-7xl mx-auto">
+          <motion.h2 variants={fadeUp} className="lg:w-[45%] lg:text-[46px] px-2 lg:px-0 text-3xl lg:leading-relaxed font-medium text-center mx-auto">
             Trusted <span className="text-[#8A38EE]">1000+</span> company find
             best jobseeker
-          </h2>
-        </div>
+          </motion.h2>
+        </motion.div>
         <div className="flex mt-20 animate-scroll-infinite overflow-hidden">
           {partnerlogos.concat(partnerlogos).map((logo, index) => (
             <div key={index} className="flex-shrink-0 w-40 mx-8">
@@ -163,8 +163,7 @@ export default function Home() {
           <div>
             <p className="text-[#8A38EE] font-medium text-[20px]">About us</p>
             <p className="lg:text-[48px] text-3xl lg:leading-tight font-medium lg:w-[90%]">
-              Join a growing network of inclusive companies and ambitious
-              professionals
+              Opportunities That Reflect Modern Workplace Values
             </p>
             <div className="flex gap-x-4 mt-10">
               <div className="w-40 h-28 bg-[#F5F5F5] rounded-2xl flex flex-col justify-center items-center">
@@ -193,10 +192,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="lg:w-[1150px]">
-            <p className="font-semibold text-[20px] text-center lg:text-left">
-              Opportunities That Reflect Modern Workplace Values
-            </p>
+          <div className="lg:w-[1000px]">
             <p className="mt-6 text-[20px] text-[#5F5270] text-center lg:text-left">
               At Hooblr, we simplify your job search by connecting you to the
               best career opportunities across industries. From leading private

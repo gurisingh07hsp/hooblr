@@ -241,7 +241,7 @@ const GovtJobsPortal = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8 h-[100vh]">
+      <div className="container mx-auto px-4 py-8 pb-20 min-h-[100vh]">
         <div className="max-w-7xl mx-auto">
           {/* Job Listings */}
           <main>
@@ -353,7 +353,7 @@ const GovtJobsPortal = () => {
                           href={job.applyLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-6 py-2 bg-[#6D47F1] text-white rounded-lg transition-colors font-medium"
+                          className="px-4 py-2 bg-[#6D47F1] text-white rounded-lg transition-colors"
                         >
                           Apply Now
                         </a>
@@ -363,7 +363,7 @@ const GovtJobsPortal = () => {
                               `/govtjobs/${job.title.replace(/\s+/g, "-")}`
                             )
                           }
-                          className="px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium"
+                          className="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
                         >
                           View Details
                         </button>

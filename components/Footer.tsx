@@ -89,19 +89,19 @@ const Footer = () => {
 
         {/* Contact Info */}
         <div className="mt-12 pt-8 border-t border-[#8A38EE]">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex items-center">
+          <div className="grid grid-cols-1 gap-6">
+            <div className="flex justify-center items-center">
               <Mail className="w-5 h-5 text-[#8A38EE] mr-3" />
-              <span className="text-[#8A38EE]">support@hooblr.com</span>
+              <button className="text-[#8A38EE]">support@hooblr.com</button>
             </div>
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               <Phone className="w-5 h-5 text-[#8A38EE] mr-3" />
               <span className="text-[#8A38EE]">1-800-HOOBLR</span>
             </div>
             <div className="flex items-center">
               <MapPin className="w-5 h-5 text-[#8A38EE] mr-3" />
               <span className="text-[#8A38EE]">Washington, DC</span>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -111,10 +111,9 @@ const Footer = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-6 text-sm text-purple-200">
-              <span>&copy; 2024 Hooblr. All rights reserved.</span>
+              <span>&copy; 2025 Hooblr. All rights reserved.</span>
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
             </div>
             <div className="flex items-center mt-4 md:mt-0">
               <span className="text-sm text-purple-200 mr-2">Made with</span>

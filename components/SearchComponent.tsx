@@ -146,12 +146,7 @@ const fadeUp = {
       initial="hidden"
       animate="show"
     >
-      <div
-       className='mt-8 mx-auto text-center'>
-        <motion.h1 variants={fadeUp} className='lg:text-5xl text-3xl font-semibold'>Find your dream job now</motion.h1>
-        <motion.p variants={fadeUp} className='text-2xl mt-4 font-medium'>jobs for you to explore</motion.p>
-      </div>
-    <motion.div variants={fadeUp} className="flex mx-auto border-2 mt-12 items-center px-2 lg:gap-x-3 gap-x-2 lg:h-[74px] h-[55px] rounded-[37px] bg-[#F5F5F5]">
+    <motion.div variants={fadeUp} className="flex mx-auto border-2 mt-4 items-center px-2 lg:gap-x-3 gap-x-2 lg:h-[74px] h-[55px] rounded-[37px] bg-[#F5F5F5]">
 
       {/* Search Input */}
 
