@@ -283,18 +283,9 @@ const Header = () => {
                       router.push("/login");
                       setIsMenuOpen(false);
                     }}
-                    className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors w-full text-left font-medium"
-                  >
-                    Login
-                  </button>
-                  <button
-                    onClick={() => {
-                      router.push("/login");
-                      setIsMenuOpen(false);
-                    }}
                     className="block px-3 py-2 bg-[#9333E9] text-white rounded-lg mx-3 my-2 text-center font-semibold"
                   >
-                    Sign Up
+                    Join Now
                   </button>
                 </>
               )}
