@@ -77,8 +77,8 @@ export default function Home() {
   const HomePage = () => (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative lg:pt-14 pt-10 pb-8 px-4 overflow-hidden">
-        <div className="max-w-7xl px-4 mx-auto flex flex-col items-center gap-y-8">
+      <section className="relative h-[520px] z-30 lg:pt-14 pt-10 pb-8 px-4 overflow-hidden">
+        <div className=" max-w-7xl px-4 mx-auto flex flex-col items-center gap-y-8">
           <motion.div variants={container} initial="hidden" animate="show">
             <div className="lg:w-[800px] mt-6">
               <motion.div
@@ -86,7 +86,7 @@ export default function Home() {
                 className="lg:text-[60px] text-3xl text-center font-semibold leading-tight"
               >
                 <span className="text-[#8A38EE]">Find Jobs</span> That Match
-                Your Ambition and Values
+                Your Ambition And Values
               </motion.div>
             </div>
             <motion.div
@@ -110,8 +110,8 @@ export default function Home() {
       <section className="mt-2 overflow-hidden">
         <motion.div variants={container} initial="hidden" animate="show" className="max-w-7xl mx-auto">
           <motion.h2 variants={fadeUp} className="lg:w-[45%] lg:text-[46px] px-2 lg:px-0 text-3xl lg:leading-relaxed font-medium text-center mx-auto">
-            Trusted <span className="text-[#8A38EE]">1000+</span> company find
-            best jobseeker
+            Trusted <span className="text-[#8A38EE]">1000+</span> Company Find
+            Best Jobseeker
           </motion.h2>
         </motion.div>
         <div className="flex mt-20 animate-scroll-infinite overflow-hidden">
@@ -170,7 +170,7 @@ export default function Home() {
                 <p className="lg:text-[40px] text-2xl font-medium">
                   10<span className="text-[#8A38EE]">K+</span>
                 </p>
-                <p className="text-[#5F5270] text-sm lg:text-[16px] mt-2">
+                <p className="text-[#5F5270] text-center text-sm lg:text-[16px] mt-2">
                   Availabe Jobs
                 </p>
               </div>
@@ -178,7 +178,7 @@ export default function Home() {
                 <p className="lg:text-[40px] text-2xl font-medium">
                   256<span className="text-[#8A38EE]">+</span>
                 </p>
-                <p className="text-[#5F5270] text-sm lg:text-[16px] mt-2">
+                <p className="text-[#5F5270] text-center text-sm lg:text-[16px] mt-2">
                   Hiring Partners
                 </p>
               </div>
@@ -313,9 +313,9 @@ export default function Home() {
                 <h2 className="lg:text-5xl text-3xl font-bold text-gray-900 mb-8 leading-tight">
                   Thousands
                   <br />
-                  of Verified Jobs,
+                  Of Verified Jobs,
                   <br />
-                  All in One Place.
+                  All In One Place.
                 </h2>
                 <button
                   onClick={() => router.push("/jobs")}

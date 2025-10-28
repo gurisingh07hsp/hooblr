@@ -145,15 +145,16 @@ const fadeUp = {
       variants={container}
       initial="hidden"
       animate="show"
+      className='lg:max-w-4xl mx-auto'
     >
     <motion.div variants={fadeUp} className="flex mx-auto border-2 mt-4 items-center px-2 lg:gap-x-3 gap-x-2 lg:h-[74px] h-[55px] rounded-[37px] bg-[#F5F5F5]">
 
       {/* Search Input */}
 
-            <div onClick={(e) => e.stopPropagation()} className="relative w-[50%] flex border-r min-w-0" ref={categoryRef}>
+            <div onClick={(e) => e.stopPropagation()} className="relative lg:w-[45%] w-[50%] flex border-r min-w-0" ref={categoryRef}>
               <input
                 type="text"
-                placeholder="ex. Graphic Design / Web Development / Android Development"
+                placeholder="ex. Graphic Design / Web Development"
                 onFocus={()=>setShowSearchSuggestions(true)}
                 value={category}
                 onChange={(e) => fetchSuggestions(e.target.value)}
@@ -161,7 +162,7 @@ const fadeUp = {
               />
 
               {showSearchSuggestions && (
-                <div className="absolute top-full left-0 right-0 w-[150px] lg:w-[400px] mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 w-[150px] lg:w-[300px] mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
                   {suggestions.length > 0 ? (
                   suggestions.map((item, index) => (
                       <button
@@ -184,7 +185,7 @@ const fadeUp = {
             </div>
 
 
-            <div className="relative w-[35%] flex min-w-0" ref={locationRef}>
+            <div className="relative lg:w-[35%] w-[40%] flex min-w-0" ref={locationRef}>
               <input
                 type="text"
                 placeholder={"Enter Location / City / State"}

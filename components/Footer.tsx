@@ -108,17 +108,12 @@ const Footer = () => {
 
       {/* Bottom Bar */}
       <div className="bg-purple-800 border-t border-[#8A38EE]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center">
+        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col md:flex-row justify-center items-center">
             <div className="flex items-center space-x-6 text-sm text-purple-200">
               <span>&copy; 2025 Hooblr. All rights reserved.</span>
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-            </div>
-            <div className="flex items-center mt-4 md:mt-0">
-              <span className="text-sm text-purple-200 mr-2">Made with</span>
-              <Heart className="w-4 h-4 text-red-400" />
-              <span className="text-sm text-purple-200 ml-2">for public service</span>
             </div>
           </div>
         </div>

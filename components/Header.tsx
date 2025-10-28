@@ -73,7 +73,14 @@ const Header = () => {
               } items-center cursor-pointer`}
               onClick={() => router.push("/")}
             >
-              <Image src="/hooblrlogo.png" width={120} height={50} alt="logo" />
+            <Image
+              src="/hooblrlogo.png"
+              alt="logo"
+              width={120}
+              height={50}
+              className="w-20 h-auto sm:w-28 md:w-32 lg:w-[120px]"
+            />
+
             </div>
 
             {/* Desktop Navigation */}
@@ -152,15 +159,9 @@ const Header = () => {
               <div className=" hidden lg:flex items-center space-x-4">
                 <button
                   onClick={() => router.push("/login")}
-                  className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
-                >
-                  Join now
-                </button>
-                <button
-                  onClick={() => router.push("/login")}
                   className="bg-[#9333E9] text-white px-6 py-2 rounded-xl font-semibold"
                 >
-                  Hire now
+                  Join Now
                 </button>
               </div>
             )}
