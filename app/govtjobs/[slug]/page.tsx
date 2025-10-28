@@ -39,9 +39,6 @@ export default async function GovtJobDetailsPage({ params }: { params: { slug: s
     title: job.title,
     description: job.eligibilityCriteria.replace(/<\/?[^>]+(>|$)/g, ""), // Remove HTML
     datePosted: job.createdAt,
-    ageLimit: job.ageLimit,
-    selectionProcess: job.selectionProcess,
-    state: job.state,
     hiringOrganization: {
       "@type": "Organization",
       name: job.category,
