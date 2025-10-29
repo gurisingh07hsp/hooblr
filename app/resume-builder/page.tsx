@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Footer from '@/components/Footer';
 import { 
@@ -18,6 +18,7 @@ import {
   Award,
   Linkedin,
   FileText,
+  PaintBucket,
   EyeOff
 } from 'lucide-react';
 import Image from 'next/image';
@@ -36,6 +37,15 @@ interface Experience {
   startDate: string;
   endDate: string;
   current: boolean;
+  description: string;
+}
+
+interface Project {
+  id: string;
+  name: string;
+  link: string;
+  startDate: string;
+  endDate: string;
   description: string;
 }
 
@@ -68,6 +78,7 @@ interface ResumeTemplate {
 
 export default function ResumeBuilderPage() {
   const router = useRouter();
+  const resumeRef = useRef<HTMLDivElement>(null);
   const [previewMode, setPreviewMode] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState('modern');
   const [selectedColor, setSelectedColor] = useState('purple');
@@ -93,6 +104,17 @@ export default function ResumeBuilderPage() {
       startDate: '',
       endDate: '',
       current: false,
+      description: ''
+    }
+  ]);
+  // Projects
+  const [projects, setProjects] = useState<Project[]>([
+    {
+      id: '1',
+      name: '',
+      link: '',
+      startDate: '',
+      endDate: '',
       description: ''
     }
   ]);
@@ -132,8 +154,23 @@ export default function ResumeBuilderPage() {
     }]);
   };
 
+  const addProject = () => {
+    setProjects([...projects, {
+      id: Date.now().toString(),
+      name: '',
+      link: '',
+      startDate: '',
+      endDate: '',
+      description: ''
+    }]);
+  };
+
   const removeExperience = (id: string) => {
     setExperiences(experiences.filter(exp => exp.id !== id));
+  };
+
+  const removeProject = (id: string) => {
+    setProjects(projects.filter(pro => pro.id !== id));
   };
 
 
@@ -143,6 +180,16 @@ export default function ResumeBuilderPage() {
   value: string | boolean
 ) => {
   setExperiences(experiences.map(exp =>
+    exp.id === id ? { ...exp, [field]: value } : exp
+  ));
+};
+
+  const updateProject = (
+  id: string,
+  field: keyof Project,
+  value: string | boolean
+) => {
+  setProjects(projects.map(exp =>
     exp.id === id ? { ...exp, [field]: value } : exp
   ));
 };
@@ -196,10 +243,427 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
   );
 };
 
+    const getColorStyles = () => {
+    const colorMap: Record<string, {primary: string, light: string, text: string}> = {
+      purple: { primary: '#9333ea', light: '#f3e8ff', text: '#581c87' },
+      blue: { primary: '#2563eb', light: '#dbeafe', text: '#1e3a8a' },
+      green: { primary: '#16a34a', light: '#dcfce7', text: '#14532d' },
+      teal: { primary: '#0d9488', light: '#ccfbf1', text: '#134e4a' },
+      red: {primary: 'red', light: 'red', text: 'red'},
+      orange: {primary: 'orange', light: 'orange', text: 'orange'},
+      indigo: {primary: 'indigo', light: 'indigo', text: 'indigo'},
+      pink: {primary: 'pink', light: 'pink', text: 'pink'},
+      black: {primary: 'black', light: 'black', text: 'black'},
+    };
+    return colorMap[selectedColor] || colorMap.purple;
+  };
 
-  const handleDownload = () => {
-    // In a real app, this would generate and download a PDF
-    alert('Resume download feature would be implemented here');
+  //  const handleDownloadPDF = async () => {
+  //   // setIsDownloading(true);
+  //   try {
+  //     const printContent = resumeRef.current?.innerHTML;
+  //     if (!printContent) return;
+
+  //     const printWindow = window.open('', '_blank');
+  //     if (!printWindow) return;
+
+  //     const colors = getColorStyles();
+
+  //     printWindow.document.write(`
+  //       <!DOCTYPE html>
+  //       <html>
+  //         <head>
+  //           <title>${personalInfo.firstName} ${personalInfo.lastName} - Resume</title>
+  //           <style>
+  //             @media print {
+  //               @page { 
+  //                 margin: 0.5in;
+  //                 size: letter;
+  //               }
+  //               body { margin: 0; padding: 0; }
+  //             }
+  //             * {
+  //               box-sizing: border-box;
+  //               margin: 0;
+  //               padding: 0;
+  //             }
+  //             body {
+  //               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  //               line-height: 1.6;
+  //               color: #1f2937;
+  //               background: white;
+  //             }
+  //             .resume-container { 
+  //               max-width: 8.5in; 
+  //               margin: 0 auto; 
+  //               padding: 0.75in;
+  //               background: white;
+  //             }
+  //             h1 { 
+  //               font-size: 32px; 
+  //               font-weight: 700;
+  //               margin-bottom: 8px;
+  //               color: #111827;
+  //             }
+  //             h2 { 
+  //               font-size: 20px; 
+  //               font-weight: 600;
+  //               margin-top: 24px; 
+  //               margin-bottom: 12px; 
+  //               padding-bottom: 6px;
+  //               color: ${colors.primary};
+  //               border-bottom: 2px solid ${colors.primary};
+  //             }
+  //             h3 { 
+  //               font-size: 16px; 
+  //               font-weight: 600;
+  //               margin-bottom: 4px;
+  //               color: #111827;
+  //             }
+  //             p { 
+  //               margin: 4px 0;
+  //               font-size: 14px;
+  //               color: #374151;
+  //             }
+  //             .text-center {
+  //               text-align: center;
+  //             }
+  //             .mb-6 {
+  //               margin-bottom: 24px;
+  //             }
+  //             .mb-4 {
+  //               margin-bottom: 16px;
+  //             }
+  //             .mb-3 {
+  //               margin-bottom: 12px;
+  //             }
+  //             .mb-2 {
+  //               margin-bottom: 8px;
+  //             }
+  //             .mb-1 {
+  //               margin-bottom: 4px;
+  //             }
+  //             .pb-4 {
+  //               padding-bottom: 16px;
+  //             }
+  //             .pb-2 {
+  //               padding-bottom: 8px;
+  //             }
+  //             .border-b-2 {
+  //               border-bottom: 2px solid #e5e7eb;
+  //             }
+  //             .flex {
+  //               display: flex;
+  //             }
+  //             .flex-wrap {
+  //               flex-wrap: wrap;
+  //             }
+  //             .justify-center {
+  //               justify-content: center;
+  //             }
+  //             .justify-between {
+  //               justify-content: space-between;
+  //             }
+  //             .items-center {
+  //               align-items: center;
+  //             }
+  //             .items-start {
+  //               align-items: flex-start;
+  //             }
+  //             .gap-4 {
+  //               gap: 16px;
+  //             }
+  //             .gap-2 {
+  //               gap: 8px;
+  //             }
+  //             .gap-1 {
+  //               gap: 4px;
+  //             }
+  //             .text-sm {
+  //               font-size: 14px;
+  //             }
+  //             .text-xs {
+  //               font-size: 12px;
+  //             }
+  //             .font-semibold {
+  //               font-weight: 600;
+  //             }
+  //             .font-medium {
+  //               font-weight: 500;
+  //             }
+  //             .font-bold {
+  //               font-weight: 700;
+  //             }
+  //             .text-gray-900 {
+  //               color: #111827;
+  //             }
+  //             .text-gray-700 {
+  //               color: #374151;
+  //             }
+  //             .text-gray-600 {
+  //               color: #4b5563;
+  //             }
+  //             .accent-color {
+  //               color: ${colors.primary};
+  //             }
+  //             .leading-relaxed {
+  //               line-height: 1.625;
+  //             }
+  //             .rounded-full {
+  //               border-radius: 9999px;
+  //             }
+  //             .skill-tag { 
+  //               display: inline-block; 
+  //               padding: 6px 14px; 
+  //               margin: 4px; 
+  //               background: ${colors.light}; 
+  //               color: ${colors.text};
+  //               border-radius: 9999px; 
+  //               font-size: 13px;
+  //               font-weight: 500;
+  //             }
+  //             svg {
+  //               display: inline-block;
+  //               width: 16px;
+  //               height: 16px;
+  //               margin-right: 4px;
+  //               vertical-align: middle;
+  //             }
+  //             .contact-item {
+  //               display: flex;
+  //               align-items: center;
+  //               gap: 4px;
+  //             }
+  //             a {
+  //               color: ${colors.primary};
+  //               text-decoration: none;
+  //             }
+  //             a:hover {
+  //               text-decoration: underline;
+  //             }
+  //           </style>
+  //         </head>
+  //         <body>
+  //           <div class="resume-container">
+  //             ${printContent}
+  //           </div>
+  //         </body>
+  //       </html>
+  //     `);
+
+  //     printWindow.document.close();
+  //     printWindow.focus();
+      
+  //     setTimeout(() => {
+  //       printWindow.print();
+  //       printWindow.close();
+  //       // setIsDownloading(false);
+  //     }, 500);
+  //   } catch (error) {
+  //     console.error('Error generating PDF:', error);
+  //     alert('Error generating PDF. Please try again.');
+  //     // setIsDownloading(false);
+  //   }
+  // };
+
+
+    const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  };
+
+    const handleDownloadDOCX = () => {
+    const colors = getColorStyles();
+    
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+        <head>
+          <meta charset="utf-8">
+          <title>${personalInfo.firstName} ${personalInfo.lastName} - Resume</title>
+          <style>
+            body {
+              font-family: Calibri, Arial, sans-serif;
+              line-height: 1.6;
+              color: #1f2937;
+              margin: 40px;
+            }
+            h1 { 
+              font-size: 32pt; 
+              font-weight: bold;
+              margin-bottom: 8pt;
+              color: #111827;
+              text-align: center;
+            }
+            h2 { 
+              font-size: 18pt; 
+              font-weight: bold;
+              margin-top: 20pt; 
+              margin-bottom: 10pt; 
+              padding-bottom: 6pt;
+              color: ${colors.primary};
+              border-bottom: 2pt solid ${colors.primary};
+            }
+            h3 { 
+              font-size: 14pt; 
+              font-weight: bold;
+              margin-bottom: 4pt;
+              color: #111827;
+            }
+            p { 
+              margin: 4pt 0;
+              font-size: 11pt;
+              color: #374151;
+            }
+            .contact-info {
+              text-align: center;
+              font-size: 10pt;
+              padding-bottom: 12pt;
+            }
+            .creative {
+              background-color: ${colors.primary};
+              border-radius: 20px;
+              padding-bottom: 4px;
+              color: white;
+            }
+            .creative-color {
+              color: white;
+            }
+            .section {
+              margin-bottom: 16pt;
+            }
+            .item {
+              margin-bottom: 12pt;
+            }
+            .item-header {
+              display: table;
+              width: 100%;
+              margin-bottom: 4pt;
+            }
+            .item-title {
+              display: table-cell;
+              font-weight: bold;
+              color: #111827;
+            }
+            .item-date {
+              display: table-cell;
+              text-align: right;
+              font-size: 10pt;
+              color: #4b5563;
+            }
+            .company, .institution {
+              color: ${colors.primary};
+              font-weight: 600;
+              margin-bottom: 6pt;
+            }
+            .description {
+              color: #374151;
+              line-height: 1.5;
+            }
+            .skill-tag {
+              display: inline-block;
+              padding: 4pt 10pt;
+              margin: 2pt;
+              background-color: ${colors.light};
+              color: ${colors.text};
+              border-radius: 12pt;
+              font-size: 10pt;
+              font-weight: 500;
+            }
+            .accent {
+              color: ${colors.primary};
+            }
+          </style>
+        </head>
+        <body>
+        <div class="${currentTemplate.id}">
+          <h1 class="${currentTemplate.id}-color">${personalInfo.firstName} ${personalInfo.lastName}</h1>
+          <div class="contact-info">
+            ${personalInfo.email ? `${personalInfo.email}` : ''}
+            ${personalInfo.email && personalInfo.phone ? ' | ' : ''}
+            ${personalInfo.phone ? `${personalInfo.phone}` : ''}
+            ${(personalInfo.email || personalInfo.phone) && personalInfo.location ? ' | ' : ''}
+            ${personalInfo.location ? `${personalInfo.location}` : ''}
+            ${personalInfo.linkedin ? `<br/>${personalInfo.linkedin}` : ''}
+            ${personalInfo.github ? ` | ${personalInfo.github}` : ''}
+          </div>
+          </div>
+          
+          ${sections.find(s => s.title === 'Summary')?.content ? `
+            <div class="section">
+              <h2>Professional Summary</h2>
+              <p class="description">${sections.find(s => s.title === 'Summary')?.content}</p>
+            </div>
+          ` : ''}
+          
+          ${experiences.some(e => e.company && e.position) ? `
+            <div class="section">
+              <h2>Work Experience</h2>
+              ${experiences.filter(e => e.company && e.position).map(exp => `
+                <div class="item">
+                  <div class="item-header">
+                    <span class="item-title">${exp.position}</span>
+                    <span class="item-date">${formatDate(exp.startDate)} - ${exp.current ? 'Present' : formatDate(exp.endDate)}</span>
+                  </div>
+                  <p class="company">${exp.company}</p>
+                  ${exp.description ? `<p class="description">${exp.description}</p>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+          
+          ${projects.some(p => p.name) ? `
+            <div class="section">
+              <h2>Projects</h2>
+              ${projects.filter(p => p.name).map(proj => `
+                <div class="item">
+                  <h3>${proj.name}</h3>
+                  ${proj.link ? `<p class="accent">${proj.link}</p>` : ''}
+                  ${proj.description ? `<p class="description">${proj.description}</p>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+          
+          ${education.some(e => e.institution && e.degree) ? `
+            <div class="section">
+              <h2>Education</h2>
+              ${education.filter(e => e.institution && e.degree).map(edu => `
+                <div class="item">
+                  <div class="item-header">
+                    <span class="item-title">${edu.degree} in ${edu.field}</span>
+                    <span class="item-date">${formatDate(edu.startDate)} - ${formatDate(edu.endDate)}</span>
+                  </div>
+                  <p class="institution">${edu.institution}</p>
+                  ${edu.gpa ? `<p>GPA: ${edu.gpa}</p>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+          
+          ${skills.some(s => s.name) ? `
+            <div class="section">
+              <h2>Skills</h2>
+              <div>
+                ${skills.filter(s => s.name).map(s => `<span class="skill-tag">${s.name} (${s.level})</span>`).join(' ')}
+              </div>
+            </div>
+          ` : ''}
+        </body>
+      </html>
+    `;
+
+    const blob = new Blob(['\ufeff', htmlContent], {
+      type: 'application/msword'
+    });
+    
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${personalInfo.firstName}_${personalInfo.lastName}_Resume.doc`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   // Resume Templates
@@ -274,9 +738,9 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
   const currentColor = colorOptions.find(c => c.id === selectedColor) || colorOptions[0];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white backdrop-blur-sm shadow-sm border-b border-purple-200 fixed w-full top-0 z-50">
+      <header className="bg-white backdrop-blur-sm fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div 
@@ -335,8 +799,9 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                 <span className="font-medium">{previewMode ? 'Edit Mode' : 'Preview'}</span>
               </button>
               <button
-                onClick={handleDownload}
-                className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold"
+                onClick={handleDownloadDOCX}
+                // onClick={handleDownloadPDF}
+                className="flex items-center space-x-2 bg-[#8A38EE] text-white px-4 py-2 rounded-lg transition-all duration-300 font-semibold"
               >
                 <Download className="w-4 h-4" />
                 <span>Download</span>
@@ -366,7 +831,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                   onClick={() => setSelectedTemplate(template.id)}
                   className={`cursor-pointer rounded-lg p-4 border-2 transition-all duration-300 ${
                     selectedTemplate === template.id
-                      ? 'border-purple-500 bg-purple-50'
+                      ? 'border-[#8A38EE] bg-zinc-100'
                       : 'border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-25'
                   }`}
                 >
@@ -377,7 +842,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                   }>
                     <div className="text-center">
                       <div className={`w-8 h-8 ${currentColor.primary} rounded-lg mx-auto mb-2 flex items-center justify-center`}>
-                        <Shield className="w-4 h-4 text-white" />
+                        <PaintBucket className="w-4 h-4 text-white" />
                       </div>
                       <div className="text-xs font-medium text-gray-600">{template.name}</div>
                     </div>
@@ -399,12 +864,12 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                   onClick={() => setSelectedColor(color.id)}
                   className={`cursor-pointer rounded-lg p-4 border-2 transition-all duration-300 text-center ${
                     selectedColor === color.id
-                      ? 'border-purple-500 bg-purple-50'
+                      ? 'border-[#8A38EE] bg-zinc-100'
                       : 'border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-25'
                   }`}
                 >
                   <div className={`w-12 h-12 ${color.primary} rounded-lg mx-auto mb-2 flex items-center justify-center`}>
-                    <Shield className="w-6 h-6 text-white" />
+                    <PaintBucket className="w-6 h-6 text-white" />
                   </div>
                   <h3 className="font-semibold text-gray-900 text-sm">{color.name}</h3>
                 </div>
@@ -415,13 +880,13 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Editor Panel */}
             {!previewMode && (
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-200 p-6">
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-[#8A38EE] p-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Resume Editor</h2>
                 
                 {/* Personal Information */}
                 <div className="mb-8">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <User className="w-5 h-5 mr-2 text-purple-600" />
+                    <User className="w-5 h-5 mr-2 text-[#8A38EE]" />
                     Personal Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -431,7 +896,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                         type="text"
                         value={personalInfo.firstName}
                         onChange={(e) => setPersonalInfo({...personalInfo, firstName: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                         placeholder="John"
                       />
                     </div>
@@ -441,7 +906,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                         type="text"
                         value={personalInfo.lastName}
                         onChange={(e) => setPersonalInfo({...personalInfo, lastName: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                         placeholder="Doe"
                       />
                     </div>
@@ -451,7 +916,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                         type="email"
                         value={personalInfo.email}
                         onChange={(e) => setPersonalInfo({...personalInfo, email: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                         placeholder="john.doe@email.com"
                       />
                     </div>
@@ -461,7 +926,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                         type="tel"
                         value={personalInfo.phone}
                         onChange={(e) => setPersonalInfo({...personalInfo, phone: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                         placeholder="(555) 123-4567"
                       />
                     </div>
@@ -471,7 +936,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                         type="text"
                         value={personalInfo.location}
                         onChange={(e) => setPersonalInfo({...personalInfo, location: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                         placeholder="Washington, DC"
                       />
                     </div>
@@ -481,7 +946,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                         type="url"
                         value={personalInfo.linkedin}
                         onChange={(e) => setPersonalInfo({...personalInfo, linkedin: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                         placeholder="linkedin.com/in/johndoe"
                       />
                     </div>
@@ -491,7 +956,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                         type="url"
                         value={personalInfo.website}
                         onChange={(e) => setPersonalInfo({...personalInfo, website: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                         placeholder="johndoe.com"
                       />
                     </div>
@@ -501,14 +966,14 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                 {/* Professional Summary */}
                 <div className="mb-8">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <FileText className="w-5 h-5 mr-2 text-purple-600" />
+                    <FileText className="w-5 h-5 mr-2 text-[#8A38EE]" />
                     Professional Summary
                   </h3>
                   <textarea
                     value={sections.find(s => s.title === 'Summary')?.content || ''}
                     onChange={(e) => updateSection(sections.find(s => s.title === 'Summary')?.id || '1', 'content', e.target.value)}
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                     placeholder="Write a compelling professional summary that highlights your key strengths and career objectives..."
                   />
                 </div>
@@ -517,12 +982,12 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                 <div className="mb-8">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                      <Briefcase className="w-5 h-5 mr-2 text-purple-600" />
+                      <Briefcase className="w-5 h-5 mr-2 text-[#8A38EE]" />
                       Work Experience
                     </h3>
                     <button
                       onClick={addExperience}
-                      className="flex items-center space-x-2 bg-purple-600 text-white px-3 py-1 rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                      className="flex items-center space-x-2 bg-[#8A38EE] text-white px-3 py-1 rounded-lg transition-colors text-sm"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Add Experience</span>
@@ -550,7 +1015,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                             type="text"
                             value={exp.company}
                             onChange={(e) => updateExperience(exp.id, 'company', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                             placeholder="Company Name"
                           />
                         </div>
@@ -570,7 +1035,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                             type="month"
                             value={exp.startDate}
                             onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                           />
                         </div>
                         <div>
@@ -579,7 +1044,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                             type="month"
                             value={exp.endDate}
                             onChange={(e) => updateExperience(exp.id, 'endDate', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                             disabled={exp.current}
                           />
                         </div>
@@ -589,7 +1054,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                               type="checkbox"
                               checked={exp.current}
                               onChange={(e) => updateExperience(exp.id, 'current', e.target.checked)}
-                              className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                              className="rounded border-gray-300 text-[#8A38EE] focus:ring-[#8A38EE]"
                             />
                             <span className="text-sm font-medium text-gray-700">Currently working here</span>
                           </label>
@@ -600,8 +1065,94 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                             value={exp.description}
                             onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
                             rows={3}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                             placeholder="Describe your responsibilities and achievements..."
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+
+                {/* Projects */}
+
+                <div className="mb-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                      <Briefcase className="w-5 h-5 mr-2 text-[#8A38EE]" />
+                      Projects
+                    </h3>
+                    <button
+                      onClick={addProject}
+                      className="flex items-center space-x-2 bg-[#8A38EE] text-white px-3 py-1 rounded-lg transition-colors text-sm"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Add Project</span>
+                    </button>
+                  </div>
+                  
+                  {projects.map((pro, index) => (
+                    <div key={pro.id} className="border border-gray-200 rounded-lg p-4 mb-4">
+                      <div className="flex justify-between items-start mb-4">
+                        <h4 className="font-medium text-gray-900">Project {index + 1}</h4>
+                        {projects.length > 1 && (
+                          <button
+                            onClick={() => removeProject(pro.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                          <input
+                            type="text"
+                            value={pro.name}
+                            onChange={(e) => updateProject(pro.id, 'name', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
+                            placeholder="Project Name"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Link</label>
+                          <input
+                            type="text"
+                            value={pro.link}
+                            onChange={(e) => updateProject(pro.id, 'link', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="https://project.com"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                          <input
+                            type="month"
+                            value={pro.startDate}
+                            onChange={(e) => updateProject(pro.id, 'startDate', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                          <input
+                            type="month"
+                            value={pro.endDate}
+                            onChange={(e) => updateProject(pro.id, 'endDate', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                          <textarea
+                            value={pro.description}
+                            onChange={(e) => updateProject(pro.id, 'description', e.target.value)}
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
+                            placeholder="Describe your project"
                           />
                         </div>
                       </div>
@@ -613,12 +1164,12 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                 <div className="mb-8">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                      <GraduationCap className="w-5 h-5 mr-2 text-purple-600" />
+                      <GraduationCap className="w-5 h-5 mr-2 text-[#8A38EE]" />
                       Education
                     </h3>
                     <button
                       onClick={addEducation}
-                      className="flex items-center space-x-2 bg-purple-600 text-white px-3 py-1 rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                      className="flex items-center space-x-2 bg-[#8A38EE] text-white px-3 py-1 rounded-lg transition-colors text-sm"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Add Education</span>
@@ -646,7 +1197,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                             type="text"
                             value={edu.institution}
                             onChange={(e) => updateEducation(edu.id, 'institution', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                             placeholder="University Name"
                           />
                         </div>
@@ -656,7 +1207,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                             type="text"
                             value={edu.degree}
                             onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                             placeholder="Bachelor's"
                           />
                         </div>
@@ -666,7 +1217,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                             type="text"
                             value={edu.field}
                             onChange={(e) => updateEducation(edu.id, 'field', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                             placeholder="Computer Science"
                           />
                         </div>
@@ -676,7 +1227,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                             type="text"
                             value={edu.gpa}
                             onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                             placeholder="3.8"
                           />
                         </div>
@@ -686,7 +1237,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                             type="month"
                             value={edu.startDate}
                             onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                           />
                         </div>
                         <div>
@@ -695,7 +1246,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                             type="month"
                             value={edu.endDate}
                             onChange={(e) => updateEducation(edu.id, 'endDate', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE] focus:border-transparent"
                           />
                         </div>
                       </div>
@@ -707,12 +1258,12 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                 <div className="mb-8">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                      <Award className="w-5 h-5 mr-2 text-purple-600" />
+                      <Award className="w-5 h-5 mr-2 text-[#8A38EE]" />
                       Skills
                     </h3>
                     <button
                       onClick={addSkill}
-                      className="flex items-center space-x-2 bg-purple-600 text-white px-3 py-1 rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                      className="flex items-center space-x-2 bg-[#8A38EE] text-white px-3 py-1 rounded-lg transition-colors text-sm"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Add Skill</span>
@@ -726,7 +1277,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                           type="text"
                           value={skill.name}
                           onChange={(e) => updateSkill(skill.id, 'name', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8A38EE]444 focus:border-transparent"
                           placeholder="Skill name"
                         />
                       </div>
@@ -756,16 +1307,16 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
             )}
 
             {/* Preview Panel */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-200 p-6">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-[#8A38EE] p-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Resume Preview</h2>
               
-              <div className={
+              <div ref={resumeRef} className={
                 currentTemplate.id === 'creative' 
                   ? `bg-white border border-${currentColor.id === 'black' ? 'gray' : currentColor.id}-200 rounded-xl p-8 shadow-lg`
                   : currentTemplate.className
               }>
                 {/* Header */}
-                                  <div className={
+                  <div className={
                     currentTemplate.id === 'creative'
                       ? `text-center mb-8 ${currentColor.primary} text-white p-6 rounded-lg -m-8 mb-6`
                       : currentTemplate.headerStyle
@@ -810,6 +1361,14 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                           <span>{personalInfo.linkedin}</span>
                         </div>
                       )}
+                      {personalInfo.website && (
+                        <div className="flex items-center">
+                          <Phone className={`w-4 h-4 mr-1 ${
+                            currentTemplate.id === 'creative' ? 'text-white' : currentColor.accent
+                          }`} />
+                          <span>{personalInfo.website}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -845,6 +1404,31 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                         } font-medium mb-2`}>{exp.company}</p>
                         {exp.description && (
                           <p className="text-gray-700 text-sm leading-relaxed">{exp.description}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {projects.some(pro => pro.name) && (
+                  <div className={currentTemplate.sectionStyle}>
+                    <h2 className={`text-xl font-semibold text-gray-900 mb-3 border-b border-gray-200 pb-2 ${
+                      currentTemplate.accentColor === 'dynamic' ? currentColor.accent : currentTemplate.accentColor
+                    }`}>Projects</h2>
+                    {projects.filter(pro => pro.name).map((pro) => (
+                      <div key={pro.id} className="mb-4">
+                        <div className="flex justify-between items-start">
+                          <h3 className={`${
+                          currentTemplate.accentColor === 'dynamic' ? currentColor.accent : currentTemplate.accentColor
+                        } font-semibold`}>{pro.name}</h3>
+                          <span className="text-sm text-gray-600">
+                            {pro.startDate && new Date(pro.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} - 
+                            {pro.endDate && new Date(pro.endDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                          </span>
+                        </div>
+                        <p className={`text-sm mb-2`}>{pro.link}</p>
+                        {pro.description && (
+                          <p className="text-gray-700 text-sm leading-relaxed">{pro.description}</p>
                         )}
                       </div>
                     ))}

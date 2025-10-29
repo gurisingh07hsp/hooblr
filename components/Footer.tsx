@@ -52,11 +52,10 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-6">For Job Seekers</h3>
             <ul className="space-y-3">
               <li><a href="/jobs" className="text-black hover:text-[#8A38EE] transition-colors">Browse Jobs</a></li>
-              <li><a href="/" className="text-black hover:text-[#8A38EE] transition-colors">Create Profile</a></li>
+              <li><a href="/login" className="text-black hover:text-[#8A38EE] transition-colors">Create Profile</a></li>
               <li><a href="/resources" className="text-black hover:text-[#8A38EE] transition-colors">Career Resources</a></li>
               <li><a href="/resume-builder" className="text-black hover:text-[#8A38EE] transition-colors">Resume Builder</a></li>
               <li><a href="/interview-tips" className="text-black hover:text-[#8A38EE] transition-colors">Interview Tips</a></li>
-              <li><a href="/resources" className="text-black hover:text-[#8A38EE] transition-colors">Salary Guide</a></li>
             </ul>
           </div>
 
@@ -64,7 +63,6 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-6">For Employers</h3>
             <ul className="space-y-3">
-              <li><a href="/" className="text-black hover:text-[#8A38EE] transition-colors">Post a Job</a></li>
               <li><a href="/companies" className="text-black hover:text-[#8A38EE] transition-colors">Browse Candidates</a></li>
               <li><a href="/admin" className="text-black hover:text-[#8A38EE] transition-colors">Recruitment Tools</a></li>
               <li><a href="/" className="text-black hover:text-[#8A38EE] transition-colors">Pricing Plans</a></li>
@@ -80,7 +78,6 @@ const Footer = () => {
               <li><a href="/about" className="text-black hover:text-[#8A38EE] transition-colors">About Us</a></li>
               <li><a href="/mission" className="text-black hover:text-[#8A38EE] transition-colors">Our Mission</a></li>
               <li><a href="/careers" className="text-black hover:text-[#8A38EE] transition-colors">Careers</a></li>
-              <li><a href="/press" className="text-black hover:text-[#8A38EE] transition-colors">Press & Media</a></li>
               <li><a href="/blog" className="text-black hover:text-[#8A38EE] transition-colors">Blog</a></li>
               <li><a href="/contact" className="text-black hover:text-[#8A38EE] transition-colors">Contact</a></li>
             </ul>
