@@ -115,6 +115,12 @@ const Header = () => {
               >
                 Blog
               </button>
+              <button
+                onClick={() => router.push("/resume-builder")}
+                className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
+              >
+                Resume Builder
+              </button>
 
               {isLoggedIn && (
                 <div className="flex items-center space-x-4">
@@ -232,6 +238,15 @@ const Header = () => {
                 className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors w-full text-left font-medium"
               >
                 Blog
+              </button>
+              <button
+                onClick={() => {
+                  router.push("/resume-builder");
+                  setIsMenuOpen(false);
+                }}
+                className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors w-full text-left font-medium"
+              >
+                Resume Builder
               </button>
 
               {isLoggedIn ? (

@@ -1,16 +1,12 @@
 'use client'
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Footer from '@/components/Footer';
 import { 
-  Shield, 
-  Menu, 
-  X,
   Mail,
-  Phone,
-  MapPin,
-  Clock,
+  // Phone,
+  // MapPin,
+  // Clock,
   Send,
   MessageSquare,
   HelpCircle,
@@ -18,8 +14,6 @@ import {
 } from 'lucide-react';
 
 export default function ContactPage() {
-  const router = useRouter();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -44,117 +38,6 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
-      {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm shadow-sm border-b border-purple-200 fixed w-full top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div 
-              className="flex items-center cursor-pointer"
-              onClick={() => router.push('/')}
-            >
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg mr-3">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-gray-900">Hooblr</span>
-            </div>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <button
-                onClick={() => router.push('/jobs')}
-                className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
-              >
-                Find Jobs
-              </button>
-              <button
-                onClick={() => router.push('/companies')}
-                className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
-              >
-                Companies
-              </button>
-              <button
-                onClick={() => router.push('/resources')}
-                className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
-              >
-                Resources
-              </button>
-              <button
-                onClick={() => router.push('/blog')}
-                className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
-              >
-                Blog
-              </button>
-              <button
-                onClick={() => router.push('/resume-builder')}
-                className="text-purple-600 font-medium"
-              >
-                Resume Builder
-              </button>
-            </div>
-
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-700 hover:text-purple-600 transition-colors"
-              >
-                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-purple-200">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              <button
-                onClick={() => {
-                  router.push('/jobs');
-                  setIsMenuOpen(false);
-                }}
-                className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors w-full text-left font-medium"
-              >
-                Find Jobs
-              </button>
-              <button
-                onClick={() => {
-                  router.push('/companies');
-                  setIsMenuOpen(false);
-                }}
-                className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors w-full text-left font-medium"
-              >
-                Companies
-              </button>
-              <button
-                onClick={() => {
-                  router.push('/resources');
-                  setIsMenuOpen(false);
-                }}
-                className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors w-full text-left font-medium"
-              >
-                Resources
-              </button>
-              <button
-                onClick={() => {
-                  router.push('/blog');
-                  setIsMenuOpen(false);
-                }}
-                className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors w-full text-left font-medium"
-              >
-                Blog
-              </button>
-              <button
-                onClick={() => {
-                  router.push('/resume-builder');
-                  setIsMenuOpen(false);
-                }}
-                className="block px-3 py-2 text-purple-600 font-medium w-full text-left"
-              >
-                Resume Builder
-              </button>
-            </div>
-          </div>
-        )}
-      </header>
 
       {/* Main Content */}
       <div className="pt-20 pb-8">
@@ -270,7 +153,7 @@ export default function ContactPage() {
                       <p className="text-gray-600">support@hooblr.com</p>
                     </div>
                   </div>
-                  <div className="flex items-center">
+                  {/* <div className="flex items-center">
                     <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
                       <Phone className="w-6 h-6 text-purple-600" />
                     </div>
@@ -278,8 +161,8 @@ export default function ContactPage() {
                       <p className="font-medium text-gray-900">Phone</p>
                       <p className="text-gray-600">+1 (555) 123-4567</p>
                     </div>
-                  </div>
-                  <div className="flex items-center">
+                  </div> */}
+                  {/* <div className="flex items-center">
                     <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
                       <MapPin className="w-6 h-6 text-purple-600" />
                     </div>
@@ -287,8 +170,8 @@ export default function ContactPage() {
                       <p className="font-medium text-gray-900">Address</p>
                       <p className="text-gray-600">123 Innovation Drive<br />San Francisco, CA 94105</p>
                     </div>
-                  </div>
-                  <div className="flex items-center">
+                  </div> */}
+                  {/* <div className="flex items-center">
                     <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
                       <Clock className="w-6 h-6 text-purple-600" />
                     </div>
@@ -296,7 +179,7 @@ export default function ContactPage() {
                       <p className="font-medium text-gray-900">Business Hours</p>
                       <p className="text-gray-600">Monday - Friday: 9AM - 6PM PST</p>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -336,10 +219,10 @@ export default function ContactPage() {
                     <p className="font-medium text-gray-900">General Support</p>
                     <p className="text-sm text-gray-600">support@hooblr.com</p>
                   </div>
-                  <div className="border-l-4 border-purple-600 pl-4">
+                  {/* <div className="border-l-4 border-purple-600 pl-4">
                     <p className="font-medium text-gray-900">Press & Media</p>
                     <p className="text-sm text-gray-600">press@hooblr.com</p>
-                  </div>
+                  </div> */}
                   <div className="border-l-4 border-purple-600 pl-4">
                     <p className="font-medium text-gray-900">Partnerships</p>
                     <p className="text-sm text-gray-600">partnerships@hooblr.com</p>

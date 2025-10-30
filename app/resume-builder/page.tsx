@@ -82,6 +82,7 @@ export default function ResumeBuilderPage() {
   const [previewMode, setPreviewMode] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState('modern');
   const [selectedColor, setSelectedColor] = useState('purple');
+  const [showDownload, setShowDownload] = useState(false);
   
   // Personal Information
   const [personalInfo, setPersonalInfo] = useState({
@@ -258,213 +259,206 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
     return colorMap[selectedColor] || colorMap.purple;
   };
 
-  //  const handleDownloadPDF = async () => {
-  //   // setIsDownloading(true);
-  //   try {
-  //     const printContent = resumeRef.current?.innerHTML;
-  //     if (!printContent) return;
+   const handleDownloadPDF = async () => {
+    try {
+      const printContent = resumeRef.current?.innerHTML;
+      if (!printContent) return;
 
-  //     const printWindow = window.open('', '_blank');
-  //     if (!printWindow) return;
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) return;
 
-  //     const colors = getColorStyles();
+      const colors = getColorStyles();
 
-  //     printWindow.document.write(`
-  //       <!DOCTYPE html>
-  //       <html>
-  //         <head>
-  //           <title>${personalInfo.firstName} ${personalInfo.lastName} - Resume</title>
-  //           <style>
-  //             @media print {
-  //               @page { 
-  //                 margin: 0.5in;
-  //                 size: letter;
-  //               }
-  //               body { margin: 0; padding: 0; }
-  //             }
-  //             * {
-  //               box-sizing: border-box;
-  //               margin: 0;
-  //               padding: 0;
-  //             }
-  //             body {
-  //               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  //               line-height: 1.6;
-  //               color: #1f2937;
-  //               background: white;
-  //             }
-  //             .resume-container { 
-  //               max-width: 8.5in; 
-  //               margin: 0 auto; 
-  //               padding: 0.75in;
-  //               background: white;
-  //             }
-  //             h1 { 
-  //               font-size: 32px; 
-  //               font-weight: 700;
-  //               margin-bottom: 8px;
-  //               color: #111827;
-  //             }
-  //             h2 { 
-  //               font-size: 20px; 
-  //               font-weight: 600;
-  //               margin-top: 24px; 
-  //               margin-bottom: 12px; 
-  //               padding-bottom: 6px;
-  //               color: ${colors.primary};
-  //               border-bottom: 2px solid ${colors.primary};
-  //             }
-  //             h3 { 
-  //               font-size: 16px; 
-  //               font-weight: 600;
-  //               margin-bottom: 4px;
-  //               color: #111827;
-  //             }
-  //             p { 
-  //               margin: 4px 0;
-  //               font-size: 14px;
-  //               color: #374151;
-  //             }
-  //             .text-center {
-  //               text-align: center;
-  //             }
-  //             .mb-6 {
-  //               margin-bottom: 24px;
-  //             }
-  //             .mb-4 {
-  //               margin-bottom: 16px;
-  //             }
-  //             .mb-3 {
-  //               margin-bottom: 12px;
-  //             }
-  //             .mb-2 {
-  //               margin-bottom: 8px;
-  //             }
-  //             .mb-1 {
-  //               margin-bottom: 4px;
-  //             }
-  //             .pb-4 {
-  //               padding-bottom: 16px;
-  //             }
-  //             .pb-2 {
-  //               padding-bottom: 8px;
-  //             }
-  //             .border-b-2 {
-  //               border-bottom: 2px solid #e5e7eb;
-  //             }
-  //             .flex {
-  //               display: flex;
-  //             }
-  //             .flex-wrap {
-  //               flex-wrap: wrap;
-  //             }
-  //             .justify-center {
-  //               justify-content: center;
-  //             }
-  //             .justify-between {
-  //               justify-content: space-between;
-  //             }
-  //             .items-center {
-  //               align-items: center;
-  //             }
-  //             .items-start {
-  //               align-items: flex-start;
-  //             }
-  //             .gap-4 {
-  //               gap: 16px;
-  //             }
-  //             .gap-2 {
-  //               gap: 8px;
-  //             }
-  //             .gap-1 {
-  //               gap: 4px;
-  //             }
-  //             .text-sm {
-  //               font-size: 14px;
-  //             }
-  //             .text-xs {
-  //               font-size: 12px;
-  //             }
-  //             .font-semibold {
-  //               font-weight: 600;
-  //             }
-  //             .font-medium {
-  //               font-weight: 500;
-  //             }
-  //             .font-bold {
-  //               font-weight: 700;
-  //             }
-  //             .text-gray-900 {
-  //               color: #111827;
-  //             }
-  //             .text-gray-700 {
-  //               color: #374151;
-  //             }
-  //             .text-gray-600 {
-  //               color: #4b5563;
-  //             }
-  //             .accent-color {
-  //               color: ${colors.primary};
-  //             }
-  //             .leading-relaxed {
-  //               line-height: 1.625;
-  //             }
-  //             .rounded-full {
-  //               border-radius: 9999px;
-  //             }
-  //             .skill-tag { 
-  //               display: inline-block; 
-  //               padding: 6px 14px; 
-  //               margin: 4px; 
-  //               background: ${colors.light}; 
-  //               color: ${colors.text};
-  //               border-radius: 9999px; 
-  //               font-size: 13px;
-  //               font-weight: 500;
-  //             }
-  //             svg {
-  //               display: inline-block;
-  //               width: 16px;
-  //               height: 16px;
-  //               margin-right: 4px;
-  //               vertical-align: middle;
-  //             }
-  //             .contact-item {
-  //               display: flex;
-  //               align-items: center;
-  //               gap: 4px;
-  //             }
-  //             a {
-  //               color: ${colors.primary};
-  //               text-decoration: none;
-  //             }
-  //             a:hover {
-  //               text-decoration: underline;
-  //             }
-  //           </style>
-  //         </head>
-  //         <body>
-  //           <div class="resume-container">
-  //             ${printContent}
-  //           </div>
-  //         </body>
-  //       </html>
-  //     `);
+      printWindow.document.write(`
+        <!DOCTYPE html>
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+        <head>
+          <meta charset="utf-8">
+          <title>${personalInfo.firstName} ${personalInfo.lastName} - Resume</title>
+          <style>
+            body {
+              font-family: Calibri, Arial, sans-serif;
+              line-height: 1.6;
+              color: #1f2937;
+              margin: 40px;
+            }
+            h1 { 
+              font-size: 32pt; 
+              font-weight: bold;
+              margin-bottom: 8pt;
+              color: #111827;
+              text-align: center;
+            }
+            h2 { 
+              font-size: 18pt; 
+              font-weight: bold;
+              margin-top: 20pt; 
+              margin-bottom: 10pt; 
+              padding-bottom: 6pt;
+              color: ${colors.primary};
+              border-bottom: 2pt solid ${colors.primary};
+            }
+            h3 { 
+              font-size: 14pt; 
+              font-weight: bold;
+              margin-bottom: 4pt;
+              color: #111827;
+            }
+            p { 
+              margin: 4pt 0;
+              font-size: 11pt;
+              color: #374151;
+            }
+            .contact-info {
+              text-align: center;
+              font-size: 10pt;
+              padding-bottom: 12pt;
+            }
+            .creative {
+              background-color: ${colors.primary};
+              border-radius: 20px;
+              padding-bottom: 4px;
+              color: white;
+            }
+            .creative-color {
+              color: white;
+            }
+            .section {
+              margin-bottom: 16pt;
+            }
+            .item {
+              margin-bottom: 12pt;
+            }
+            .item-header {
+              display: table;
+              width: 100%;
+              margin-bottom: 4pt;
+            }
+            .item-title {
+              display: table-cell;
+              font-weight: bold;
+              color: #111827;
+            }
+            .item-date {
+              display: table-cell;
+              text-align: right;
+              font-size: 10pt;
+              color: #4b5563;
+            }
+            .company, .institution {
+              color: ${colors.primary};
+              font-weight: 600;
+              margin-bottom: 6pt;
+            }
+            .description {
+              color: #374151;
+              line-height: 1.5;
+            }
+            .skill-tag {
+              display: inline-block;
+              padding: 4pt 10pt;
+              margin: 2pt;
+              background-color: ${colors.light};
+              color: ${colors.text};
+              border-radius: 12pt;
+              font-size: 10pt;
+              font-weight: 500;
+            }
+            .accent {
+              color: ${colors.primary};
+            }
+          </style>
+        </head>
+        <body>
+        <div class="${currentTemplate.id}">
+          <h1 class="${currentTemplate.id}-color">${personalInfo.firstName} ${personalInfo.lastName}</h1>
+          <div class="contact-info">
+            ${personalInfo.email ? `${personalInfo.email}` : ''}
+            ${personalInfo.email && personalInfo.phone ? ' | ' : ''}
+            ${personalInfo.phone ? `${personalInfo.phone}` : ''}
+            ${(personalInfo.email || personalInfo.phone) && personalInfo.location ? ' | ' : ''}
+            ${personalInfo.location ? `${personalInfo.location}` : ''}
+            ${personalInfo.linkedin ? `<br/>${personalInfo.linkedin}` : ''}
+            ${personalInfo.github ? ` | ${personalInfo.github}` : ''}
+          </div>
+          </div>
+          
+          ${sections.find(s => s.title === 'Summary')?.content ? `
+            <div class="section">
+              <h2>Professional Summary</h2>
+              <p class="description">${sections.find(s => s.title === 'Summary')?.content}</p>
+            </div>
+          ` : ''}
+          
+          ${experiences.some(e => e.company && e.position) ? `
+            <div class="section">
+              <h2>Work Experience</h2>
+              ${experiences.filter(e => e.company && e.position).map(exp => `
+                <div class="item">
+                  <div class="item-header">
+                    <span class="item-title">${exp.position}</span>
+                    <span class="item-date">${formatDate(exp.startDate)} - ${exp.current ? 'Present' : formatDate(exp.endDate)}</span>
+                  </div>
+                  <p class="company">${exp.company}</p>
+                  ${exp.description ? `<p class="description">${exp.description}</p>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+          
+          ${projects.some(p => p.name) ? `
+            <div class="section">
+              <h2>Projects</h2>
+              ${projects.filter(p => p.name).map(proj => `
+                <div class="item">
+                  <h3>${proj.name}</h3>
+                  ${proj.link ? `<p class="accent">${proj.link}</p>` : ''}
+                  ${proj.description ? `<p class="description">${proj.description}</p>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+          
+          ${education.some(e => e.institution && e.degree) ? `
+            <div class="section">
+              <h2>Education</h2>
+              ${education.filter(e => e.institution && e.degree).map(edu => `
+                <div class="item">
+                  <div class="item-header">
+                    <span class="item-title">${edu.degree} in ${edu.field}</span>
+                    <span class="item-date">${formatDate(edu.startDate)} - ${formatDate(edu.endDate)}</span>
+                  </div>
+                  <p class="institution">${edu.institution}</p>
+                  ${edu.gpa ? `<p>GPA: ${edu.gpa}</p>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+          
+          ${skills.some(s => s.name) ? `
+            <div class="section">
+              <h2>Skills</h2>
+              <div>
+                ${skills.filter(s => s.name).map(s => `<span class="skill-tag">${s.name} (${s.level})</span>`).join(' ')}
+              </div>
+            </div>
+          ` : ''}
+        </body>
+      </html>
+    `);
 
-  //     printWindow.document.close();
-  //     printWindow.focus();
+      printWindow.document.close();
+      printWindow.focus();
       
-  //     setTimeout(() => {
-  //       printWindow.print();
-  //       printWindow.close();
-  //       // setIsDownloading(false);
-  //     }, 500);
-  //   } catch (error) {
-  //     console.error('Error generating PDF:', error);
-  //     alert('Error generating PDF. Please try again.');
-  //     // setIsDownloading(false);
-  //   }
-  // };
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 500);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF. Please try again.');
+    }
+  };
 
 
     const formatDate = (dateString: string) => {
@@ -747,12 +741,18 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
               className={`flex items-center cursor-pointer`}
               onClick={() => router.push('/')}
             >
-            <Image src='/hooblrlogo.png' width={120} height={50} alt='logo'/>
+             <Image
+              src="/hooblrlogo.png"
+              alt="logo"
+              width={120}
+              height={50}
+              className="w-20 h-auto sm:w-28 md:w-32 lg:w-[120px]"
+            />
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex relative items-center space-x-4">
               {/* Template Selector */}
-              <div className="relative">
+              <div className="relative hidden lg:block">
                 <select
                   value={selectedTemplate}
                   onChange={(e) => setSelectedTemplate(e.target.value)}
@@ -772,7 +772,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
               </div>
 
               {/* Color Selector */}
-              <div className="relative">
+              <div className="relative hidden lg:block">
                 <select
                   value={selectedColor}
                   onChange={(e) => setSelectedColor(e.target.value)}
@@ -793,25 +793,36 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
               
               <button
                 onClick={() => setPreviewMode(!previewMode)}
-                className="flex items-center space-x-2 text-gray-600 hover:text-purple-600 transition-colors p-2 rounded-lg hover:bg-purple-50"
+                className="lg:flex items-center space-x-2 hidden text-gray-600 hover:text-purple-600 transition-colors p-2 rounded-lg hover:bg-purple-50"
               >
                 {previewMode ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 <span className="font-medium">{previewMode ? 'Edit Mode' : 'Preview'}</span>
               </button>
               <button
-                onClick={handleDownloadDOCX}
-                // onClick={handleDownloadPDF}
+                onClick={()=> setShowDownload(true)}
                 className="flex items-center space-x-2 bg-[#8A38EE] text-white px-4 py-2 rounded-lg transition-all duration-300 font-semibold"
               >
                 <Download className="w-4 h-4" />
                 <span>Download</span>
               </button>
+              {showDownload && (
+                <div className='w-60 h-28 flex flex-col gap-1 p-1 border rounded-lg bg-white absolute right-0 top-12'>
+                  <button onClick={()=> {handleDownloadPDF(),setShowDownload(false)}} className='h-[50%] p-1 flex border rounded-lg bg-white hover:bg-zinc-300'>
+                    <p className='bg-red-600 flex justify-center items-center px-[6px] rounded-lg text-white'>PDF</p>
+                    <p className='flex justify-center items-center ms-3'>Download in PDF</p>
+                  </button>
+                  <button onClick={()=> {handleDownloadDOCX(),setShowDownload(false)}} className='h-[50%] p-1 flex border rounded-lg bg-white hover:bg-zinc-300'>
+                    <p className='bg-blue-600 flex justify-center items-center px-1 rounded-lg text-white'>DOC</p>
+                    <p className='flex justify-center items-center ms-3'>Download in DOC</p>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </header>
 
-      <div className="pt-20 pb-8">
+      <div onClick={()=> setShowDownload(false)} className="pt-20 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Page Header */}
           <div className="text-center mb-8">
