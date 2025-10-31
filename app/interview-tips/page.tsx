@@ -187,7 +187,7 @@ export default function InterviewTipsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Hero Section */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Interview Tips & Strategies</h1>
+            <h1 className="lg:text-4xl text-3xl font-bold text-gray-900 mb-4">Interview Tips & Strategies</h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Master the art of interviewing with our comprehensive collection of tips, techniques, and strategies to help you succeed in any interview situation.
             </p>

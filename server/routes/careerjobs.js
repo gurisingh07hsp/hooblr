@@ -1,6 +1,6 @@
 const express = require("express");
 const { validationResult, query } = require("express-validator");
-const GovtJob = require("../models/GovtJobs");
+const CareerJob = require("../models/CareerJobs");
 const { auth, authorize} = require("../middleware/auth");
 
 const router = express.Router();
@@ -39,26 +39,17 @@ router.get(
       //   if (state) filter.state = { $regex: location, $options: "i" };
       if (search) filter.title = { $regex: search, $options: "i" };
 
-      if (state && state !== "All India") {
-        filter["state"] = state ? state : {};
-      }
-
-      // Salary filter
-      if (salary) {
-        filter["salary"] = salary ? { $gte: salary } : {};
-      }
-
       const sortObj = {};
       sortObj[sort] = order === "desc" ? -1 : 1;
 
       const skip = (page - 1) * limit;
 
-      const jobs = await GovtJob.find(filter)
+      const jobs = await CareerJob.find(filter)
         .sort(sortObj)
         .skip(skip)
         .limit(parseInt(limit));
 
-      const total = await GovtJob.countDocuments(filter);
+      const total = await CareerJob.countDocuments(filter);
 
       res.json({
         jobs,
@@ -76,21 +67,27 @@ router.get(
   }
 );
 
-router.get("/:title", async (req, res) => {
-  try {
-    const title = req.params.title;
-    const job = await GovtJob.findOne({ title });
-
-    if (!job) {
-      return res.status(404).json({ error: "Job not found" });
+router.put('/apply/:id', async(req, res, next) => {
+    try{
+        const job = await CareerJob.findByIdAndUpdate(
+            req.params.id,
+            { $push: { enteries: req.body } },
+            { new: true, runValidators: true }
+        );
+        if(!job){
+            return res.status(400).json({
+                success: false,
+                message: 'Job not found'
+            })
+        }
+        return res.status(200).json({
+            success: true,
+            message: 'Application submitted successfully'
+        })
+    }catch(error){
+        next(error);
     }
-
-    res.json({ job });
-  } catch (error) {
-    console.error("Get job error:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+})
 
 router.post("/", auth, authorize("admin"), async (req, res) => {
   try {
@@ -98,10 +95,10 @@ router.post("/", auth, authorize("admin"), async (req, res) => {
       ...req.body,
     };
 
-    const job = new GovtJob(jobData);
+    const job = new CareerJob(jobData);
     await job.save();
 
-    const populatedJob = await GovtJob.findById(job._id);
+    const populatedJob = await CareerJob.findById(job._id);
 
     res.status(200).json({
       message: "Job created successfully",
@@ -120,13 +117,13 @@ router.put("/:id", auth, authorize("admin"), async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const job = await GovtJob.findById(req.params.id);
+    const job = await CareerJob.findById(req.params.id);
 
     if (!job) {
       return res.status(404).json({ error: "Job not found" });
     }
 
-    const updatedJob = await GovtJob.findByIdAndUpdate(
+    const updatedJob = await CareerJob.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true, runValidators: true }
@@ -144,14 +141,14 @@ router.put("/:id", auth, authorize("admin"), async (req, res) => {
 
 router.delete("/:id", auth, authorize("admin"), async (req, res) => {
   try {
-    const job = await GovtJob.findById(req.params.id);
+    const job = await CareerJob.findById(req.params.id);
     if (!job) {
       return res.status(404).json({ error: "Job not found" });
     }
 
     // Check if user owns the job or is admin
 
-    await GovtJob.findByIdAndDelete(req.params.id);
+    await CareerJob.findByIdAndDelete(req.params.id);
 
     res.status(200).json({ message: "Job deleted successfully" });
   } catch (error) {

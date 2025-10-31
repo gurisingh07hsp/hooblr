@@ -800,7 +800,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
               </button>
               <button
                 onClick={()=> setShowDownload(true)}
-                className="flex items-center space-x-2 bg-[#8A38EE] text-white px-4 py-2 rounded-lg transition-all duration-300 font-semibold"
+                className="flex items-center space-x-2 bg-[#8A38EE] text-white lg:px-4 px-2 py-2 rounded-lg transition-all duration-300 font-semibold"
               >
                 <Download className="w-4 h-4" />
                 <span>Download</span>
@@ -826,7 +826,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Page Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Resume Builder</h1>
+            <h1 className="lg:text-4xl text-3xl font-bold text-gray-900 mb-4">Resume Builder</h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Create a professional resume that stands out to employers. Our builder helps you craft the perfect resume for government and private sector jobs.
             </p>

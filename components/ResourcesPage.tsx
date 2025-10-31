@@ -133,12 +133,12 @@ export default function ResourcesPage() {
               <span>Free Career Resources</span>
             </div>
             <h1 className="text-3xl flex justify-center items-center md:text-4xl font-bold text-black mb-4">
-              <span className='text-4xl text-[#8A38EE]'>Accelerate</span> Your Career
+              <span className='lg:text-4xl text-3xl text-[#8A38EE]'>Accelerate</span> Your Career
             </h1>
             <p className="text-lg mb-6 text-black max-w-3xl mx-auto leading-relaxed">
               Free guides, templates, and tools to help you land your dream job and advance your career
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+            <div className="grid grid-cols-3 gap-6 max-w-3xl mx-auto">
               <div className="text-center">
                 <div className="text-2xl font-bold text-black mb-1">50+</div>
                 <div className="text-[#8A38EE] text-sm">Resources</div>
@@ -169,22 +169,27 @@ export default function ResourcesPage() {
             {resources.filter(resource => resource.featured).map((resource) => {
               const IconComponent = resource.icon;
               return (
-                <div key={resource.id} className="group bg-white/80 backdrop-blur-sm rounded-xl border border-[#8A38EE] p-6 transition-all duration-300 transform hover:-translate-y-1">
-                  <div className="flex items-start space-x-4">
-                    <div className={`w-12 h-12 bg-gradient-to-br ${resource.color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                      <IconComponent className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-3">
-                        <span className="bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-800 text-xs font-bold px-2 py-1 rounded-full">
-                          {resource.type}
-                        </span>
-                        <span className="bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-800 text-xs font-bold px-2 py-1 rounded-full flex items-center">
-                          <Sparkles className="w-3 h-3 mr-1" />
-                          Featured
-                        </span>
+                <div key={resource.id} className="group bg-white/80 backdrop-blur-sm rounded-xl border border-[#8A38EE] lg:p-6 p-2 transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="space-x-4">
+                    <div className='flex items-center gap-2'>
+                      <div className={`w-12 h-12 bg-gradient-to-br ${resource.color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                        <IconComponent className="w-6 h-6 text-white" />
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#8A38EE] transition-colors">{resource.title}</h3>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <span className="bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-800 text-xs font-bold px-2 py-1 rounded-full">
+                            {resource.type}
+                          </span>
+                          <span className="bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-800 text-xs font-bold px-2 py-1 rounded-full flex items-center">
+                            <Sparkles className="w-3 h-3 mr-1" />
+                            Featured
+                          </span>
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#8A38EE] transition-colors">{resource.title}</h3>
+                        </div>
+
+                    </div>
+                      <div>
                       <p className="text-gray-600 mb-4 text-sm leading-relaxed">{resource.description}</p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4 text-xs text-gray-500">
@@ -201,11 +206,11 @@ export default function ResourcesPage() {
                             {resource.downloads.toLocaleString()}
                           </div>
                         </div>
-                        <button className="bg-[#8A38EE] text-white px-4 py-2 rounded-lg transition-all duration-300 font-semibold flex items-center transform hover:-translate-y-1 text-sm">
+                      </div>
+                        <button className="bg-[#8A38EE] mt-4 text-white px-4 py-2 rounded-lg transition-all duration-300 font-semibold flex items-center transform hover:-translate-y-1 text-sm">
                           Access Now
                           <ArrowRight className="w-4 h-4 ml-2" />
                         </button>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -268,13 +273,14 @@ export default function ResourcesPage() {
               {filteredResources.map((resource) => {
                 const IconComponent = resource.icon;
                 return (
-                  <div key={resource.id} className="group bg-white/80 backdrop-blur-sm rounded-2xl border border-purple-200 p-6 transition-all duration-300 transform hover:-translate-y-1">
-                    <div className="flex items-start space-x-4">
-                      <div className={`w-12 h-12 bg-gradient-to-br ${resource.color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                        <IconComponent className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-3">
+                  <div key={resource.id} className="group bg-white/80 backdrop-blur-sm rounded-2xl border border-purple-200 lg:p-6 p-3 transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="space-x-4">
+                      <div className='flex gap-2'>
+                        <div className={`w-12 h-12 bg-gradient-to-br ${resource.color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                          <IconComponent className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <div className="flex items-center space-x-2 mb-1">
                           <span className="bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-800 text-xs font-bold px-2.5 py-1 rounded-full">
                             {resource.type}
                           </span>
@@ -283,6 +289,10 @@ export default function ResourcesPage() {
                           </span>
                         </div>
                         <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#8A38EE] transition-colors">{resource.title}</h3>
+                        </div>
+                      </div>
+                      <div className="flex-1">
+              
                         <p className="text-gray-600 text-sm mb-4 leading-relaxed">{resource.description}</p>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4 text-xs text-gray-500">
@@ -294,15 +304,8 @@ export default function ResourcesPage() {
                               <Star className="w-3 h-3 mr-1 text-yellow-400 fill-current" />
                               {resource.rating}
                             </div>
-                            <div className="flex items-center">
-                              <Download className="w-3 h-3 mr-1 text-purple-600" />
-                              {resource.downloads.toLocaleString()}
-                            </div>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <button className="p-2 text-gray-400 hover:text-purple-600 transition-colors">
-                              <Heart className="w-4 h-4" />
-                            </button>
                             <button className="p-2 text-gray-400 hover:text-purple-600 transition-colors">
                               <Share2 className="w-4 h-4" />
                             </button>

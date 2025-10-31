@@ -142,6 +142,7 @@ export default function AdminPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [govtJobs, setGovtJobs] = useState<any[]>([]);
+  const [careerJobs, setCareerJobs] = useState<any[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [users, setUsers] = useState<User[]>([]);
 
@@ -169,7 +170,7 @@ export default function AdminPage() {
   
   // Modal states
   const [modalState, setModalState] = useState({
-    type: null as 'company' | 'job' | 'govtjob' | 'blog' | 'user' | null,
+    type: null as 'company' | 'job' | 'govtjob' | 'careerjob' | 'blog' | 'user' | null,
     mode: null as 'create' | 'edit' | 'view' | null,
     isOpen: false,
     data: null as any
@@ -187,6 +188,7 @@ export default function AdminPage() {
     { id: 'companies', label: 'Companies', icon: Building },
     { id: 'jobs', label: 'Jobs', icon: BriefcaseBusiness },
     { id: 'govtjobs', label: 'Govt Jobs', icon: Briefcase},
+    { id: 'careerjobs', label: 'Career Jobs', icon: Briefcase},
     { id: 'blog', label: 'Blog', icon: FileText },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'settings', label: 'Settings', icon: Settings },
@@ -208,6 +210,7 @@ export default function AdminPage() {
         fetchCompanies(),
         fetchJobs(),
         fetchGovtJobs(),
+        fetchCareerJobs(),
         fetchBlogPosts(),
         // fetchUsers()
       ]);
@@ -261,6 +264,15 @@ export default function AdminPage() {
       console.error('Error fetching jobs:', error);
     }
   };
+  const fetchCareerJobs = async () => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/careerjobs/`);
+      const data = await response.data  ;
+      setCareerJobs(data.jobs || []);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
 
   const fetchBlogPosts = async () => {
     try {
@@ -289,7 +301,7 @@ export default function AdminPage() {
     fetchBlogPosts();
   },[setBlogEditorState])
 
-  const openModal = (type: 'company' | 'job' | 'govtjob' | 'blog' | 'user', mode: 'create' | 'edit' | 'view', data?: any) => {
+  const openModal = (type: 'company' | 'job' | 'govtjob' | 'careerjob' | 'blog' | 'user', mode: 'create' | 'edit' | 'view', data?: any) => {
     setModalState({ type, mode, isOpen: true, data });
   };
 
@@ -345,6 +357,20 @@ export default function AdminPage() {
             closeModal();
           }
         }
+      } else if(type === 'careerjob'){
+        if(mode === 'create'){
+          const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/careerjobs/`, data, {withCredentials: true});
+          if(response.status === 200){
+            fetchCareerJobs();
+            closeModal();
+          }
+        } else if(mode === 'edit'){
+          const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/careerjobs/${data._id}`, data, {withCredentials: true});
+          if (response.status === 200) {
+            setCareerJobs(prev => prev.map(j => j._id === data._id ? response.data.job : j));
+            closeModal();
+          }
+        }
       }
       
       closeModal();
@@ -375,6 +401,11 @@ export default function AdminPage() {
         const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/govtjobs/${id}`, {withCredentials:true});
         if(response.status === 200){
           setGovtJobs(prev => prev.filter(j => j._id !== id));
+        }
+      } else if (type === 'careerjob') {
+        const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/careerjobs/${id}`, {withCredentials:true});
+        if(response.status === 200){
+          setCareerJobs(prev => prev.filter(j => j._id !== id));
         }
       } else if (type === 'blog-post') {
          const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/blog/${id}`, {withCredentials:true});
@@ -1163,6 +1194,145 @@ export default function AdminPage() {
       </form>
     );
   };
+   const CareerJobForm = ({ careerjob, onSave, onCancel }: { 
+    careerjob?: any; 
+    onSave: (data: any) => void; 
+    onCancel: () => void; 
+  }) => {
+    const [formData, setFormData] = useState({
+      title: careerjob?.title || '',
+      description: careerjob?.description ||'',
+      role: careerjob?.role || '',
+      type: careerjob?.type || '',
+      vacancies: careerjob?.vacancies || '',
+      status: careerjob?. status || '',
+      requirements: careerjob?.requirements || '',
+      benefits: careerjob?.benefits || ''
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      onSave({ ...careerjob, ...formData });
+    };
+    return (
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Job Title *</label>
+            <input
+              type="text"
+              required
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Type *</label>
+            <select
+              required
+              value={formData.type}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value={''}>Select Type</option>
+              <option value={'Full-Time'}>Full-Time</option>
+              <option value={'Part-Time'}>Part-Time</option>
+              <option value={'Internship'}>Internship</option>
+            </select>
+          </div>
+         
+        </div>
+
+        {/* Salary Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Vacancies *</label>
+            <input
+              type="text"
+              required
+              value={formData.vacancies}
+              onChange={(e) => setFormData({ ...formData, vacancies: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Status *</label>
+            <select
+              required
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value={''}>Select Status</option>
+              <option value={'Open'}>Open</option>
+              <option value={'Closed'}>Closed</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Text Areas */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+            <div className="rounded-lg pb-10">
+          <ReactQuill
+            value={formData.description}
+            onChange={(description) => setFormData({ ...formData, description})}
+            modules={quillModules}
+            formats={quillFormats}
+            placeholder="Write your job selection process here....."
+            style={{ height: '200px' }}
+          />
+        </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Requirements</label>
+            <div className="rounded-lg pb-10">
+          <ReactQuill
+            value={formData.requirements}
+            onChange={(requirements) => setFormData({ ...formData, requirements})}
+            modules={quillModules}
+            formats={quillFormats}
+            placeholder="Write your job selection process here....."
+            style={{ height: '200px' }}
+          />
+        </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Benefits</label>
+            <div className="rounded-lg pb-10">
+            <ReactQuill
+            value={formData.benefits}
+            onChange={(benefits) => setFormData({ ...formData, benefits})}
+            modules={quillModules}
+            formats={quillFormats}
+            placeholder="Write your job eligibility criteria here....."
+            style={{ height: '200px' }}
+          />
+          </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end space-x-3 pt-4">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          >
+            <Save className="w-4 h-4" />
+            <span>Save Job</span>
+          </button>
+        </div>
+      </form>
+    );
+  };
 
 
 
@@ -1350,6 +1520,55 @@ export default function AdminPage() {
         </div>
       );
     }
+    if(type === 'careerjob'){
+      return (
+        <div>
+          <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-900">
+                  Applications for {data.title}
+                </h3>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="text-left p-3 font-semibold text-gray-900">Candidate</th>
+                      <th className="text-left p-3 font-semibold text-gray-900">Experience</th>
+                      <th className="text-left p-3 font-semibold text-gray-900">Applied Date</th>
+                      <th className="text-left p-3 font-semibold text-gray-900">Cover Letter</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.enteries.map((app: any, index: number) => (
+                      <tr key={index} className="border-b border-gray-100">
+                        <td className="p-3">
+                          <div>
+                            <div className="font-semibold text-gray-900">{app.name}</div>
+                            <div className="text-sm text-gray-600">{app.email}</div>
+                            <div className="text-sm text-gray-600">{app.phone}</div>
+                          </div>
+                        </td>
+                        <td className="p-3 text-gray-700">{app.experience} years</td>
+                        <td className="p-3 text-gray-600">{new Date(app.appliedAt).toLocaleDateString()}</td>
+                        <td className="p-3">
+                          <p>{app.coverletter}</p>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {data.enteries.length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    No applications found for this job.
+                  </div>
+                )}
+              </div>
+            </div>
+        </div>
+      )
+    }
     if(type === "blog"){
       return (
             <div className="prose max-w-none">
@@ -1413,7 +1632,6 @@ export default function AdminPage() {
     if (!modalState.isOpen) return null;
 
     const { type, mode, data } = modalState;
-    console.log(data);
     const title = `${mode === 'create' ? 'Create' : mode === 'edit' ? 'Edit' : 'View'} ${type?.charAt(0).toUpperCase()}${type?.slice(1)}`;
 
     return (
@@ -1438,6 +1656,8 @@ export default function AdminPage() {
               <JobForm job={data} onSave={handleSave} onCancel={closeModal} />
             ) : type === 'govtjob' ? (   
               <GovtJobForm govtjob={data} onSave={handleSave} onCancel={closeModal} />
+            ) : type === 'careerjob' ? ( 
+              <CareerJobForm careerjob={data} onSave={handleSave} onCancel={closeModal} />
             ) : (
               <div>Form for {type} not implemented</div>
             )}
@@ -1834,6 +2054,108 @@ export default function AdminPage() {
                       </button>
                       <button 
                         onClick={() => handleDelete('govtjob', job._id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {jobs.length === 0 && (
+        <div className="text-center py-12">
+          <Briefcase className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs found</h3>
+          <p className="text-gray-600 mb-4">Create a company first, then post your first job.</p>
+          <button
+            onClick={() => companies.length > 0 ? openModal('job', 'create') : openModal('company', 'create')}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+          >
+            {companies.length > 0 ? 'Post Job' : 'Create Company First'}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+
+  const renderCareerJobsManagement = () => (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-2xl font-bold text-gray-900">Career Job Management</h2>
+        <button
+          onClick={() => openModal('careerjob', 'create')}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Post Career Job</span>
+        </button>
+      </div>
+            {/* Search and Filters */}
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Search jobs..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      {/* Jobs Table */}
+      <div className="bg-white w-[80vw] lg:w-full rounded-lg border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Job</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vacancies</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Posted</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {careerJobs
+                .filter(job => 
+                  job.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+                  (filterStatus === 'all' || job.status === filterStatus)
+                )
+                .map((job) => (
+                <tr key={job._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">{job.title}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.type}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.vacancies}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.status}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(job.createdAt).toLocaleDateString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex items-center space-x-2">
+                      <button 
+                        onClick={() => openModal('careerjob', 'view', job)}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => openModal('careerjob', 'edit', job)}
+                        className="text-green-600 hover:text-green-900"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete('careerjob', job._id)}
                         className="text-red-600 hover:text-red-900"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -2312,7 +2634,7 @@ export default function AdminPage() {
         </div>
       </header>
 
-           <div className="pt-16">
+        <div className="pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex gap-8">
             {/* Sidebar */}
@@ -2364,6 +2686,7 @@ export default function AdminPage() {
                     {activeTab === 'companies' && renderCompaniesManagement()}
                     {activeTab === 'jobs' && renderJobsManagement()}
                     {activeTab === 'govtjobs' && renderGovtJobsManagement()}
+                    {activeTab === 'careerjobs' && renderCareerJobsManagement()}
                     {activeTab === 'blog' && renderBlogManagement()}
                     {activeTab === 'users' && renderUserManagement()}
                     {activeTab === 'settings' && renderSettings()}

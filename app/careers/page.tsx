@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Footer from '@/components/Footer';
 import { 
   Search,
@@ -14,148 +14,90 @@ import {
   Briefcase,
   Star
 } from 'lucide-react';
+import axios from 'axios';
 
 export default function CareersPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('All');
+  const [jobs, setJobs] = useState<any[]>([]); 
+  const [showModal, setShowModal] = useState(false)
+  const [selectedJob, setSelectedJob] = useState<any | null>(null)
+   const [showSuccess, setShowSuccess] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    experience: '',
+    coverletter: '',
+  })
 
-  const departments = ['All', 'Engineering', 'Product', 'Marketing', 'Sales', 'Operations', 'Design'];
-
-  const jobs = [
-    {
-      id: '1',
-      title: 'Senior Frontend Engineer',
-      department: 'Engineering',
-      location: 'San Francisco, CA',
-      type: 'Full-time',
-      experience: '5+ years',
-      description: 'Join our engineering team to build the next generation of career development tools.',
-      requirements: [
-        'Strong experience with React, TypeScript, and Next.js',
-        'Experience with modern frontend frameworks and tools',
-        'Understanding of responsive design and accessibility',
-        'Experience with testing frameworks and CI/CD'
-      ],
-      benefits: [
-        'Competitive salary and equity',
-        'Flexible work arrangements',
-        'Health, dental, and vision insurance',
-        'Professional development budget'
-      ]
-    },
-    {
-      id: '2',
-      title: 'Product Manager',
-      department: 'Product',
-      location: 'Remote',
-      type: 'Full-time',
-      experience: '3+ years',
-      description: 'Lead product strategy and development for our career platform features.',
-      requirements: [
-        'Experience in product management for SaaS platforms',
-        'Strong analytical and problem-solving skills',
-        'Experience with user research and data analysis',
-        'Excellent communication and collaboration skills'
-      ],
-      benefits: [
-        'Competitive salary and equity',
-        'Remote-first culture',
-        'Health, dental, and vision insurance',
-        'Professional development budget'
-      ]
-    },
-    {
-      id: '3',
-      title: 'Marketing Specialist',
-      department: 'Marketing',
-      location: 'New York, NY',
-      type: 'Full-time',
-      experience: '2+ years',
-      description: 'Drive growth and brand awareness for Hooblr through creative marketing campaigns.',
-      requirements: [
-        'Experience in digital marketing and content creation',
-        'Knowledge of SEO, SEM, and social media marketing',
-        'Experience with marketing analytics tools',
-        'Creative thinking and strong writing skills'
-      ],
-      benefits: [
-        'Competitive salary and equity',
-        'Flexible work arrangements',
-        'Health, dental, and vision insurance',
-        'Professional development budget'
-      ]
-    },
-    {
-      id: '4',
-      title: 'UX/UI Designer',
-      department: 'Design',
-      location: 'Remote',
-      type: 'Full-time',
-      experience: '3+ years',
-      description: 'Create beautiful and intuitive user experiences for our career platform.',
-      requirements: [
-        'Strong portfolio demonstrating UX/UI design skills',
-        'Experience with design tools (Figma, Sketch, etc.)',
-        'Understanding of user-centered design principles',
-        'Experience with design systems and component libraries'
-      ],
-      benefits: [
-        'Competitive salary and equity',
-        'Remote-first culture',
-        'Health, dental, and vision insurance',
-        'Professional development budget'
-      ]
-    },
-    {
-      id: '5',
-      title: 'Sales Development Representative',
-      department: 'Sales',
-      location: 'Austin, TX',
-      type: 'Full-time',
-      experience: '1+ years',
-      description: 'Build relationships with potential clients and drive business growth.',
-      requirements: [
-        'Experience in B2B sales or customer success',
-        'Strong communication and interpersonal skills',
-        'Experience with CRM systems (Salesforce preferred)',
-        'Motivated and results-driven attitude'
-      ],
-      benefits: [
-        'Competitive salary and commission structure',
-        'Flexible work arrangements',
-        'Health, dental, and vision insurance',
-        'Professional development budget'
-      ]
-    },
-    {
-      id: '6',
-      title: 'Operations Manager',
-      department: 'Operations',
-      location: 'San Francisco, CA',
-      type: 'Full-time',
-      experience: '4+ years',
-      description: 'Optimize internal processes and ensure smooth day-to-day operations.',
-      requirements: [
-        'Experience in operations management or business operations',
-        'Strong analytical and problem-solving skills',
-        'Experience with process improvement and project management',
-        'Excellent organizational and communication skills'
-      ],
-      benefits: [
-        'Competitive salary and equity',
-        'Flexible work arrangements',
-        'Health, dental, and vision insurance',
-        'Professional development budget'
-      ]
+  const fetchCareerJobs = async () => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/careerjobs/`);
+      const data = await response.data;
+      setJobs(data.jobs || []);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
     }
-  ];
+  };
+  useEffect(()=> {
+    fetchCareerJobs();
+  },[])
 
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          job.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDepartment = selectedDepartment === 'All' || job.department === selectedDepartment;
-    return matchesSearch && matchesDepartment;
+    return matchesSearch;
   });
+
+   const handleApplyClick = (job: any) => {
+    setSelectedJob(job)
+    setShowModal(true)
+    setShowSuccess(false)
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  const handleSubmit = async() => {
+    // Simulate form submission
+    if (formData.name && formData.email && formData.phone && formData.experience) {
+      try{
+        const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/careerjobs/apply/${selectedJob?._id}`, formData);
+        if(response.status === 200){
+          setShowSuccess(true)
+          setTimeout(() => {
+            setShowModal(false)
+            setShowSuccess(false)
+            setFormData({
+              name: '',
+              email: '',
+              phone: '',
+              experience: '',
+              coverletter: ''
+            })
+          }, 2000)
+        }
+      }catch(error){
+        console.log(error);
+      }
+    }
+  }
+
+  const closeModal = () => {
+    setShowModal(false)
+    setShowSuccess(false)
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      experience: '',
+      coverletter: ''
+    })
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
@@ -164,7 +106,7 @@ export default function CareersPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Hero Section */}
           <div className="text-center mb-16">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">Join Our Team</h1>
+            <h1 className="lg:text-4xl text-3xl font-bold text-gray-900 mb-6">Join Our Team</h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Help us revolutionize the way people find jobs and build careers. 
               Join a team that&#39;s passionate about making a difference.
@@ -250,7 +192,7 @@ export default function CareersPage() {
 
           {/* Search and Filter */}
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1gap-4">
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
@@ -261,15 +203,6 @@ export default function CareersPage() {
                   className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
               </div>
-              <select
-                value={selectedDepartment}
-                onChange={(e) => setSelectedDepartment(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-                {departments.map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
-                ))}
-              </select>
             </div>
           </div>
 
@@ -283,53 +216,37 @@ export default function CareersPage() {
                     <div className="flex items-center space-x-4 text-sm text-gray-600">
                       <div className="flex items-center">
                         <MapPin className="w-4 h-4 mr-1" />
-                        {job.location}
+                        {'Remote'}
                       </div>
                       <div className="flex items-center">
                         <Clock className="w-4 h-4 mr-1" />
                         {job.type}
                       </div>
-                      <div className="flex items-center">
-                        <Briefcase className="w-4 h-4 mr-1" />
-                        {job.experience}
-                      </div>
                     </div>
                   </div>
                   <div className="mt-4 md:mt-0">
-                    <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm font-medium rounded-full">
-                      {job.department}
+                    <span className={`px-3 py-1 ${job.status == 'Open' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} text-sm font-medium rounded-full`}>
+                      {job.status}
                     </span>
                   </div>
                 </div>
                 
-                <p className="text-gray-600 mb-4">{job.description}</p>
+                <div className="prose max-w-none mb-2" dangerouslySetInnerHTML={{ __html: job.description }} />
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-2">Requirements</h4>
-                    <ul className="space-y-1">
-                      {job.requirements.map((req, index) => (
-                        <li key={index} className="text-sm text-gray-600 flex items-start">
-                          <span className="w-1.5 h-1.5 bg-purple-600 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                          {req}
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: job.requirements }} />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-2">Benefits</h4>
-                    <ul className="space-y-1">
-                      {job.benefits.map((benefit, index) => (
-                        <li key={index} className="text-sm text-gray-600 flex items-start">
-                          <span className="w-1.5 h-1.5 bg-green-600 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                          {benefit}
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: job.benefits }} />
                   </div>
                 </div>
                 
-                <button className="w-full md:w-auto bg-purple-600 text-white px-6 py-3 rounded-xl hover:bg-purple-700 transition-colors font-medium">
+                <button
+                  onClick={() => handleApplyClick(job)}
+                  className="w-full md:w-auto bg-purple-600 text-white px-6 py-3 rounded-xl hover:bg-purple-700 transition-colors font-medium">
                   Apply Now
                 </button>
               </div>
@@ -346,7 +263,7 @@ export default function CareersPage() {
           )}
 
           {/* CTA */}
-          <div className="mt-16 text-center">
+          {/* <div className="mt-16 text-center">
             <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 text-white">
               <h2 className="text-3xl font-bold mb-4">Don&#39;t See the Right Fit?</h2>
               <p className="text-purple-100 mb-6 max-w-2xl mx-auto">
@@ -357,9 +274,140 @@ export default function CareersPage() {
                 Send Your Resume
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
+
+
+       {/* Application Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-screen overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-900">
+                  Apply for {selectedJob?.title}
+                </h3>
+                <button
+                  onClick={closeModal}
+                  className="text-gray-500 hover:text-gray-700 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+
+              {!showSuccess ? (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Years of Experience *
+                    </label>
+                    <select
+                      name="experience"
+                      value={formData.experience}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select experience</option>
+                      <option value="0-1">0-1 years</option>
+                      <option value="1-3">1-3 years</option>
+                      <option value="3-5">3-5 years</option>
+                      <option value="5+">5+ years</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Cover Letter
+                    </label>
+                    <textarea
+                      name="coverletter"
+                      value={formData.coverletter}
+                      onChange={handleInputChange}
+                      rows={4}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Tell us why you're perfect for this role..."
+                    />
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={closeModal}
+                      className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    >
+                      Submit Application
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Application Submitted Successfully!</h3>
+                  <p className="text-gray-600">Thank you for your interest. We&apos;ll review your application and get back to you soon.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

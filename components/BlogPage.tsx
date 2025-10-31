@@ -103,7 +103,7 @@ export default function BlogPage({ posts }: BlogPageProps) {
 
             {/* Search and Filters */}
             <div className="max-w-4xl mx-auto">
-              <div className="flex flex-col md:flex-row gap-4 mb-8">
+              <div className="flex flex-col md:flex-row gap-4 mb-2">
                 <div className="flex-1 relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5" />
                   <input
@@ -131,18 +131,18 @@ export default function BlogPage({ posts }: BlogPageProps) {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {/* Featured Posts Section */}
         {featuredPosts.length > 0 &&
           searchTerm === "" &&
           selectedCategory === "all" && (
-            <div className="mb-20">
+            <div className="mb-10">
               <div className="text-center mb-12">
                 {/* <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
                 <Star className="w-4 h-4" />
                 <span>Featured Articles</span>
               </div> */}
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4">
                   Must-Read Career Insights
                 </h2>
                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">

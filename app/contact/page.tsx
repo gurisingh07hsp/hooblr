@@ -44,7 +44,7 @@ export default function ContactPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Hero Section */}
           <div className="text-center mb-16">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">Get in Touch</h1>
+            <h1 className="lg:text-4xl text-3xl font-bold text-gray-900 mb-6">Get in Touch</h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Have questions, feedback, or need support? We&apos;re here to help. 
               Reach out to our team and we&apos;ll get back to you as soon as possible.
@@ -207,29 +207,6 @@ export default function ContactPage() {
                       <p className="font-medium text-gray-900">Documentation</p>
                       <p className="text-sm text-gray-600">Browse our guides and tutorials</p>
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Departments */}
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h3 className="text-xl font-semibold text-gray-900 mb-6">Contact by Department</h3>
-                <div className="space-y-4">
-                  <div className="border-l-4 border-purple-600 pl-4">
-                    <p className="font-medium text-gray-900">General Support</p>
-                    <p className="text-sm text-gray-600">support@hooblr.com</p>
-                  </div>
-                  {/* <div className="border-l-4 border-purple-600 pl-4">
-                    <p className="font-medium text-gray-900">Press & Media</p>
-                    <p className="text-sm text-gray-600">press@hooblr.com</p>
-                  </div> */}
-                  <div className="border-l-4 border-purple-600 pl-4">
-                    <p className="font-medium text-gray-900">Partnerships</p>
-                    <p className="text-sm text-gray-600">partnerships@hooblr.com</p>
-                  </div>
-                  <div className="border-l-4 border-purple-600 pl-4">
-                    <p className="font-medium text-gray-900">Careers</p>
-                    <p className="text-sm text-gray-600">careers@hooblr.com</p>
                   </div>
                 </div>
               </div>

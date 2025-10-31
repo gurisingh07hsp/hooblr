@@ -134,13 +134,4 @@ jobSchema.index({
   department: 'text'
 });
 
-// Virtual for application count
-// jobSchema.virtual('applicationCount').get(function() {
-//   return this.applications.length;
-// });
-
-// // Ensure virtuals are serialized
-// jobSchema.set('toJSON', { virtuals: true });
-// jobSchema.set('toObject', { virtuals: true });
-
 module.exports = mongoose.model('Job', jobSchema); 
