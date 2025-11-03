@@ -19,7 +19,8 @@ import {
   Linkedin,
   FileText,
   PaintBucket,
-  EyeOff
+  EyeOff,
+  Globe
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -310,6 +311,10 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
               color: #374151;
             }
             .contact-info {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              flex-wrap: wrap;
               text-align: center;
               font-size: 10pt;
               padding-bottom: 12pt;
@@ -367,19 +372,30 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
             .accent {
               color: ${colors.primary};
             }
+            .icon svg {
+              width: 14px;
+              height: 14px;
+              vertical-align: middle;
+              margin-right: 6px;
+              margin-left: 6px;
+              fill: ${colors.primary};
+            }
           </style>
         </head>
         <body>
         <div class="${currentTemplate.id}">
           <h1 class="${currentTemplate.id}-color">${personalInfo.firstName} ${personalInfo.lastName}</h1>
           <div class="contact-info">
-            ${personalInfo.email ? `${personalInfo.email}` : ''}
+            ${personalInfo.email ? `<span class='icon'><svg data-name="1-Email" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" height='12' weight='12'><path d="M29 4H3a3 3 0 0 0-3 3v18a3 3 0 0 0 3 3h26a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-.72 2L16 14.77 3.72 6zM30 25a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.23l13.42 9.58a1 1 0 0 0 1.16 0L30 7.23z"/></svg>${personalInfo.email}</span>` : ''}
             ${personalInfo.email && personalInfo.phone ? ' | ' : ''}
-            ${personalInfo.phone ? `${personalInfo.phone}` : ''}
+            ${personalInfo.phone ? `<span class='icon'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height='12' weight='12'><path d="M23 17.11a5.92 5.92 0 0 0-4.63-3.95 1.5 1.5 0 0 0-1.51.66l-1.26 1.81a.53.53 0 0 1-.61.2 13.25 13.25 0 0 1-3.6-2.14 13 13 0 0 1-2.94-3.52.5.5 0 0 1 .17-.69l1.63-1.09a1.52 1.52 0 0 0 .61-1.71 10.13 10.13 0 0 0-1.38-2.89 10.36 10.36 0 0 0-2.2-2.33A1.53 1.53 0 0 0 6 1.19a7.31 7.31 0 0 0-1.13.43A7.64 7.64 0 0 0 1.2 6.1a1.48 1.48 0 0 0 0 .93 24.63 24.63 0 0 0 6.53 10.41A24.76 24.76 0 0 0 17.12 23a1.41 1.41 0 0 0 .45.07 1.59 1.59 0 0 0 .48-.07 7.64 7.64 0 0 0 4.47-3.66A6.21 6.21 0 0 0 23 18a1.46 1.46 0 0 0 0-.89zm-1.33 1.74A6.61 6.61 0 0 1 17.73 22a.54.54 0 0 1-.31 0 23.61 23.61 0 0 1-9-5.29 23.74 23.74 0 0 1-6.27-10 .47.47 0 0 1 0-.31 6.59 6.59 0 0 1 3.14-3.88 5 5 0 0 1 1-.36h.1a.5.5 0 0 1 .32.11 9.4 9.4 0 0 1 2 2.09A9.07 9.07 0 0 1 9.9 7a.52.52 0 0 1-.21.6L8.06 8.64a1.54 1.54 0 0 0-.47 2 14.09 14.09 0 0 0 7 6.09 1.51 1.51 0 0 0 1.81-.58l1.21-1.81a.51.51 0 0 1 .51-.23A4.94 4.94 0 0 1 22 17.44a.58.58 0 0 1 0 .29 5.35 5.35 0 0 1-.38 1.12z"/></svg>${personalInfo.phone}</span>` : ''}
             ${(personalInfo.email || personalInfo.phone) && personalInfo.location ? ' | ' : ''}
-            ${personalInfo.location ? `${personalInfo.location}` : ''}
-            ${personalInfo.linkedin ? `<br/>${personalInfo.linkedin}` : ''}
-            ${personalInfo.github ? ` | ${personalInfo.github}` : ''}
+            ${personalInfo.location ? `<span class='icon'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs></defs><g id="location"><path class="cls-1" d="m24.1 6-.1-.1A9.12 9.12 0 0 0 16 2a9.12 9.12 0 0 0-8 3.9l-.1.1C3.85 11.42 6.48 21.35 14 29.16a2.75 2.75 0 0 0 4 0C25.52 21.35 28.15 11.42 24.1 6zm-7.56 21.77a.76.76 0 0 1-1.08 0c-7.82-8.09-8.9-16.62-6-20.53l.11-.15A7.16 7.16 0 0 1 16 4a7.16 7.16 0 0 1 6.39 3.09l.11.15c2.94 3.91 1.86 12.44-6 20.53z"/><path class="cls-1" d="M16 7a4 4 0 1 0 4 4 4 4 0 0 0-4-4zm0 6a2 2 0 1 1 2-2 2 2 0 0 1-2 2z"/></g></svg>${personalInfo.location}</span>` : ''}
+            ${(personalInfo.email || personalInfo.location) && personalInfo.linkedin ? ' | ' : ''}
+            ${personalInfo.linkedin ? `<span class='icon'><svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 24 24" height='12' weight='12' id="linkedin">
+             <path d="M3 6.002c-1.654 0-3-1.346-3-3s1.346-3 3-3 3 1.346 3 3-1.346 3-3 3zm0-5c-1.103 0-2 .897-2 2s.897 2 2 2 2-.897 2-2-.897-2-2-2zM5.5 24.002h-5a.5.5 0 0 1-.5-.5v-15a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-.5.5zm-4.5-1h4v-14H1v14zM23.5 24.002h-5a.5.5 0 0 1-.5-.5v-9c0-1.135-.473-1.987-1.299-2.336-.853-.362-1.894-.14-2.701.556v10.78a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-15a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .484.375c1.604-1.154 4.276-1.796 6.413-1.064 1.613.553 3.546 2.073 3.603 6.183v10.007a.5.5 0 0 1-.5.499zm-4.5-1h4v-9.5c-.038-2.785-1.051-4.601-2.927-5.243-2.33-.798-5.266.407-6.183 1.555a.501.501 0 0 1-.89-.312v-.5H9v14h4v-10.5a.5.5 0 0 1 .151-.358c1.118-1.086 2.667-1.436 3.939-.899 1.214.514 1.91 1.701 1.909 3.257v8.5z"></path>
+              </svg>${personalInfo.linkedin}</span>` : ''}
+            ${personalInfo.website ? ` | <span class='icon'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm11.84 12.11h-.07A19.62 19.62 0 0 1 24 15.79a19.27 19.27 0 0 0-2.88-10.63 12 12 0 0 1 6.72 8.95zM10 16c0-5.82 2.2-10.83 5-11.81V17a26 26 0 0 1-5-.64V16zm5 3v8.84c-2.4-.85-4.37-4.65-4.87-9.41A28.57 28.57 0 0 0 15 19zm2 8.84V19a28.57 28.57 0 0 0 4.87-.57c-.5 4.73-2.47 8.57-4.87 9.38zM17 17V4.19c2.8 1 5 6 5 11.81v.33a26 26 0 0 1-5 .67zM10.88 5.16A19.27 19.27 0 0 0 8 15.79a19.62 19.62 0 0 1-3.78-1.65h-.07a12 12 0 0 1 6.73-8.98zM4 16.28a22.26 22.26 0 0 0 4.07 1.61 18.36 18.36 0 0 0 2.8 9A12 12 0 0 1 4 16.28zm17.12 10.56a18.36 18.36 0 0 0 2.8-8.95A22.26 22.26 0 0 0 28 16.28a12 12 0 0 1-6.88 10.56z"/></svg>${personalInfo.website}</span>` : ''}
           </div>
           </div>
           
@@ -511,6 +527,10 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
               color: #374151;
             }
             .contact-info {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              flex-wrap: wrap;
               text-align: center;
               font-size: 10pt;
               padding-bottom: 12pt;
@@ -568,19 +588,30 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
             .accent {
               color: ${colors.primary};
             }
+            .icon svg {
+              width: 14px;
+              height: 14px;
+              vertical-align: middle;
+              margin-right: 6px;
+              margin-left: 6px;
+              fill: ${colors.primary};
+            }
           </style>
         </head>
         <body>
         <div class="${currentTemplate.id}">
           <h1 class="${currentTemplate.id}-color">${personalInfo.firstName} ${personalInfo.lastName}</h1>
           <div class="contact-info">
-            ${personalInfo.email ? `${personalInfo.email}` : ''}
+            ${personalInfo.email ? `<span class='icon'><svg data-name="1-Email" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" height='12' weight='12'><path d="M29 4H3a3 3 0 0 0-3 3v18a3 3 0 0 0 3 3h26a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-.72 2L16 14.77 3.72 6zM30 25a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.23l13.42 9.58a1 1 0 0 0 1.16 0L30 7.23z"/></svg>${personalInfo.email}</span>` : ''}
             ${personalInfo.email && personalInfo.phone ? ' | ' : ''}
-            ${personalInfo.phone ? `${personalInfo.phone}` : ''}
+            ${personalInfo.phone ? `<span class='icon'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height='12' weight='12'><path d="M23 17.11a5.92 5.92 0 0 0-4.63-3.95 1.5 1.5 0 0 0-1.51.66l-1.26 1.81a.53.53 0 0 1-.61.2 13.25 13.25 0 0 1-3.6-2.14 13 13 0 0 1-2.94-3.52.5.5 0 0 1 .17-.69l1.63-1.09a1.52 1.52 0 0 0 .61-1.71 10.13 10.13 0 0 0-1.38-2.89 10.36 10.36 0 0 0-2.2-2.33A1.53 1.53 0 0 0 6 1.19a7.31 7.31 0 0 0-1.13.43A7.64 7.64 0 0 0 1.2 6.1a1.48 1.48 0 0 0 0 .93 24.63 24.63 0 0 0 6.53 10.41A24.76 24.76 0 0 0 17.12 23a1.41 1.41 0 0 0 .45.07 1.59 1.59 0 0 0 .48-.07 7.64 7.64 0 0 0 4.47-3.66A6.21 6.21 0 0 0 23 18a1.46 1.46 0 0 0 0-.89zm-1.33 1.74A6.61 6.61 0 0 1 17.73 22a.54.54 0 0 1-.31 0 23.61 23.61 0 0 1-9-5.29 23.74 23.74 0 0 1-6.27-10 .47.47 0 0 1 0-.31 6.59 6.59 0 0 1 3.14-3.88 5 5 0 0 1 1-.36h.1a.5.5 0 0 1 .32.11 9.4 9.4 0 0 1 2 2.09A9.07 9.07 0 0 1 9.9 7a.52.52 0 0 1-.21.6L8.06 8.64a1.54 1.54 0 0 0-.47 2 14.09 14.09 0 0 0 7 6.09 1.51 1.51 0 0 0 1.81-.58l1.21-1.81a.51.51 0 0 1 .51-.23A4.94 4.94 0 0 1 22 17.44a.58.58 0 0 1 0 .29 5.35 5.35 0 0 1-.38 1.12z"/></svg>${personalInfo.phone}</span>` : ''}
             ${(personalInfo.email || personalInfo.phone) && personalInfo.location ? ' | ' : ''}
-            ${personalInfo.location ? `${personalInfo.location}` : ''}
-            ${personalInfo.linkedin ? `<br/>${personalInfo.linkedin}` : ''}
-            ${personalInfo.github ? ` | ${personalInfo.github}` : ''}
+            ${personalInfo.location ? `<span class='icon'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs></defs><g id="location"><path class="cls-1" d="m24.1 6-.1-.1A9.12 9.12 0 0 0 16 2a9.12 9.12 0 0 0-8 3.9l-.1.1C3.85 11.42 6.48 21.35 14 29.16a2.75 2.75 0 0 0 4 0C25.52 21.35 28.15 11.42 24.1 6zm-7.56 21.77a.76.76 0 0 1-1.08 0c-7.82-8.09-8.9-16.62-6-20.53l.11-.15A7.16 7.16 0 0 1 16 4a7.16 7.16 0 0 1 6.39 3.09l.11.15c2.94 3.91 1.86 12.44-6 20.53z"/><path class="cls-1" d="M16 7a4 4 0 1 0 4 4 4 4 0 0 0-4-4zm0 6a2 2 0 1 1 2-2 2 2 0 0 1-2 2z"/></g></svg>${personalInfo.location}</span>` : ''}
+            ${(personalInfo.email || personalInfo.location) && personalInfo.linkedin ? ' | ' : ''}
+            ${personalInfo.linkedin ? `<span class='icon'><svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 24 24" height='12' weight='12' id="linkedin">
+             <path d="M3 6.002c-1.654 0-3-1.346-3-3s1.346-3 3-3 3 1.346 3 3-1.346 3-3 3zm0-5c-1.103 0-2 .897-2 2s.897 2 2 2 2-.897 2-2-.897-2-2-2zM5.5 24.002h-5a.5.5 0 0 1-.5-.5v-15a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-.5.5zm-4.5-1h4v-14H1v14zM23.5 24.002h-5a.5.5 0 0 1-.5-.5v-9c0-1.135-.473-1.987-1.299-2.336-.853-.362-1.894-.14-2.701.556v10.78a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-15a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .484.375c1.604-1.154 4.276-1.796 6.413-1.064 1.613.553 3.546 2.073 3.603 6.183v10.007a.5.5 0 0 1-.5.499zm-4.5-1h4v-9.5c-.038-2.785-1.051-4.601-2.927-5.243-2.33-.798-5.266.407-6.183 1.555a.501.501 0 0 1-.89-.312v-.5H9v14h4v-10.5a.5.5 0 0 1 .151-.358c1.118-1.086 2.667-1.436 3.939-.899 1.214.514 1.91 1.701 1.909 3.257v8.5z"></path>
+              </svg>${personalInfo.linkedin}</span>` : ''}
+            ${personalInfo.website ? ` | <span class='icon'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm11.84 12.11h-.07A19.62 19.62 0 0 1 24 15.79a19.27 19.27 0 0 0-2.88-10.63 12 12 0 0 1 6.72 8.95zM10 16c0-5.82 2.2-10.83 5-11.81V17a26 26 0 0 1-5-.64V16zm5 3v8.84c-2.4-.85-4.37-4.65-4.87-9.41A28.57 28.57 0 0 0 15 19zm2 8.84V19a28.57 28.57 0 0 0 4.87-.57c-.5 4.73-2.47 8.57-4.87 9.38zM17 17V4.19c2.8 1 5 6 5 11.81v.33a26 26 0 0 1-5 .67zM10.88 5.16A19.27 19.27 0 0 0 8 15.79a19.62 19.62 0 0 1-3.78-1.65h-.07a12 12 0 0 1 6.73-8.98zM4 16.28a22.26 22.26 0 0 0 4.07 1.61 18.36 18.36 0 0 0 2.8 9A12 12 0 0 1 4 16.28zm17.12 10.56a18.36 18.36 0 0 0 2.8-8.95A22.26 22.26 0 0 0 28 16.28a12 12 0 0 1-6.88 10.56z"/></svg>${personalInfo.website}</span>` : ''}
           </div>
           </div>
           
@@ -1374,7 +1405,7 @@ const updateSection = <K extends keyof ResumeSection>(id: string, field: K, valu
                       )}
                       {personalInfo.website && (
                         <div className="flex items-center">
-                          <Phone className={`w-4 h-4 mr-1 ${
+                          <Globe className={`w-4 h-4 mr-1 ${
                             currentTemplate.id === 'creative' ? 'text-white' : currentColor.accent
                           }`} />
                           <span>{personalInfo.website}</span>
