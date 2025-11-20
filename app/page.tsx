@@ -31,6 +31,7 @@ export default function Home() {
     "/Logo2.png",
     "/Logo3.png",
     "/Logo.png",
+    "/Logo5.png",
     "/Logo4.png",
     "/Logo3.png",
     "/Logo.png", // repeat for seamless loop
@@ -116,14 +117,8 @@ export default function Home() {
         </motion.div>
         <div className="flex mt-20 animate-scroll-infinite overflow-hidden">
           {partnerlogos.concat(partnerlogos).map((logo, index) => (
-            <div key={index} className="flex-shrink-0 w-40 mx-8">
-              <Image
-                src={logo}
-                alt={`logo-${index}`}
-                width={200}
-                height={80}
-                className="w-full h-20 object-contain"
-              />
+            <div key={index} className="flex-shrink-0 w-64 mx-8">
+              <img src={logo} alt={`logo-${index}`} className="w-full h-12 object-cover" />
             </div>
           ))}
         </div>
@@ -242,7 +237,7 @@ export default function Home() {
               {/* Right Content */}
               <div className="flex flex-col items-center">
                 {/* Image Placeholder */}
-                <div className="w-full bg-gray-300 rounded-3xl h-80 mb-8"></div>
+                <img src="/jobs.jpg" alt="jobs" className="w-full rounded-3xl h-80 mb-8"/>
 
                 {/* Stats Section */}
                 <div className="w-full flex items-center justify-between">

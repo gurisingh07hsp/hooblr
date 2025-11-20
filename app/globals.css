@@ -17,7 +17,7 @@
 }
 
 .animate-scroll-infinite {
-    animation: scroll-infinite 10s linear infinite;
+    animation: scroll-infinite 20s linear infinite;
     width: fit-content;
 }
 
