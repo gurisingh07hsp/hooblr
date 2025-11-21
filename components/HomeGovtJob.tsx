@@ -37,8 +37,8 @@ const HomeGovtJobs = () => {
   }, [selectedState]);
 
   return (
-    <section className="mt-12">
-      <div className="max-w-7xl mx-auto px-8 py-12">
+    <section className="lg:mt-12">
+      <div className="max-w-7xl mx-auto px-8 lg:py-12 py-4">
         {/* Header */}
         <h2 className="lg:text-[48px] text-3xl font-medium mb-14">
           <span className="text-purple-600">Latest</span>{" "}

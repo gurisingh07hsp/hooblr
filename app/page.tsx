@@ -28,7 +28,6 @@ export default function Home() {
 
   const partnerlogos = [
     "/Logo1.png",
-    "/Logo2.png",
     "/Logo3.png",
     "/Logo.png",
     "/Logo5.png",
@@ -78,7 +77,7 @@ export default function Home() {
   const HomePage = () => (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative h-[520px] z-30 lg:pt-14 pt-10 pb-8 px-4 overflow-hidden">
+      <section className="relative lg:h-[450px] z-30 lg:pt-4 pt-2 pb-4 px-4 overflow-hidden">
         <div className=" max-w-7xl px-4 mx-auto flex flex-col items-center gap-y-8">
           <motion.div variants={container} initial="hidden" animate="show">
             <div className="lg:w-[800px] mt-6">
@@ -108,7 +107,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mt-2 overflow-hidden">
+      <section className="lg:mt-2 overflow-hidden">
         <motion.div variants={container} initial="hidden" animate="show" className="max-w-7xl mx-auto">
           <motion.h2 variants={fadeUp} className="lg:w-[45%] lg:text-[46px] px-2 lg:px-0 text-3xl lg:leading-relaxed font-medium text-center mx-auto">
             Trusted <span className="text-[#8A38EE]">1000+</span> Company Find
@@ -117,8 +116,8 @@ export default function Home() {
         </motion.div>
         <div className="flex mt-20 animate-scroll-infinite overflow-hidden">
           {partnerlogos.concat(partnerlogos).map((logo, index) => (
-            <div key={index} className="flex-shrink-0 w-64 mx-8">
-              <img src={logo} alt={`logo-${index}`} className="w-full h-12 object-cover" />
+            <div key={index} className="flex-shrink-0 w-44 mx-8">
+              <img src={logo} alt={`logo-${index}`} className="w-full h-8 object-cover" />
             </div>
           ))}
         </div>
@@ -153,42 +152,42 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 px-4 bg-white mt-14">
+      <section className="lg:py-20 py-10 px-4 bg-white lg:mt-14">
         <div className="max-w-6xl mx-auto flex lg:flex-row flex-col gap-y-8">
           <div>
             <p className="text-[#8A38EE] font-medium text-[20px]">About us</p>
-            <p className="lg:text-[48px] text-3xl lg:leading-tight font-medium lg:w-[90%]">
+            <p className="lg:text-[48px] text-2xl lg:leading-tight font-medium lg:w-[90%]">
               Opportunities That Reflect Modern Workplace Values
             </p>
-            <div className="flex gap-x-4 mt-10">
-              <div className="w-40 h-28 bg-[#F5F5F5] rounded-2xl flex flex-col justify-center items-center">
-                <p className="lg:text-[40px] text-2xl font-medium">
+            <div className="flex gap-x-4 lg:mt-10 mt-4">
+              <div className="lg:w-40 lg:h-28 w-36 h-24 bg-[#F5F5F5] rounded-2xl flex flex-col justify-center items-center">
+                <p className="lg:text-[30px] text-xl font-medium">
                   10<span className="text-[#8A38EE]">K+</span>
                 </p>
-                <p className="text-[#5F5270] text-center text-sm lg:text-[16px] mt-2">
+                <p className="text-[#5F5270] text-center text-xs lg:text-[16px] mt-3">
                   Availabe Jobs
                 </p>
               </div>
-              <div className="w-40 h-28 bg-[#F5F5F5] rounded-2xl flex flex-col justify-center items-center">
-                <p className="lg:text-[40px] text-2xl font-medium">
+              <div className="lg:w-40 lg:h-28 w-36 h-24 bg-[#F5F5F5] rounded-2xl flex flex-col justify-center items-center">
+                <p className="lg:text-[30px] text-xl font-medium">
                   256<span className="text-[#8A38EE]">+</span>
                 </p>
-                <p className="text-[#5F5270] text-center text-sm lg:text-[16px] mt-2">
+                <p className="text-[#5F5270] text-center text-xs lg:text-[16px] mt-3">
                   Hiring Partners
                 </p>
               </div>
-              <div className="w-40 h-28 bg-[#F5F5F5] rounded-2xl flex flex-col justify-center items-center">
-                <p className="lg:text-[40px] text-2xl font-medium">
+              <div className="lg:w-40 lg:h-28 w-36 h-24 bg-[#F5F5F5] rounded-2xl flex flex-col justify-center items-center">
+                <p className="lg:text-[30px] text-xl font-medium">
                   1<span className="text-[#8A38EE]">K+</span>
                 </p>
-                <p className="text-[#5F5270] text-sm lg:text-[16px] text-center mt-2">
+                <p className="text-[#5F5270] text-xs lg:text-[16px] text-center mt-3">
                   Success Stories
                 </p>
               </div>
             </div>
           </div>
           <div className="lg:w-[1000px]">
-            <p className="mt-6 text-[20px] text-[#5F5270] text-center lg:text-left">
+            <p className="lg:mt-6 mt-2 lg:text-[20px] text-[#5F5270] text-center lg:text-left">
               At Hooblr, we simplify your job search by connecting you to the
               best career opportunities across industries. From leading private
               organizations to government sectors, we bring verified job
@@ -207,7 +206,7 @@ export default function Home() {
 
       <HomeGovtJobs />
 
-      <section className="mt-16">
+      <section className="lg:mt-16">
         <div className="bg-gray-50 py-16">
           <div className="max-w-7xl mx-auto px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -216,7 +215,7 @@ export default function Home() {
                 <p className="text-purple-600 font-semibold mb-4">
                   Ready to Grow Your Career?
                 </p>
-                <h2 className="lg:text-5xl text-3xl font-bold text-gray-900 mb-8 leading-tight">
+                <h2 className="lg:text-5xl text-2xl font-bold text-gray-900 lg:mb-8 mb-4 leading-tight">
                   Thousands
                   <br />
                   Of Verified Jobs,
@@ -225,7 +224,7 @@ export default function Home() {
                 </h2>
                 <button
                   onClick={() => router.push("/jobs")}
-                  className="flex items-center gap-3 bg-purple-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-purple-700 hover:shadow-xl transition-all hover:scale-105"
+                  className="flex items-center gap-3 bg-purple-600 text-white lg:px-8 px-4 py-3 rounded-full font-semibold shadow-lg hover:bg-purple-700 hover:shadow-xl transition-all hover:scale-105"
                 >
                   Find Your Job
                   <div className="bg-white bg-opacity-20 rounded-full p-1">
@@ -237,14 +236,14 @@ export default function Home() {
               {/* Right Content */}
               <div className="flex flex-col items-center">
                 {/* Image Placeholder */}
-                <img src="/jobs.jpg" alt="jobs" className="w-full rounded-3xl h-80 mb-8"/>
+                <img src="/jobs.jpg" alt="jobs" className="w-full rounded-3xl lg:h-80 h-64 mb-8"/>
 
                 {/* Stats Section */}
                 <div className="w-full flex items-center justify-between">
                   {/* Jobs Stats */}
                   <div className="flex gap-12">
                     <div className="text-center">
-                      <div className="text-4xl font-bold text-gray-900">
+                      <div className="lg:text-4xl text-3xl font-bold text-gray-900">
                         10<span className="text-purple-600">K+</span>
                       </div>
                       <p className="text-gray-600 text-sm mt-1">
@@ -252,7 +251,7 @@ export default function Home() {
                       </p>
                     </div>
                     <div className="text-center">
-                      <div className="text-4xl font-bold text-gray-900">
+                      <div className="lg:text-4xl text-3xl font-bold text-gray-900">
                         1<span className="text-purple-600">K+</span>
                       </div>
                       <p className="text-gray-600 text-sm mt-1">
