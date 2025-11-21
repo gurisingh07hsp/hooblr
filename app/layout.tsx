@@ -10,10 +10,13 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.hooblr.com"),
-  title: 'Hooblr - Professional Job Board Platform',
-  description: 'Find your dream job or hire top talent with Hooblr',
+  title: 'Find Top Jobs in India – Apply Now',
+  description: 'Discover the latest jobs in India on Hooblr. Browse roles, compare companies, and apply instantly to fast-track your career growth.',
   verification: {
     google: "P8SyxngAQjuCxJyPsWuGEpLrEMghrPLPfMXyzTafqQA",
+  },
+  alternates: {
+    canonical: "/",
   },
 }
 

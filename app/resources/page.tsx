@@ -1,9 +1,13 @@
-'use client'
-
 import React from 'react';
 import ResourcesPage from '@/components/ResourcesPage';
 import Footer from '@/components/Footer';
+import type { Metadata } from 'next'
 
+export const metadata: Metadata = {
+  alternates: {
+    canonical: '/resources',
+  },
+}
 export default function ResourcesPageRoute() {
 
   return (

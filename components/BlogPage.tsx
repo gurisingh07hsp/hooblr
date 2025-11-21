@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Calendar,
@@ -16,6 +16,7 @@ import {
   Bookmark,
   MessageCircle,
 } from "lucide-react";
+import axios from "axios";
 
 interface BlogPost {
   _id?: string;
@@ -34,14 +35,11 @@ interface BlogPost {
   likes?: number;
 }
 
-interface BlogPageProps {
-  posts: BlogPost[];
-}
-
-export default function BlogPage({ posts }: BlogPageProps) {
+export default function BlogPage() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [posts, setPosts] = useState<BlogPost[]>([]);
 
   // Filter published posts
   const publishedPosts = posts.filter((post) => post.status === "published");
@@ -61,6 +59,22 @@ export default function BlogPage({ posts }: BlogPageProps) {
     "all",
     ...Array.from(new Set(publishedPosts.map((post) => post.category))),
   ];
+
+  const fetchblogs = async()=>{
+    try{
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/blog/`);
+      if(response.status === 200){
+        console.log(response.data.posts);
+        setPosts(response.data.posts);
+      }
+    }catch(error){
+      console.error(error);
+    }
+  }
+
+  useEffect(()=>{
+    fetchblogs();
+  },[]);
 
   const getCategoryColor = (category: string) => {
     const colors = {

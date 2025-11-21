@@ -1,6 +1,5 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+'use client';
+import React, { useState, useEffect } from 'react'
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -14,6 +13,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { useUser } from "@/context/UserContext";
+import Footer from "@/components/Footer";
 import { categories } from "@/types/utils";
 
 interface Job {
@@ -38,12 +38,15 @@ interface Job {
   createdAt: Date;
 }
 
-export default function FindJobsPage() {
+interface PageProps {
+  params: {
+    category: string;
+  };
+}
+const SearchJobsPage = ({ params }: PageProps) => {
   const router = useRouter();
   const { user } = useUser();
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [selectedSalaryRange, setSelectedSalaryRange] = useState("");
   const [sortBy, setSortBy] = useState("recent");
@@ -51,6 +54,13 @@ export default function FindJobsPage() {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
   const [isApplied, setIsApplied] = useState<string[]>([]);
+
+  const category = capitalizeWords(
+    decodeURIComponent(params.category.replace(/-/g, " ").split(" jobs")[0])
+  );
+  // const category = decodeURIComponent(params.category.replace(/-/g, ' ').split(' jobs')[0]);
+  const [selectedCategory, setSelectedCategory] = useState(category || "");
+  const [selectedLocation, setSelectedLocation] = useState("");
 
   const [filters, setFilters] = useState({
     type: "",
@@ -60,9 +70,19 @@ export default function FindJobsPage() {
     search: "",
   });
 
+  function capitalizeWords(str: string) {
+    if (str == "it") {
+      return "IT";
+    } else if (str == "sql") {
+      return "SQL";
+    }
+    return str.replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
   // Fetch jobs with filters
   const fetchJobs = async (pageNumber: number, filters: any) => {
     setLoading(true);
+
     try {
       const params = new URLSearchParams({
         page: String(pageNumber),
@@ -85,9 +105,11 @@ export default function FindJobsPage() {
       setFilteredJobs((prev) =>
         pageNumber === 1 ? newJobs : [...prev, ...newJobs]
       );
+      setLoading(false);
       setHasMore(pageNumber < res.data.pagination.pages);
     } catch (err) {
       console.error("Error fetching jobs:", err);
+      setLoading(false);
     }
 
     setLoading(false);
@@ -187,9 +209,8 @@ export default function FindJobsPage() {
         return <DollarSign className="w-4 h-4 mr-1 text-[#6D47F1]" />; // fallback
     }
   };
-
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-16">
       {/* Header Section */}
       <div className="bg-white border-b border-black/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -250,7 +271,6 @@ export default function FindJobsPage() {
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-[#f8fafc]">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters */}
-
           <div className="hidden lg:block lg:w-1/5">
             <div className="bg-white rounded-xl border p-6 sticky top-6">
               <div className="flex items-center justify-between mb-6">
@@ -400,9 +420,8 @@ export default function FindJobsPage() {
               </div>
             </div>
           </div>
-
           {/* Mobile Filters - Horizontal Scroll */}
-          <div className="lg:hidden md:mb-6 mb-2">
+          <div className="lg:hidden mb-6">
             <div className="flex items-center justify-between mb-4 px-4">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                 <Filter className="w-5 h-5 mr-2 text-purple-600" />
@@ -519,11 +538,11 @@ export default function FindJobsPage() {
 
           {/* Job Listings */}
           <div className="lg:w-3/4">
-            <div className="flex lg:flex-row flex-col gap-3 lg:items-center justify-between mb-6">
-              <h2 className="md:text-2xl text-xl font-bold text-gray-900">
-                {filteredJobs.length} Jobs Found
+            <div className="flex lg:flex-row flex-col lg:items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Jobs in {selectedCategory}
               </h2>
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-y-2 space-x-4">
                 <span className="text-sm text-gray-600">Sort by:</span>
                 <select
                   value={sortBy}
@@ -545,10 +564,7 @@ export default function FindJobsPage() {
                   className="w-full bg-white rounded-2xl border p-2"
                 >
                   <div className="flex border-b pb-4">
-                    <div
-                      onClick={() => router.push(`/jobs/${job._id}`)}
-                      className="w-14 h-14 rounded-xl border flex justify-center items-center px-1 cursor-pointer"
-                    >
+                    <div className="w-14 h-14 rounded-xl border flex justify-center items-center px-1">
                       <img
                         className={job?.company?.logo ? "block" : "hidden"}
                         src={job?.company?.logo}
@@ -688,15 +704,10 @@ export default function FindJobsPage() {
                 </div>
               ))}
             </section>
-            {loading && (
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#6D47F1] mx-auto" />
-                <p className="mt-4 text-gray-600">Loading Jobs…</p>
-              </div>
-            )}
+            {loading && <p>Loading...</p>}
             <div id="load-more" className="h-10"></div>
             {!hasMore && filteredJobs.length !== 0 && (
-              <p className="text-gray-500 ms-4">No more jobs</p>
+              <p className="text-gray-500 ms-4">No More jobs</p>
             )}
 
             {!loading && filteredJobs.length === 0 && (
@@ -710,6 +721,9 @@ export default function FindJobsPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
-  );
+  )
 }
+
+export default SearchJobsPage

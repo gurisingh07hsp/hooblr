@@ -1,6 +1,4 @@
-'use client'
 import React from 'react';
-import { useRouter } from 'next/navigation';
 import Footer from '@/components/Footer';
 import { 
   Users,
@@ -11,9 +9,17 @@ import {
   Lightbulb,
   CheckCircle
 } from 'lucide-react';
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'About Hooblr – India’s Job Platform',
+  description: 'Learn how Hooblr connects job seekers and employers with tools designed to simplify hiring, job search, and professional growth.',
+  alternates: {
+    canonical: '/about',
+  },
+}
 
 export default function AboutPage() {
-  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
@@ -163,7 +169,7 @@ export default function AboutPage() {
           </div>
 
           {/* CTA */}
-          <div className="text-center">
+          {/* <div className="text-center">
             <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 text-white">
               <h2 className="text-3xl font-bold mb-4">Join Our Mission</h2>
               <p className="text-purple-100 mb-6 max-w-2xl mx-auto">
@@ -185,7 +191,7 @@ export default function AboutPage() {
                 </button>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
