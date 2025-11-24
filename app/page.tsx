@@ -77,7 +77,7 @@ export default function Home() {
   const HomePage = () => (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative lg:h-[450px] z-30 lg:pt-4 pt-2 pb-4 px-4 overflow-hidden">
+      <section className="relative lg:h-[500px] z-30 lg:pt-4 pt-2 pb-4 px-4 overflow-hidden">
         <div className=" max-w-7xl px-4 mx-auto flex flex-col items-center gap-y-8">
           <motion.div variants={container} initial="hidden" animate="show">
             <div className="lg:w-[800px] mt-6">
