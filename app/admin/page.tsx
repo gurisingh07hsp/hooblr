@@ -940,6 +940,7 @@ export default function AdminPage() {
       totalPosts: govtjob?.totalPosts || '',
       salary: govtjob?.salary || '',
       applicationFees: govtjob?.applicationFees || '',
+      description: govtjob?.description || '',
       selectionProcess: govtjob?.selectionProcess || '',
       howToApply: govtjob?.howToApply || '',
       startDateToApply: govtjob?.startDateToApply || '',
@@ -1111,17 +1112,30 @@ export default function AdminPage() {
         {/* Text Areas */}
         <div className="space-y-4">
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">About Job *</label>
+            <div className="rounded-lg pb-10">
+              <ReactQuill
+                value={formData.description}
+                onChange={(description) => setFormData({ ...formData, description})}
+                modules={quillModules}
+                formats={quillFormats}
+                placeholder="Write about job here....."
+                style={{ height: '200px' }}
+              />
+            </div>
+          </div>
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Selection Process *</label>
             <div className="rounded-lg pb-10">
-          <ReactQuill
-            value={formData.selectionProcess}
-            onChange={(selectionProcess) => setFormData({ ...formData, selectionProcess})}
-            modules={quillModules}
-            formats={quillFormats}
-            placeholder="Write your job selection process here....."
-            style={{ height: '200px' }}
-          />
-        </div>
+              <ReactQuill
+                value={formData.selectionProcess}
+                onChange={(selectionProcess) => setFormData({ ...formData, selectionProcess})}
+                modules={quillModules}
+                formats={quillFormats}
+                placeholder="Write your job selection process here....."
+                style={{ height: '200px' }}
+              />
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Eligibility Criteria *</label>

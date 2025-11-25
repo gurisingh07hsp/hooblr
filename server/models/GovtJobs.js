@@ -45,6 +45,10 @@ const govtjobSchema = new mongoose.Schema({
     type: String,
     required: true, // e.g., "₹100 for General/OBC, No fee for SC/ST"
   },
+  description: {
+    type: String,
+    required: true
+  },
   selectionProcess: {
     type: String,
     required: true, // e.g., "Written Exam, Interview, Document Verification"

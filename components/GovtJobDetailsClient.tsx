@@ -8,6 +8,7 @@ import {
   Building2,
   User,
   SquareArrowOutUpRight,
+  IndianRupee,
 } from "lucide-react";
 import Footer from "@/components/Footer";
 
@@ -24,6 +25,7 @@ interface GovtJob {
   totalPosts: string;
   salary: string;
   applicationFees: string;
+  description: string;
   selectionProcess: string;
   howToApply: string;
   startDateToApply: string;
@@ -78,8 +80,11 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
                   <Building2 className="w-4 h-4 mr-2 text-purple-500" />
                   {job.category}
                 </span>
-                <span className="flex items-center">{job.salary}</span>
               </div>
+              <span className="flex items-center text-gray-500 mt-2">
+                <IndianRupee className="w-4 h-4 mr-2 text-purple-500" />
+                {job.salary}
+              </span>
               <span className="flex items-center text-gray-500 mt-2">
                 <MapPin className="w-4 h-4 mr-2 text-purple-500" />
                 {job.state}
@@ -122,6 +127,19 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
 
           <div className="flex lg:flex-row flex-col-reverse gap-6">
             <div className="space-y-6 w-full">
+              {job.description && (
+                <section className="bg-white/80 rounded-xl shadow border border-purple-200 p-6">
+                  <h2 className="text-xl font-semibold mb-3">
+                    About Job
+                  </h2>
+                  <div
+                    className="prose max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: job.description,
+                    }}
+                  />
+                </section>
+              )}
               {job.eligibilityCriteria && (
                 <section className="bg-white/80 rounded-xl shadow border border-purple-200 p-6">
                   <h2 className="text-xl font-semibold mb-3">
