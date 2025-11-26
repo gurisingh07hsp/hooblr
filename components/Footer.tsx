@@ -32,16 +32,16 @@ const Footer = () => {
               across federal, state, and local government agencies with Hooblr.
             </p>
             <div className="flex space-x-4 text-white">
-              <a href="#" className="w-10 h-10 bg-purple-700 hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors">
+              <a href="https://www.facebook.com/hooblr" className="w-10 h-10 bg-purple-700 hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 bg-purple-700 hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors">
+              {/* <a href="#" className="w-10 h-10 bg-purple-700 hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors">
                 <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 bg-purple-700 hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors">
+              </a> */}
+              <a href="https://www.linkedin.com/company/hooblr/" className="w-10 h-10 bg-purple-700 hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors">
                 <Linkedin className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 bg-purple-700 hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors">
+              <a href="https://www.instagram.com/hooblrofficial/" className="w-10 h-10 bg-purple-700 hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors">
                 <Instagram className="w-5 h-5" />
               </a>
             </div>

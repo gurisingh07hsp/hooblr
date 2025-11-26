@@ -49,13 +49,16 @@ const SearchGovtjobsPage = ({ params }: PageProps) => {
   });
 
   const category = capitalizeWords(
-    decodeURIComponent(params.category.replace(/-/g, " "))
+    decodeURIComponent(params?.category?.replace(/-/g, " "))
+  );
+  const state = capitalizeWords(
+    decodeURIComponent(params?.category?.replace(/-/g, " "))
   );
 
   console.log(category);
   // Filters
   const [selectedCategory, setSelectedCategory] = useState(category || "");
-  const [selectedState, setSelectedState] = useState("");
+  const [selectedState, setSelectedState] = useState(state || "");
   const [searchQuery, setSearchQuery] = useState("");
 
   const categories = [
@@ -177,7 +180,7 @@ const SearchGovtjobsPage = ({ params }: PageProps) => {
                 <button
                   key={cat}
                   onClick={() =>
-                    router.push(`${cat.replace(/\s+/g, "-").toLowerCase()}`)
+                    router.push(`/govtjobs/search/${cat.replace(/\s+/g, "-").toLowerCase()}`)
                   }
                   className={`px-4 py-2 rounded font-medium whitespace-nowrap transition-colors ${
                     selectedCategory === cat
@@ -207,7 +210,10 @@ const SearchGovtjobsPage = ({ params }: PageProps) => {
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-black" />
                 <select
                   value={selectedState}
-                  onChange={(e) => setSelectedState(e.target.value)}
+                  onChange={(e) =>
+                    router.push(`/govtjobs/state/${e.target.value.replace(/\s+/g, "-").toLowerCase()}`)
+                  }
+                  // onChange={(e) => setSelectedState(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-[#F6F6F6] text-black placeholder:text-black rounded-3xl focus:outline-none"
                 >
                   <option className="bg-white" value="All India">
