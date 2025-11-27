@@ -66,7 +66,41 @@ export async function GET() {
   <lastmod>2025-11-21T06:16:27+00:00</lastmod>
   <priority>0.80</priority>
 </url>
-
+<url><loc>https://www.hooblr.com/govtjobs/state/andhra-pradesh</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/arunachal-pradesh</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/assam</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/bihar</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/chhattisgarh</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/goa</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/gujarat</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/haryana</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/himachal-pradesh</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/jharkhand</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/karnataka</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/kerala</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/madhya-pradesh</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/maharashtra</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/manipur</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/meghalaya</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/mizoram</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/nagaland</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/odisha</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/punjab</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/rajasthan</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/sikkim</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/tamil-nadu</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/telangana</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/tripura</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/uttar-pradesh</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/uttarakhand</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/west-bengal</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/andaman-and-nicobar-islands</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/chandigarh</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/dadra-and-nagar-haveli-and-daman-and-diu</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/delhi</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/jammu-and-kashmir</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/lakshadweep</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
+   <url><loc>https://www.hooblr.com/govtjobs/state/puducherry</loc><lastmod>2025-11-27T00:00:00+00:00</lastmod></url>
 </urlset>`;
 
   return new Response(xml, {

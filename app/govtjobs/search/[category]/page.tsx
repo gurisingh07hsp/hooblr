@@ -5,6 +5,7 @@ import type { Metadata } from 'next'
 interface PageProps {
   params: {
     category: string;
+    state: string;
   };
 }
 

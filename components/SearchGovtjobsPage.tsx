@@ -35,6 +35,7 @@ interface PaginationData {
 interface PageProps {
   params: {
     category: string;
+    state: string;
   };
 }
 const SearchGovtjobsPage = ({ params }: PageProps) => {
@@ -52,15 +53,14 @@ const SearchGovtjobsPage = ({ params }: PageProps) => {
     decodeURIComponent(params?.category?.replace(/-/g, " "))
   );
   const state = capitalizeWords(
-    decodeURIComponent(params?.category?.replace(/-/g, " "))
+    decodeURIComponent(params?.state?.replace(/-/g, " "))
   );
 
-  console.log(category);
   // Filters
-  const [selectedCategory, setSelectedCategory] = useState(category || "");
-  const [selectedState, setSelectedState] = useState(state || "");
+  const [selectedCategory, setSelectedCategory] = useState(category == 'Undefined' ? "" : category);
+  const [selectedState, setSelectedState] = useState(state == 'Undefined' ? "All India" : state);
   const [searchQuery, setSearchQuery] = useState("");
-
+  
   const categories = [
     "State Govt Jobs",
     "Bank Jobs",
@@ -211,9 +211,9 @@ const SearchGovtjobsPage = ({ params }: PageProps) => {
                 <select
                   value={selectedState}
                   onChange={(e) =>
-                    router.push(`/govtjobs/state/${e.target.value.replace(/\s+/g, "-").toLowerCase()}`)
-                  }
-                  // onChange={(e) => setSelectedState(e.target.value)}
+                    { router.push(`/govtjobs/state/${e.target.value.replace(/\s+/g, "-").toLowerCase()}`);
+                      setSelectedState(e.target.value);
+                    }}
                   className="w-full pl-10 pr-4 py-3 bg-[#F6F6F6] text-black placeholder:text-black rounded-3xl focus:outline-none"
                 >
                   <option className="bg-white" value="All India">

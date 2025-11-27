@@ -35,7 +35,9 @@ router.get(
 
       const filter = {};
 
-      if (category) filter.category = category;
+      if (category && category != undefined){
+        filter.category = category;
+      } 
       //   if (state) filter.state = { $regex: location, $options: "i" };
       if (search) filter.title = { $regex: search, $options: "i" };
 

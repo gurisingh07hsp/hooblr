@@ -32,7 +32,7 @@ interface PaginationData {
   pages: number;
 }
 const GovtJobsPage = () => {
-    const router = useRouter();
+  const router = useRouter();
   const [jobs, setJobs] = useState<GovtJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState<PaginationData>({
@@ -197,7 +197,10 @@ const GovtJobsPage = () => {
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-black" />
                 <select
                   value={selectedState}
-                  onChange={(e) => setSelectedState(e.target.value)}
+                  onChange={(e) => 
+                    { router.push(`/govtjobs/state/${e.target.value.replace(/\s+/g, "-").toLowerCase()}`);
+                      setSelectedState(e.target.value);
+                    }}
                   className="w-full pl-10 pr-4 py-3 bg-[#F6F6F6] text-black placeholder:text-black rounded-3xl focus:outline-none"
                 >
                   <option className="bg-white" value="All India">
