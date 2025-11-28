@@ -14,11 +14,14 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const job = data.job;
 
   return {
-    title: `${job.title}`,
-    description: job.eligibilityCriteria,
+    title: job.seoTitle || job.title,
+    description: job.seoDescription || job.description,
     openGraph: {
       title: job.title,
-      description: job.eligibilityCriteria,
+      description: job.description,
+    },
+    alternates: {
+      canonical: `/govtjobs/${params.slug}`,
     },
   };
 }
@@ -48,7 +51,8 @@ export default async function GovtJobDetailsPage({ params }: { params: { slug: s
       "@type": "Place",
       address: {
         "@type": "PostalAddress",
-        addressLocality: job.state,
+        addressLocality: job.location || "",
+        addressRegion: job.state,
         addressCountry: "IN",
       },
     },

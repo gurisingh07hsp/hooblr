@@ -21,6 +21,9 @@ const govtjobSchema = new mongoose.Schema({
     type: String,
     required: true, // e.g., Gujrat
   },
+  location:{
+    type: String,
+  },
   category:{
     type: String,
     required: true, // e.g., police, railway
@@ -64,6 +67,8 @@ const govtjobSchema = new mongoose.Schema({
     type: Date, // Optional but useful
   },
   expiryDate: { type: Date },
+  seoTitle: {type: String},
+  seoDescription: {type: String},
   createdAt: {
     type: Date,
     default: Date.now,

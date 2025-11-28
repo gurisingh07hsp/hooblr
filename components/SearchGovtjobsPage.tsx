@@ -39,7 +39,7 @@ interface PageProps {
   };
 }
 const SearchGovtjobsPage = ({ params }: PageProps) => {
-    const router = useRouter();
+  const router = useRouter();
   const [jobs, setJobs] = useState<GovtJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState<PaginationData>({
@@ -254,7 +254,7 @@ const SearchGovtjobsPage = ({ params }: PageProps) => {
       </nav>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8 h-[100vh]">
+      <div className="container mx-auto px-4 py-8 min-h-[100vh]">
         <div className="max-w-7xl mx-auto">
           {/* Job Listings */}
           <main>

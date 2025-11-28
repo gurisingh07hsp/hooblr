@@ -118,7 +118,6 @@ const GovtJobsPage = () => {
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/govtjobs?${params}`
       );
       const data = await response.data.jobs;
-      console.log(data);
 
       setTimeout(() => {
         setJobs(data);
@@ -149,7 +148,6 @@ const GovtJobsPage = () => {
     const deadline = new Date(lastDate);
     const diffTime = deadline.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    console.log("days: ", diffDays);
     return diffDays;
   };
   return (

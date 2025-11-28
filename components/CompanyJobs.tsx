@@ -8,6 +8,7 @@ import axios from "axios";
 import { Eye, FileText, User, X } from "lucide-react";
 import { sendMessage, listenToMessages, markMessagesAsSeen } from "@/lib/chat";
 import { useRouter } from "next/navigation";
+import { generateSlug } from "@/hooks/generateSlug";
 
 interface Job {
   _id: string;
@@ -767,7 +768,7 @@ const CompanyJobs = () => {
               >
                 <div className="flex relative border-b pb-4">
                   <div
-                    onClick={() => router.push(`/jobs/${job._id}`)}
+                    onClick={() => router.push(`/jobs/${generateSlug(job?.company?.name || '') + '-' + generateSlug(job.title) + '-' + generateSlug(job.location) + '-' + job._id}`)}
                     className="w-14 h-14 rounded-xl border flex justify-center items-center px-1 cursor-pointer"
                   >
                     <img
@@ -997,7 +998,7 @@ const CompanyJobs = () => {
 
                 <div className="flex justify-between items-center mt-6 pb-2 px-2">
                   <button
-                    onClick={() => router.push(`/jobs/${job._id}`)}
+                    onClick={() => router.push(`/jobs/${generateSlug(job?.company?.name || '') + '-' + generateSlug(job.title) + '-' + generateSlug(job.location) + '-' + job._id}`)}
                     className={`px-4 py-1 flex items-center border rounded-3xl text-[#6D47F1]`}
                   >
                     View Job

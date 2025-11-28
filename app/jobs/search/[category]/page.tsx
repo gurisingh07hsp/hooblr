@@ -11,7 +11,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   return {
     title: `${params.category.replace('-', ' ')} in India – Apply Now`,
-    description: 'Find the latest government job openings in India. Explore SSC, railway, banking, police, and state govt vacancies and apply online quickly through Hooblr.',
+    description: 'Discover the latest jobs in India on Hooblr. Browse roles, compare companies, and apply instantly to fast-track your career growth.',
     alternates: {
       canonical: `/jobs/search/${params.category}`,
     },

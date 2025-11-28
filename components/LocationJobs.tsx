@@ -14,8 +14,9 @@ import {
 import axios from "axios";
 import { useUser } from "@/context/UserContext";
 import Footer from "@/components/Footer";
+import { useSearchParams } from "next/navigation";
 import { categories } from "@/types/utils";
-import { generateSlug } from '@/hooks/generateSlug';
+import { generateSlug } from "@/hooks/generateSlug";
 
 interface Job {
   _id: string;
@@ -41,10 +42,11 @@ interface Job {
 
 interface PageProps {
   params: {
-    category: string;
+    location: string;
   };
 }
-const SearchJobsPage = ({ params }: PageProps) => {
+
+const LocationJobs = ({ params }: PageProps) => {
   const router = useRouter();
   const { user } = useUser();
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
@@ -56,12 +58,15 @@ const SearchJobsPage = ({ params }: PageProps) => {
   const [loading, setLoading] = useState(true);
   const [isApplied, setIsApplied] = useState<string[]>([]);
 
-  const category = capitalizeWords(
-    decodeURIComponent(params.category.replace(/-/g, " ").split(" jobs")[0])
-  );
-  // const category = decodeURIComponent(params.category.replace(/-/g, ' ').split(' jobs')[0]);
+  const searchParams = useSearchParams();
+  const category = searchParams
+    .get("category")
+    ?.replace(/-/g, " ")
+    .replace(/@/g, "&");
   const [selectedCategory, setSelectedCategory] = useState(category || "");
-  const [selectedLocation, setSelectedLocation] = useState("");
+
+  const location = decodeURIComponent(params.location.replace(/-/g, " "));
+  const [selectedLocation, setSelectedLocation] = useState(location || "");
 
   const [filters, setFilters] = useState({
     type: "",
@@ -70,15 +75,6 @@ const SearchJobsPage = ({ params }: PageProps) => {
     maxSalary: "",
     search: "",
   });
-
-  function capitalizeWords(str: string) {
-    if (str == "it") {
-      return "IT";
-    } else if (str == "sql") {
-      return "SQL";
-    }
-    return str.replace(/\b\w/g, (char) => char.toUpperCase());
-  }
 
   // Fetch jobs with filters
   const fetchJobs = async (pageNumber: number, filters: any) => {
@@ -211,7 +207,7 @@ const SearchJobsPage = ({ params }: PageProps) => {
     }
   };
   return (
-    <div className="min-h-screen bg-white pt-16">
+     <div className="min-h-screen bg-white pt-16">
       {/* Header Section */}
       <div className="bg-white border-b border-black/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -539,11 +535,11 @@ const SearchJobsPage = ({ params }: PageProps) => {
 
           {/* Job Listings */}
           <div className="lg:w-3/4">
-            <div className="flex lg:flex-row flex-col lg:items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
-                Jobs in {selectedCategory}
+                Jobs in {selectedLocation}
               </h2>
-              <div className="flex items-center space-y-2 space-x-4">
+              <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-600">Sort by:</span>
                 <select
                   value={sortBy}
@@ -727,4 +723,4 @@ const SearchJobsPage = ({ params }: PageProps) => {
   )
 }
 
-export default SearchJobsPage
+export default LocationJobs

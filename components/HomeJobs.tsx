@@ -1,3 +1,4 @@
+import { generateSlug } from "@/hooks/generateSlug";
 import { Job } from "@/types/user";
 import axios from "axios";
 import {
@@ -151,7 +152,7 @@ const HomeJobs = () => {
               {/* Apply Button & Salary */}
               <div className="flex items-center justify-between mb-6 pb-6 border-b border-dashed border-gray-300">
                 <button
-                  onClick={() => router.push(`/jobs/${job._id}`)}
+                  onClick={() => router.push(`/jobs/${generateSlug(job?.company?.name || '') + '-' + generateSlug(job.title) + '-' + generateSlug(job.location) + '-' + job._id}`)}
                   className={`lg:px-6 px-2 py-2 rounded-full font-semibold transition-all hover:scale-105 group-hover:bg-white group-hover:text-purple-600 hover:shadow-lg bg-purple-600 text-white`}
                 >
                   Apply Now

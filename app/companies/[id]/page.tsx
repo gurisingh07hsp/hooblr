@@ -4,8 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Footer from '@/components/Footer';
 import { 
-  Menu, 
-  X,
   Building2,
   MapPin,
   Users,
@@ -23,7 +21,7 @@ import {
   Euro,
 } from 'lucide-react';
 import axios from 'axios';
-import Image from 'next/image';
+import { generateSlug } from '@/hooks/generateSlug';
 
 interface Company {
   id: number;
@@ -61,7 +59,7 @@ export default function CompanyProfilePage() {
   const router = useRouter();
   const params = useParams();
   const companyId = params.id;
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  // const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [company, setCompany] = useState<Company | null>(null);
   const [jobs,setJobs] = useState<Job[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -107,7 +105,7 @@ export default function CompanyProfilePage() {
             </div>
           </div>
         ) : (
-                  <div className="pt-20 pb-8">
+          <div className="pt-20 pb-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center py-16">
               <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -130,115 +128,6 @@ export default function CompanyProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
-      {/* Header */}
-      <header className="bg-white backdrop-blur-sm shadow-sm border-b border-purple-200 fixed w-full top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div 
-              className="flex items-center cursor-pointer"
-              onClick={() => router.push('/')}
-            >
-              <Image src='/hooblrlogo.png' width={120} height={50} alt='logo'/>
-            </div>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <button
-                onClick={() => router.push('/jobs')}
-                className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
-              >
-                Find Jobs
-              </button>
-              <button
-                onClick={() => router.push('/companies')}
-                className="text-purple-600 font-medium"
-              >
-                Companies
-              </button>
-              <button
-                onClick={() => router.push('/resources')}
-                className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
-              >
-                Resources
-              </button>
-              <button
-                onClick={() => router.push('/blog')}
-                className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
-              >
-                Blog
-              </button>
-              <button
-                onClick={() => router.push('/resume-builder')}
-                className="text-purple-600 font-medium"
-              >
-                Resume Builder
-              </button>
-            </div>
-
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-700 hover:text-purple-600 transition-colors"
-              >
-                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-purple-200">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              <button
-                onClick={() => {
-                  router.push('/jobs');
-                  setIsMenuOpen(false);
-                }}
-                className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors w-full text-left font-medium"
-              >
-                Find Jobs
-              </button>
-              <button
-                onClick={() => {
-                  router.push('/companies');
-                  setIsMenuOpen(false);
-                }}
-                className="block px-3 py-2 text-purple-600 font-medium w-full text-left"
-              >
-                Companies
-              </button>
-              <button
-                onClick={() => {
-                  router.push('/resources');
-                  setIsMenuOpen(false);
-                }}
-                className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors w-full text-left font-medium"
-              >
-                Resources
-              </button>
-              <button
-                onClick={() => {
-                  router.push('/blog');
-                  setIsMenuOpen(false);
-                }}
-                className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors w-full text-left font-medium"
-              >
-                Blog
-              </button>
-              <button
-                onClick={() => {
-                  router.push('/resume-builder');
-                  setIsMenuOpen(false);
-                }}
-                className="block px-3 py-2 text-purple-600 font-medium w-full text-left"
-              >
-                Resume Builder
-              </button>
-            </div>
-          </div>
-        )}
-      </header>
-
       {/* Main Content */}
       <div className="pt-20 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -335,7 +224,7 @@ export default function CompanyProfilePage() {
                           }) : "just now"}
                           </div>
                         </div>
-                        <button onClick={()=> router.push(`/jobs/${job._id}`)} className="bg-[#9333E9] mt-3 lg:mt-0 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium">
+                        <button onClick={()=> router.push(`/jobs/${generateSlug(company?.name || '') + '-' + generateSlug(job.title) + '-' + generateSlug(job.location) + '-' + job._id}`)} className="bg-[#9333E9] mt-3 lg:mt-0 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium">
                           Apply Now
                         </button>
                       </div>

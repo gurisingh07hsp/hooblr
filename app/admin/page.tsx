@@ -934,6 +934,7 @@ export default function AdminPage() {
       applyLink: govtjob?.applyLink || '',
       notificationLink: govtjob?.notificationLink || '',
       state: govtjob?.state || 'All India',
+      location: govtjob?.location || '',
       category: govtjob?.category || '',
       eligibilityCriteria: govtjob?.eligibilityCriteria || '',
       ageLimit: govtjob?.ageLimit || '',
@@ -945,6 +946,8 @@ export default function AdminPage() {
       howToApply: govtjob?.howToApply || '',
       startDateToApply: govtjob?.startDateToApply || '',
       lastDateToApply: govtjob?.lastDateToApply || '',
+      seoTitle: govtjob?.seoTitle || '',
+      seoDescription: govtjob?.seoDescription || ''
     });
 
     const indianStates = [
@@ -1109,6 +1112,16 @@ export default function AdminPage() {
           </div>
         </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+              <input
+                type="text"
+                value={formData.location}
+                onChange={(e) => setFormData({ ...formData, location: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+          </div>
+
         {/* Text Areas */}
         <div className="space-y-4">
           <div>
@@ -1171,7 +1184,6 @@ export default function AdminPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Start Date To Apply *</label>
               <input
                 type="Date"
-                required
                 value={formData.startDateToApply}
                 onChange={(e) => setFormData({ ...formData, startDateToApply: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -1181,13 +1193,32 @@ export default function AdminPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Last Date To Apply *</label>
              <input
               type='date'
-              required
               value={formData.lastDateToApply}
               onChange={(e) => setFormData({ ...formData, lastDateToApply: e.target.value})}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
+
+        {/* SEO Settings */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">SEO Title</label>
+            <input
+              type="text"
+              value={formData.seoTitle}
+              onChange={(e) => setFormData({ ...formData, seoTitle: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">SEO Description</label>
+              <textarea
+                value={formData.seoDescription}
+                onChange={(e) => setFormData({ ...formData, seoDescription: e.target.value})}
+                className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+          </div>
 
         <div className="flex justify-end space-x-3 pt-4">
           <button

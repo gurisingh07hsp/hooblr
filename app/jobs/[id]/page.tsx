@@ -6,7 +6,8 @@ import JobDetailsClient from "@/components/JobDetailsClient";
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const res = await fetch(`${API_BASE}/api/jobs/${params.id}`, { cache: "no-store" });
+  const id = params.id.split('-').pop();
+  const res = await fetch(`${API_BASE}/api/jobs/${id}`, { cache: "no-store" });
   const data = await res.json();
   const job = data.job;
 
@@ -17,13 +18,16 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
       title: job.title,
       description: job.description,
     },
+    alternates: {
+      canonical: `/jobs/${job.title}`,
+    },
   };
 }
 
 
 export default async function JobDetailsPage({ params }: { params: { id: string } }) {
-
-  const res = await fetch(`${API_BASE}/api/jobs/${params.id}`, { cache: "no-store" });
+  const id = params.id.split('-').pop();
+  const res = await fetch(`${API_BASE}/api/jobs/${id}`, { cache: "no-store" });
   const data = await res.json();
   const job = data.job;
 
@@ -62,7 +66,6 @@ export default async function JobDetailsPage({ params }: { params: { id: string 
 
   return (
     <>
-      {/* ✅ Safe JSON-LD Injection */}
       <Script
         id="job-posting-schema"
         type="application/ld+json"
