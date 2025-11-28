@@ -14,11 +14,13 @@ import {
   FileText,
   Upload,
   ArrowUpRightFromCircle,
+  Calendar,
 } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import axios from 'axios';
 import Footer from "@/components/Footer";
 import { sendMessage } from "@/lib/chat";
+import { generateSlug } from '@/hooks/generateSlug';
 
 type Salary = { min: number; max: number; currency: string; period: string };
 
@@ -67,6 +69,8 @@ const JobDetailsClient = ({ job }: { job: Job }) => {
   const [file, setFile] = useState<File | null>(null);
   const [text, setText] = useState("");
 
+  const [similarJobs, setSimilarJobs] = useState<Job[]>([]);
+
   useEffect(() => {
     if (job && user) {
       job.applications.forEach((app) => {
@@ -80,6 +84,29 @@ const JobDetailsClient = ({ job }: { job: Job }) => {
       setShowResumeField(true);
     }
   }, [job, user]);
+
+  useEffect(()=> {
+    fetchSimilarJobs();
+  },[job])
+
+  const fetchSimilarJobs = async() => {
+    try {
+      const params = new URLSearchParams({
+        page: String(1),
+        limit: "20",
+        category: job.category,
+      });
+
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs?${params.toString()}`
+      );
+
+      const similarjobs = res.data.jobs;
+      setSimilarJobs(similarjobs);
+    } catch (err) {
+      console.error("Error fetching jobs:", err);
+    }
+  }
 
   const handleSend = async () => {
     if (user?._id && user.profile?.name && job?._id && job.company.name) {
@@ -353,6 +380,49 @@ const JobDetailsClient = ({ job }: { job: Job }) => {
                   </p>
                 </section>
               )}
+
+              {similarJobs.length > 1 && (
+              <div className="bg-white rounded-2xl border p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Similar Jobs</h2>
+                <div className="space-y-4 max-h-72 overflow-auto">
+                  {similarJobs?.map((sjob) => (
+                    <div key={sjob._id} className={`${sjob._id == job._id && 'hidden'} border border-gray-200 rounded-xl p-6`}>
+                      <div className="flex lg:flex-row flex-col items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">{sjob.title}</h3>
+                          <div className="flex lg:flex-row flex-col gap-2 lg:items-center text-sm text-gray-600 mb-3">
+                            <div className="flex items-center">
+                              <MapPin className="w-4 h-4 mr-1" />
+                              {sjob.location}
+                            </div>
+                            <div className="flex items-center">
+                              <Clock className="w-4 h-4 mr-1" />
+                              {sjob.type}
+                            </div>
+                            <div className="flex items-center">
+                              {getCurrencyIcon(sjob.salary.currency)}
+                              {sjob.salary.min} - {sjob.salary.max} {sjob.salary.period}
+                            </div>
+                          </div>
+                          <div className="flex items-center text-xs text-gray-500">
+                            <Calendar className="w-3 h-3 mr-1" />
+                            Posted {sjob.createdAt ? new Date(sjob.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric"
+                          }) : "just now"}
+                          </div>
+                        </div>
+                        <button onClick={()=> router.push(`/jobs/${generateSlug(sjob.company?.name || '') + '-' + generateSlug(sjob.title) + '-' + generateSlug(sjob.location) + '-' + sjob._id}`)} className="bg-[#9333E9] mt-3 lg:mt-0 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium">
+                          Apply Now
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              )}
+
             </div>
             <aside className="space-y-6">
               <div className="bg-white/80 rounded-xl shadow border border-purple-200 p-6">

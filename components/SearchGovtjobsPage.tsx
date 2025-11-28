@@ -278,7 +278,7 @@ const SearchGovtjobsPage = ({ params }: PageProps) => {
                       key={job._id}
                       className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6"
                     >
-                      <div className="flex justify-between items-start mb-4">
+                      <div className="flex lg:flex-row flex-col gap-2 justify-between items-start mb-4">
                         <div className="flex-1">
                           <h2 className="text-xl font-bold text-gray-900 mb-2 hover:text-[#6D47F1] cursor-pointer">
                             <p
@@ -366,7 +366,7 @@ const SearchGovtjobsPage = ({ params }: PageProps) => {
                           href={job.applyLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-6 py-2 bg-[#6D47F1] text-white rounded-lg transition-colors font-medium"
+                          className="lg:px-4 px-2 py-2 bg-[#6D47F1] text-white rounded-lg transition-colors font-medium"
                         >
                           Apply Now
                         </a>
@@ -376,7 +376,7 @@ const SearchGovtjobsPage = ({ params }: PageProps) => {
                               `/govtjobs/${job.title.replace(/\s+/g, "-")}`
                             )
                           }
-                          className="px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium"
+                          className="lg:px-4 px-2 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium"
                         >
                           View Details
                         </button>

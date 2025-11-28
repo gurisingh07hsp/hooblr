@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {useRouter } from "next/navigation";
 import {
   MapPin,
@@ -9,8 +9,10 @@ import {
   User,
   SquareArrowOutUpRight,
   IndianRupee,
+  Calendar,
 } from "lucide-react";
 import Footer from "@/components/Footer";
+import axios from "axios";
 
 interface GovtJob {
   _id: string;
@@ -35,8 +37,31 @@ interface GovtJob {
 
 const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
     const router = useRouter();
-      const [submitted, setSubmitted] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
+    const [similarJobs, setSimilarJobs] = useState<GovtJob[]>([]);
 
+      useEffect(()=> {
+    fetchSimilarJobs();
+  },[job])
+
+  const fetchSimilarJobs = async() => {
+    try {
+      const params = new URLSearchParams({
+        page: String(1),
+        limit: "20",
+        category: job.category,
+      });
+
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/govtjobs?${params.toString()}`
+      );
+
+      const similarjobs = res.data.jobs;
+      setSimilarJobs(similarjobs);
+    } catch (err) {
+      console.error("Error fetching jobs:", err);
+    }
+  }
     
       const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -174,6 +199,47 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
                     dangerouslySetInnerHTML={{ __html: job.howToApply }}
                   />
                 </section>
+              )}
+              {similarJobs.length > 1 && (
+              <div className="bg-white rounded-2xl border p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Similar Jobs</h2>
+                <div className="space-y-4 max-h-72 overflow-auto">
+                  {similarJobs?.map((sjob) => (
+                    <div key={sjob._id} className={`${sjob._id == job._id && 'hidden'} border border-gray-200 rounded-xl p-6`}>
+                      <div className="flex lg:flex-row flex-col items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">{sjob.title}</h3>
+                          <div className="flex lg:flex-row flex-col gap-2 lg:items-center text-sm text-gray-600 mb-3">
+                            <div className="flex items-center">
+                              <MapPin className="w-4 h-4 mr-1" />
+                              {sjob.state}
+                            </div>
+                            <div className="flex items-center">
+                               <User className="w-4 h-4 mr-2 text-purple-500" />
+                              {sjob.totalPosts} Posts
+                            </div>
+                            <div className="flex items-center">
+                              <IndianRupee className="w-4 h-4 mr-1" />
+                              {sjob.salary}
+                            </div>
+                          </div>
+                          <div className="flex items-center text-xs text-gray-500">
+                            <Calendar className="w-3 h-3 mr-1" />
+                            Posted {sjob.createdAt ? new Date(sjob.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric"
+                          }) : "just now"}
+                          </div>
+                        </div>
+                        <button onClick={()=> router.push(`/govtjobs/${sjob.title}`)} className="bg-[#9333E9] mt-3 lg:mt-0 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium">
+                          Apply Now
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
               )}
             </div>
             <aside className="space-y-6">
