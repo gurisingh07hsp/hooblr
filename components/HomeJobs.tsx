@@ -95,11 +95,11 @@ const HomeJobs = () => {
         </div>
 
         {/* Job Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 flex gap-6 mb-8">
           {jobs.slice(0, seeJobs).map((job, index) => (
             <div
               key={index}
-              className={`rounded-3xl p-6 border transition-all hover:shadow-lg hover:text-white hover:bg-gradient-to-br from-purple-600 to-purple-500 border-[#B683F5] group`}
+              className={`rounded-3xl p-6 border w-full transition-all hover:shadow-lg hover:text-white hover:bg-gradient-to-br from-purple-600 to-purple-500 border-[#B683F5] group`}
             >
               {/* Job Title & Location */}
               <div className="mb-4">
@@ -150,7 +150,7 @@ const HomeJobs = () => {
               </div>
 
               {/* Apply Button & Salary */}
-              <div className="flex items-center justify-between mb-6 pb-6 border-b border-dashed border-gray-300">
+              <div className="flex flex-wrap-reverse gap-2 items-center justify-between mb-6 pb-6 border-b border-dashed border-gray-300">
                 <button
                   onClick={() => router.push(`/jobs/${generateSlug(job?.company?.name || '') + '-' + generateSlug(job.title) + '-' + generateSlug(job.location) + '-' + job._id}`)}
                   className={`lg:px-6 px-2 py-2 rounded-full font-semibold transition-all hover:scale-105 group-hover:bg-white group-hover:text-purple-600 hover:shadow-lg bg-purple-600 text-white`}

@@ -17,7 +17,6 @@ import {
   Users,
 } from "lucide-react";
 import Footer from "@/components/Footer";
-import Image from "next/image";
 import SearchComponent from "@/components/SearchComponent";
 import HomeJobs from "@/components/HomeJobs";
 import { motion } from "framer-motion";
@@ -77,10 +76,10 @@ export default function Home() {
   const HomePage = () => (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative lg:h-[500px] z-30 lg:pt-4 pt-2 pb-4 px-4 overflow-hidden">
+      <section className="relative lg:h-[500px] md:h-[400px] z-30 lg:pt-4 pt-2 pb-4 px-4 overflow-hidden">
         <div className=" max-w-7xl px-4 mx-auto flex flex-col items-center gap-y-8">
           <motion.div variants={container} initial="hidden" animate="show">
-            <div className="lg:w-[800px] mt-6">
+            <div className="lg:w-[800px] md:w-[400px] mx-auto mt-6">
               <motion.div
                 variants={fadeUp}
                 className="lg:text-[60px] text-3xl text-center font-semibold leading-tight"
@@ -91,7 +90,7 @@ export default function Home() {
             </div>
             <motion.div
               variants={fadeUp}
-              className="lg:w-[500px] mx-auto text-[#5F5270] text-[20px] mt-8"
+              className="md:w-[500px] mx-auto text-[#5F5270] text-[20px] mt-8"
             >
               <p className="text-center">
                 Connect with employers who put diversity, equality, and
@@ -155,11 +154,11 @@ export default function Home() {
       <section className="lg:py-20 py-10 px-4 bg-white lg:mt-14">
         <div className="max-w-6xl mx-auto flex lg:flex-row flex-col gap-y-8">
           <div>
-            <p className="text-[#8A38EE] font-medium text-[20px]">About us</p>
-            <p className="lg:text-[48px] text-2xl lg:leading-tight font-medium lg:w-[90%]">
+            <p className="text-[#8A38EE] font-medium md:text-center lg:text-start text-[20px]">About us</p>
+            <p className="lg:text-[48px] md:text-center lg:text-start text-2xl lg:leading-tight font-medium lg:w-[90%]">
               Opportunities That Reflect Modern Workplace Values
             </p>
-            <div className="flex gap-x-4 lg:mt-10 mt-4">
+            <div className="flex md:justify-center lg:justify-start gap-x-4 lg:mt-10 mt-4">
               <div className="lg:w-40 lg:h-28 w-36 h-24 bg-[#F5F5F5] rounded-2xl flex flex-col justify-center items-center">
                 <p className="lg:text-[30px] text-xl font-medium">
                   10<span className="text-[#8A38EE]">K+</span>
@@ -236,7 +235,7 @@ export default function Home() {
               {/* Right Content */}
               <div className="flex flex-col items-center">
                 {/* Image Placeholder */}
-                <img src="/jobs.jpg" alt="jobs" className="w-full rounded-3xl lg:h-80 h-64 mb-8"/>
+                <img src="/jobs.jpg" alt="jobs" className="w-full md:w-[80%] rounded-3xl lg:h-80 h-64 mb-8"/>
 
                 {/* Stats Section */}
                 <div className="w-full flex items-center justify-between">

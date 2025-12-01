@@ -521,9 +521,9 @@ export default function FindJobsPage() {
           {/* Job Listings */}
           <div className="lg:w-3/4">
             <div className="flex lg:flex-row flex-col gap-3 lg:items-center justify-between mb-6">
-              <h2 className="md:text-2xl text-xl font-bold text-gray-900">
+              <h1 className="md:text-2xl text-xl font-bold text-gray-900">
                 {filteredJobs.length} Jobs Found
-              </h2>
+              </h1>
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-600">Sort by:</span>
                 <select

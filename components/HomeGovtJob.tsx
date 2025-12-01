@@ -2,6 +2,7 @@ import axios from "axios";
 import {
   ChevronDown,
   ChevronUp,
+  IndianRupee,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -76,11 +77,11 @@ const HomeGovtJobs = () => {
         </div>
 
         {/* Job Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 flex overflow-x-auto gap-6 mb-8">
           {jobs.slice(0, seeJobs).map((job, index) => (
             <div
               key={index}
-              className={`rounded-3xl p-6 border transition-all hover:shadow-lg hover:text-white hover:bg-gradient-to-br from-purple-600 to-purple-500 border-[#B683F5] group`}
+              className={`rounded-3xl p-6 border w-full transition-all hover:shadow-lg hover:text-white hover:bg-gradient-to-br from-purple-600 to-purple-500 border-[#B683F5] group`}
             >
               {/* Job Title & Location */}
               <div className="mb-4">
@@ -95,10 +96,11 @@ const HomeGovtJobs = () => {
                   {job.state}
                 </p>
               </div>
+              <hr />
 
               {/* Posted & Applicants */}
               <div
-                className={`flex items-center gap-2 text-sm mb-6 group-hover:text-purple-100 text-gray-600`}
+                className={`flex items-center gap-2 text-sm mb-6 mt-2 group-hover:text-purple-100 text-gray-600`}
               >
                 <span>
                   {new Date(job.startDateToApply).toLocaleDateString("en-US", {
@@ -117,7 +119,13 @@ const HomeGovtJobs = () => {
 
               <div className="space-y-2">
                 <p><b>Age Limit: </b>{job.ageLimit}</p>
-                <p><b>Application Fees: </b>{job.applicationFees}</p>
+                <div className="flex">
+                  <p><b>Application Fees:</b></p>
+                  <p className="flex items-center w-52">
+                    <IndianRupee className="w-4 h-4"/> 
+                    {job.applicationFees}
+                  </p>
+                </div>
                 <p><b>Total Posts: </b>{job.totalPosts}</p>
 
               </div>
@@ -127,11 +135,14 @@ const HomeGovtJobs = () => {
                 <div
                   className={`lg:text-right mb-4 mt-4 group-hover:text-white flex items-center text-purple-600`}
                 >
-                  <p className="text-lg font-bold">{job.salary}</p>
+                  <p className="text-lg font-bold flex items-center">
+                    <IndianRupee className="w-4 h-5"/>
+                    {job.salary}</p>
                 </div>
+                <hr />
                 <button
                   onClick={()=> router.push(`/govtjobs/${job.title.replace(/\s+/g, '-')}`)}
-                  className={`lg:px-6 px-2 py-2 rounded-full font-semibold transition-all hover:scale-105 group-hover:bg-white group-hover:text-purple-600 hover:shadow-lg bg-purple-600 text-white`}
+                  className={`lg:px-6 px-2 py-2 mt-2 rounded-full font-semibold transition-all hover:scale-105 group-hover:bg-white group-hover:text-purple-600 hover:shadow-lg bg-purple-600 text-white`}
                 >
                   Apply Now
                 </button>

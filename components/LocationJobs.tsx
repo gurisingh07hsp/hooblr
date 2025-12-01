@@ -535,10 +535,10 @@ const LocationJobs = ({ params }: PageProps) => {
 
           {/* Job Listings */}
           <div className="lg:w-3/4">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
+            <div className="flex lg:flex-row flex-col lg:items-center justify-between mb-6">
+              <h1 className="text-2xl font-bold text-gray-900">
                 Jobs in {selectedLocation}
-              </h2>
+              </h1>
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-600">Sort by:</span>
                 <select

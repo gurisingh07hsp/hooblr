@@ -162,7 +162,7 @@ const fadeUp = {
               />
 
               {showSearchSuggestions && (
-                <div className="absolute top-full left-0 right-0 w-[150px] lg:w-[300px] mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 w-[150px] md:w-[300px] mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
                   {suggestions.length > 0 ? (
                   suggestions.map((item, index) => (
                       <button
@@ -197,7 +197,7 @@ const fadeUp = {
               
               {/* Location Dropdown */}
               {showLocationDropdown && (
-                <div className="absolute top-full left-0 border-none right-0 mt-1 w-[130px] lg:w-[400px] bg-white rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                <div className="absolute top-full left-0 border-none right-0 mt-1 w-[130px] lg:w-[400px] md:w-[250px] bg-white rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
                   {filteredCities.length > 0 && (
                     filteredCities.filter((city, index, arr) => arr.indexOf(city) === index).map((city, index) => (
                       <button
