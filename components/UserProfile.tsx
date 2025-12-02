@@ -289,7 +289,7 @@ const UserProfile = () => {
                   />
                 </div>
 
-                <div>
+                <div className="w-[100%]">
                   {!showResumeField ? (
                     <div>
                       <label
@@ -311,17 +311,14 @@ const UserProfile = () => {
                   ) : (
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-[#6D47F1] transition-colors">
                       <div>
-                        <div className="flex gap-2 items-center">
-                          <div className="bg-blue-100 p-4 rounded-full mb-3">
-                            <FileText className="w-6 h-6 text-[#6D47F1]" />
+                        <div className="flex gap-2">
+                          <div className="bg-blue-100 hidden h-8 lg:h-12 lg:w-12 lg:flex justify-center items-center lg:p-4 p-2 rounded-full mb-3">
+                            <FileText className="lg:w-6 lg:h-6 w-4 h-4 text-[#6D47F1]" />
                           </div>
 
                           <div>
                             <p className="text-sm font-medium text-gray-700 mb-2">
-                              {user?.profile?.resume
-                                ?.split("/")
-                                .pop()
-                                ?.slice(14)}
+                              {user?.profile?.resume?.split('/').pop()?.slice(14)}
                             </p>
                             <div className="flex gap-3">
                               <button
@@ -340,7 +337,7 @@ const UserProfile = () => {
                                   e.preventDefault();
                                   setShowResumeField(false);
                                 }}
-                                className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                                className="flex items-center gap-2 lg:px-4 px-2 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
                               >
                                 Change Resume
                               </button>

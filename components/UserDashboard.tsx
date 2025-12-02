@@ -22,6 +22,7 @@ import { ChartBarIcon, MessageSquareTextIcon, User } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { listenToMessages, markMessagesAsSeen, sendMessage } from "@/lib/chat";
+import Header from "./Header";
 
 interface SidebarItem {
   id: string;
@@ -49,7 +50,7 @@ interface Message {
 const UserDashboard = ({ tab }: any) => {
   const { user, logout } = useUser();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState(tab || "dashboard");
+  const [activeTab, setActiveTab] = useState(tab || "profile");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState<number>(0);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -60,7 +61,7 @@ const UserDashboard = ({ tab }: any) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const sidebarItems: SidebarItem[] = [
-    { id: "dashboard", name: "Dashboard", icon: HomeIcon },
+    // { id: "dashboard", name: "Dashboard", icon: HomeIcon },
     { id: "profile", name: "Profile", icon: UserIcon },
     { id: "Applied jobs", name: "Applied Jobs", icon: BriefcaseIcon },
     {
@@ -508,7 +509,8 @@ const UserDashboard = ({ tab }: any) => {
                 />
               </div>
             </div>
-            <div className="w-10"></div> {/* Spacer for centering */}
+            <div className="w-10">
+            </div>
           </div>
         </div>
 
