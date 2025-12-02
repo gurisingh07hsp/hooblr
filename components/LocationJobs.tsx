@@ -535,7 +535,7 @@ const LocationJobs = ({ params }: PageProps) => {
 
           {/* Job Listings */}
           <div className="lg:w-3/4">
-            <div className="flex lg:flex-row flex-col lg:items-center justify-between mb-6">
+            <div className="flex lg:flex-row flex-col gap-3 lg:items-center justify-between mb-6">
               <h1 className="text-2xl font-bold text-gray-900">
                 Jobs in {selectedLocation}
               </h1>

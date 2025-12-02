@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import { usePathname } from "next/navigation";
 import { listenToMessages } from "@/lib/chat";
-import { Menu, X, LogOut, MessageSquareTextIcon } from "lucide-react";
+import { Menu, X, LogOut, MessageSquareTextIcon, User } from "lucide-react";
 import Image from "next/image";
 const Header = () => {
   const router = useRouter();
@@ -175,6 +175,15 @@ const Header = () => {
 
             {/* Mobile menu button */}
             <div className="lg:hidden flex gap-4">
+              {isLoggedIn ? (
+                <div>
+                  <button
+                  onClick={()=> router.push('/dashboard')}
+                  >
+                    <User className="w-6 h-6"/>
+                  </button>
+                </div>
+              ) : (
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => router.push("/login")}
@@ -183,6 +192,7 @@ const Header = () => {
                   Sign In
                 </button>
               </div>
+              )}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="text-gray-700 hover:text-purple-600 transition-colors"
@@ -269,7 +279,7 @@ const Header = () => {
 
               {isLoggedIn ? (
                 <>
-                  {user?.role && (
+                  {user?.role == 'admin' && (
                     <button
                       onClick={() => {
                         router.push("/admin");
@@ -281,23 +291,29 @@ const Header = () => {
                     </button>
                   )}
 
+                  <div>
                   <button
                     onClick={() => router.push("/dashboard")}
-                    className="text-gray-700 ms-2 border rounded-lg px-3 py-2 hover:text-purple-600 transition-colors font-medium"
+                    className="text-gray-700 ms-2 mt-2 border rounded-lg px-3 py-2 hover:text-purple-600 transition-colors font-medium"
                   >
                     Dashboard
                   </button>
 
+                  </div>
+
+                  <div>
                   <button
                     onClick={() => router.push("/dashboard?tab=messages")}
-                    className="relative py-2 flex justify-center items-center transition-colors"
+                    className="relative py-2 mt-1 flex justify-center items-center transition-colors"
                   >
                     <p className="ms-3">Messages</p>
                     {notifications > 0 && (
                       <div className="p-[4px] border border-white bg-red-600 rounded-full ms-1"></div>
                     )}
                   </button>
+                  </div>
 
+                  <div>
                   <button
                     onClick={() => {
                       handleLogout();
@@ -308,6 +324,8 @@ const Header = () => {
                     Logout
                     <LogOut className="w-4 h-4 ms-1" />
                   </button>
+                  </div>
+
                 </>
               ) : (
                 <>
