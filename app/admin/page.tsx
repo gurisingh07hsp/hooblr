@@ -10,13 +10,10 @@ import axios from 'axios';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 
-// Dynamically import ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), {
+const TiptapEditor = dynamic(() => import('@/components/TipTapEditor'), {
   ssr: false,
-  loading: () => <div className="h-64 bg-gray-100 rounded-lg animate-pulse"></div>
+  loading: () => <p>Loading editor...</p>
 });
-
-import 'react-quill/dist/quill.snow.css';
 import { categories } from '@/types/utils';
 
 // Enhanced interfaces
@@ -146,27 +143,6 @@ export default function AdminPage() {
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [users, setUsers] = useState<User[]>([]);
 
-
-
-    // Quill editor configuration
-  const quillModules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'align': [] }],
-      ['link', 'image', 'blockquote', 'code-block'],
-      ['clean']
-    ],
-  };
-
-  const quillFormats = [
-    'header', 'bold', 'italic', 'underline', 'strike',
-    'list', 'bullet', 'color', 'background', 'align',
-    'link', 'image', 'blockquote', 'code-block'
-  ];
-
   
   // Modal states
   const [modalState, setModalState] = useState({
@@ -287,15 +263,6 @@ export default function AdminPage() {
     }
   };
 
-  // const fetchUsers = async () => {
-  //   try {
-  //     const response = await fetch('/api/admin/users');
-  //     const data = await response.json();
-  //     setUsers(data.users || []);
-  //   } catch (error) {
-  //     console.error('Error fetching users:', error);
-  //   }
-  // };
 
   useEffect(()=>{
     fetchBlogPosts();
@@ -353,6 +320,7 @@ export default function AdminPage() {
         } else if(mode === 'edit'){
           const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/govtjobs/${data._id}`, data, {withCredentials: true});
           if (response.status === 200) {
+            console.log("run jjeijfejifj");
             setGovtJobs(prev => prev.map(j => j._id === data._id ? response.data.job : j));
             closeModal();
           }
@@ -1127,53 +1095,46 @@ export default function AdminPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">About Job *</label>
             <div className="rounded-lg pb-10">
-              <ReactQuill
+              <TiptapEditor
                 value={formData.description}
-                onChange={(description) => setFormData({ ...formData, description})}
-                modules={quillModules}
-                formats={quillFormats}
-                placeholder="Write about job here....."
-                style={{ height: '200px' }}
+                onChange={(description: any) => setFormData({ ...formData, description: description })}
               />
+
             </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Selection Process *</label>
             <div className="rounded-lg pb-10">
-              <ReactQuill
+              <TiptapEditor
+                value={formData.selectionProcess}
+                onChange={(selectionProcess: any) => setFormData({ ...formData, selectionProcess: selectionProcess })}
+              />
+              {/* <ReactQuill
                 value={formData.selectionProcess}
                 onChange={(selectionProcess) => setFormData({ ...formData, selectionProcess})}
                 modules={quillModules}
                 formats={quillFormats}
                 placeholder="Write your job selection process here....."
                 style={{ height: '200px' }}
-              />
+              /> */}
             </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Eligibility Criteria *</label>
             <div className="rounded-lg pb-10">
-            <ReactQuill
-            value={formData.eligibilityCriteria}
-            onChange={(eligibilityCriteria) => setFormData({ ...formData, eligibilityCriteria})}
-            modules={quillModules}
-            formats={quillFormats}
-            placeholder="Write your job eligibility criteria here....."
-            style={{ height: '200px' }}
-          />
+              <TiptapEditor
+                value={formData.eligibilityCriteria}
+                onChange={(eligibilityCriteria: any) => setFormData({ ...formData, eligibilityCriteria: eligibilityCriteria })}
+              />
           </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">How To Apply *</label>
             <div className="rounded-lg pb-10">
-            <ReactQuill
-            value={formData.howToApply}
-            onChange={(howToApply) => setFormData({ ...formData, howToApply})}
-            modules={quillModules}
-            formats={quillFormats}
-            placeholder="Write your job Apply process here....."
-            style={{ height: '200px' }}
-          />
+            <TiptapEditor
+                value={formData.howToApply}
+                onChange={(howToApply: any) => setFormData({ ...formData, howToApply: howToApply })}
+              />
           </div>
           </div>
         </div>
@@ -1321,40 +1282,44 @@ export default function AdminPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
             <div className="rounded-lg pb-10">
-          <ReactQuill
+              <TiptapEditor
+                value={formData.description}
+                onChange={(description: any) => setFormData({ ...formData, description })}
+              />
+          {/* <ReactQuill
             value={formData.description}
             onChange={(description) => setFormData({ ...formData, description})}
             modules={quillModules}
             formats={quillFormats}
             placeholder="Write your job selection process here....."
             style={{ height: '200px' }}
-          />
+          /> */}
         </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Requirements</label>
             <div className="rounded-lg pb-10">
-          <ReactQuill
+              <TiptapEditor
+                value={formData.requirements}
+                onChange={(requirements: any) => setFormData({ ...formData, requirements })}
+              />
+          {/* <ReactQuill
             value={formData.requirements}
             onChange={(requirements) => setFormData({ ...formData, requirements})}
             modules={quillModules}
             formats={quillFormats}
             placeholder="Write your job selection process here....."
             style={{ height: '200px' }}
-          />
+          /> */}
         </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Benefits</label>
             <div className="rounded-lg pb-10">
-            <ReactQuill
-            value={formData.benefits}
-            onChange={(benefits) => setFormData({ ...formData, benefits})}
-            modules={quillModules}
-            formats={quillFormats}
-            placeholder="Write your job eligibility criteria here....."
-            style={{ height: '200px' }}
-          />
+              <TiptapEditor
+                value={formData.benefits}
+                onChange={(benefits: any) => setFormData({ ...formData, benefits })}
+              />
           </div>
           </div>
         </div>
@@ -1550,17 +1515,17 @@ export default function AdminPage() {
 
           <div>
             <h3 className="text-lg font-semibold mb-2">Eligibility Criteria</h3>
-            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: data.eligibilityCriteria }} />
+            <div className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: data.eligibilityCriteria }} />
           </div>
 
           <div>
             <h3 className="text-lg font-semibold mb-2">selectionProcess</h3>
-             <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: data.selectionProcess }} />
+             <div className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: data.selectionProcess }} />
           </div>
 
           <div>
             <h3 className="text-lg font-semibold mb-2">how To Apply</h3>
-             <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: data.howToApply }} />
+             <div className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: data.howToApply }} />
           </div>
         </div>
       );
@@ -1647,7 +1612,7 @@ export default function AdminPage() {
       )}
       
       <div 
-        className="text-gray-700 leading-relaxed"
+        className="text-gray-700 leading-relaxed quill-content prose prose-sm sm:prose lg:prose-lg max-w-none"
         dangerouslySetInnerHTML={{ __html: data.content }}
       />
       
@@ -2745,6 +2710,11 @@ export default function AdminPage() {
 
       {/* Modals */}
       <Modal />
+
+              {/* <TiptapEditor
+                value={formData.selectionProcess}
+                onChange={(selectionProcess) => setFormData({ ...formData, howToApply: selectionProcess })}
+              /> */}
       
       {blogEditorState.isOpen && (
         <BlogPostEditor

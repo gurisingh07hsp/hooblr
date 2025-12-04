@@ -196,7 +196,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
             
             {/* Article Content */}
             <div 
-              className="prose prose-lg max-w-none"
+              className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
             

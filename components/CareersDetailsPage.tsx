@@ -228,16 +228,16 @@ const CareersDetailsPage = () => {
                   </div>
                 </div>
                 
-                <div className="prose max-w-none mb-2" dangerouslySetInnerHTML={{ __html: job.description }} />
+                <div className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none mb-2" dangerouslySetInnerHTML={{ __html: job.description }} />
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-2">Requirements</h4>
-                    <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: job.requirements }} />
+                    <div className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: job.requirements }} />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-2">Benefits</h4>
-                    <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: job.benefits }} />
+                    <div className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: job.benefits }} />
                   </div>
                 </div>
                 

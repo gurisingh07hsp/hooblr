@@ -4,15 +4,12 @@ import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { X, Save, Eye, ArrowLeft } from "lucide-react";
 
-// Dynamically import ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import("react-quill"), {
+
+const TiptapEditor = dynamic(() => import('@/components/TipTapEditor'), {
   ssr: false,
-  loading: () => (
-    <div className="h-64 bg-gray-100 rounded-lg animate-pulse"></div>
-  ),
+  loading: () => <p>Loading editor...</p>
 });
 
-import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 
 interface BlogPost {
@@ -78,36 +75,6 @@ export default function BlogPostEditor({
 
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [newTag, setNewTag] = useState("");
-
-  // Quill editor configuration
-  const quillModules = {
-    toolbar: [
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
-      ["bold", "italic", "underline", "strike"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      [{ color: [] }, { background: [] }],
-      [{ align: [] }],
-      ["link", "image", "blockquote", "code-block"],
-      ["clean"],
-    ],
-  };
-
-  const quillFormats = [
-    "header",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "list",
-    "bullet",
-    "color",
-    "background",
-    "align",
-    "link",
-    "image",
-    "blockquote",
-    "code-block",
-  ];
 
   const handleSave = async () => {
     try {
@@ -373,13 +340,9 @@ export default function BlogPostEditor({
           Content *
         </label>
         <div className="rounded-lg pb-10">
-          <ReactQuill
+          <TiptapEditor
             value={blogPost.content}
-            onChange={(content) => setBlogPost({ ...blogPost, content })}
-            modules={quillModules}
-            formats={quillFormats}
-            placeholder="Write your blog post content here..."
-            style={{ height: "400px" }}
+            onChange={(content: any) => setBlogPost({ ...blogPost, content })}
           />
         </div>
       </div>
