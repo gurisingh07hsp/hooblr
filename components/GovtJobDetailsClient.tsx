@@ -159,7 +159,7 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
                     About Job
                   </h2>
                   <div
-                    className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none"
+                    className="quill-content prose prose-sm sm:prose lg:prose-lg w-full max-w-full"
                     dangerouslySetInnerHTML={{
                       __html: job.description,
                     }}
@@ -172,7 +172,7 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
                     Eligibility Criteria
                   </h2>
                   <div
-                    className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none"
+                    className="quill-content prose prose-sm sm:prose lg:prose-lg w-full max-w-full"
                     dangerouslySetInnerHTML={{
                       __html: job.eligibilityCriteria,
                     }}
@@ -186,8 +186,10 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
                     Selection Process
                   </h2>
                   <div
-                    className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none"
-                    dangerouslySetInnerHTML={{ __html: job.selectionProcess }}
+                    className="quill-content prose prose-sm sm:prose lg:prose-lg w-full max-w-full"
+                    dangerouslySetInnerHTML={{
+                      __html: job.selectionProcess,
+                    }}
                   />
                 </section>
               )}
@@ -196,8 +198,10 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
                 <section className="bg-white/80 rounded-xl shadow border border-purple-200 p-6">
                   <h2 className="text-xl font-semibold mb-3">How to Apply</h2>
                   <div
-                    className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none"
-                    dangerouslySetInnerHTML={{ __html: job.howToApply }}
+                    className="quill-content prose prose-sm sm:prose lg:prose-lg w-full max-w-full"
+                    dangerouslySetInnerHTML={{
+                      __html: job.howToApply,
+                    }}
                   />
                 </section>
               )}

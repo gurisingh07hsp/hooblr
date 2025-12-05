@@ -195,11 +195,13 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
             </div>
             
             {/* Article Content */}
-            <div 
-              className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+            <div
+              className="quill-content prose prose-sm sm:prose lg:prose-lg w-full max-w-full"
+              dangerouslySetInnerHTML={{
+                __html: post.content,
+              }}
             />
-            
+                        
             {/* Article Footer */}
             <div className="mt-8 pt-6 border-t border-purple-200">
               <div className="flex items-center justify-between">

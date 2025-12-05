@@ -1933,7 +1933,7 @@ export default function AdminPage() {
                 <tr key={job._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{job.title}</div>
+                      <div className="text-sm font-medium text-gray-900">{job.title.length > 50 ? job.title.slice(0,50)+'...' : job.title}</div>
                       <div className="text-sm text-gray-500">{job.location} • {job.type}</div>
                     </div>
                   </td>
@@ -2041,7 +2041,7 @@ export default function AdminPage() {
                 <tr key={job._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{job.title}</div>
+                      <div className="text-sm font-medium text-gray-900">{job.title.length > 50 ? job.title.slice(0,50)+'...' : job.title}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.category}</td>
