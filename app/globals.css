@@ -337,12 +337,12 @@
   }
 }
 
-.quill-content table tbody,
+/* .quill-content table tbody,
 .quill-content table thead,
 .quill-content table tr {
   display: table;
   width: 100%;
-}
+} */
 
 .quill-content table tbody,
 .quill-content table thead {
