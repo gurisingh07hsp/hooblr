@@ -32,6 +32,8 @@ type Job = {
   requirements: string;
   responsibilities?: string;
   location: string;
+  state: string;
+  pincode: string;
   type: string;
   category: string;
   department?: string;
@@ -432,6 +434,8 @@ const JobDetailsClient = ({ job }: { job: Job }) => {
                   {job.department && <li>Department: {job.department}</li>}
                   {job.experience && <li>Experience: {job.experience}</li>}
                   {job.education && <li>Education: {job.education}</li>}
+                  {job.state && <li>State: {job.state}</li>}
+                  {job.pincode && <li>Pin Code: {job.pincode}</li>}
                 </ul>
               </div>
               {user?._id && (

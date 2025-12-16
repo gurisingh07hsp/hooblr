@@ -14,6 +14,8 @@ interface Job {
   _id: string;
   title: string;
   location: string;
+  state: string;
+  pincode: string;
   requirements: string;
   responsibilities: string;
   description: string;

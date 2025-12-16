@@ -27,6 +27,12 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  state: {
+    type: String,
+  },
+  pincode: {
+    type: String,
+  },
   type: {
     type: String,
     enum: ['Full-time', 'Part-time', 'Contract', 'Temporary', 'Internship',],

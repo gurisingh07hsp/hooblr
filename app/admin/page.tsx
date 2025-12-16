@@ -45,6 +45,8 @@ interface Job {
   requirements: string;
   responsibilities: string;
   location: string;
+  state: string;
+  pincode: string;
   type: 'Full-time' | 'Part-time' | 'Contract' | 'Temporary' | 'Internship';
   category: string;
   department: string;
@@ -571,13 +573,15 @@ export default function AdminPage() {
       requirements: job?.requirements || '',
       responsibilities: job?.responsibilities || '',
       location: job?.location || '',
+      state: job?.state || '',
+      pincode: job?.pincode || '',
       type: job?.type || 'Full-time',
       category: job?.category || '',
       department: job?.department || '',
       salary: {
         min: job?.salary?.min,
         max: job?.salary?.max,
-        currency: job?.salary?.currency || 'USD',
+        currency: job?.salary?.currency || 'INR',
         period: job?.salary?.period || 'yearly'
       },
       benefits: job?.benefits || [],
@@ -672,6 +676,28 @@ export default function AdminPage() {
               <option value="Internship">Internship</option>
             </select>
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
+            <input
+              type="text"
+              required
+              value={formData.state}
+              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Pin Code</label>
+            <input
+              type="text"
+              required
+              value={formData.pincode}
+              onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
             <select

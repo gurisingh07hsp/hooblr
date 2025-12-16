@@ -48,6 +48,9 @@ export default async function JobDetailsPage({ params }: { params: { id: string 
       address: {
         "@type": "PostalAddress",
         addressLocality: job.location,
+        addressRegion: job.state || '',
+        postalCode: job.pincode || '',
+        streetAddress: job.location || '',
         addressCountry: "IN",
       },
     },

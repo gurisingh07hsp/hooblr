@@ -15,6 +15,8 @@ interface Job {
   requirements: string;
   responsibilities: string;
   location: string;
+  state: string;
+  pincode: string;
   type: string;
   category: string;
   department: string;
@@ -78,6 +80,8 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
     requirements: '',
     responsibilities: '',
     location: '',
+    state: '',
+    pincode: '',
     type: 'Full-time',
     category: '',
     department: '',
@@ -434,9 +438,39 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSave, onCancel, className = ''
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     errors.location ? 'border-red-300' : 'border-gray-300'
                   }`}
-                  placeholder="e.g., Bengaluru, Pune"
+                  placeholder="e.g., 123 street"
                 />
                 {errors.location && <p className="mt-1 text-sm text-red-600">{errors.location}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
+                <input
+                  type="text"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleInputChange}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.state ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  placeholder="e.g., Bengaluru, Pune"
+                />
+                {errors.state && <p className="mt-1 text-sm text-red-600">{errors.state}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Pin Code</label>
+                <input
+                  type="text"
+                  name="pincode"
+                  value={formData.pincode}
+                  onChange={handleInputChange}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.pincode ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  placeholder="e.g., 123456, 654321"
+                />
+                {errors.pincode && <p className="mt-1 text-sm text-red-600">{errors.pincode}</p>}
               </div>
             </div>
 
