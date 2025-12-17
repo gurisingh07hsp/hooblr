@@ -770,7 +770,7 @@ const CompanyJobs = () => {
               >
                 <div className="flex relative border-b pb-4">
                   <div
-                    onClick={() => router.push(`/jobs/${generateSlug(job?.company?.name || '') + '-' + generateSlug(job.title) + '-' + generateSlug(job.location) + '-' + job._id}`)}
+                    onClick={() => router.push(`/jobs/${generateSlug(job?.company?.name || '') + '-' + generateSlug(job.title) + '-' + generateSlug(job.location.split(',').pop() || job.location) + '-' + job._id}`)}
                     className="w-14 h-14 rounded-xl border flex justify-center items-center px-1 cursor-pointer"
                   >
                     <img

@@ -415,7 +415,7 @@ const JobDetailsClient = ({ job }: { job: Job }) => {
                           }) : "just now"}
                           </div>
                         </div>
-                        <button onClick={()=> router.push(`/jobs/${generateSlug(sjob.company?.name || '') + '-' + generateSlug(sjob.title) + '-' + generateSlug(sjob.location) + '-' + sjob._id}`)} className="bg-[#9333E9] mt-3 lg:mt-0 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium">
+                        <button onClick={()=> router.push(`/jobs/${generateSlug(sjob.company?.name || '') + '-' + generateSlug(sjob.title) + '-' + generateSlug(sjob.location.split(',').pop() || sjob.location) + '-' + sjob._id}`)} className="bg-[#9333E9] mt-3 lg:mt-0 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium">
                           Apply Now
                         </button>
                       </div>

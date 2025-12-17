@@ -682,7 +682,7 @@ const LocationJobs = ({ params }: PageProps) => {
 
                   <div className="flex justify-between items-center mt-6 pb-2 px-2">
                     <button
-                      onClick={() => router.push(`/jobs/${generateSlug(job?.company?.name || '') + '-' + generateSlug(job.title) + '-' + generateSlug(job.location) + '-' + job._id}`)}
+                      onClick={() => router.push(`/jobs/${generateSlug(job?.company?.name || '') + '-' + generateSlug(job.title) + '-' + generateSlug(job.location.split(',').pop() || job.location) + '-' + job._id}`)}
                       className={`px-4 py-1 flex items-center border rounded-3xl text-[#6D47F1]`}
                     >
                       {isApplied.includes(job._id) ? "Applied" : "Apply Now"}
