@@ -300,7 +300,7 @@ router.post("/forgotPassword", async (req, res, next) => {
   const mailOptions = {
     from: process.env.EMAIL,
     to: email,
-    subject: "OTP for Login",
+    subject: "Hooblr OTP for Login",
     html: `
     <div style="font-family: Arial, sans-serif; background:#f9f9f9; padding:20px; border:1px solid white; border-radius:8px;">
       <div style="max-width:600px; margin:auto; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
@@ -324,7 +324,7 @@ router.post("/forgotPassword", async (req, res, next) => {
               ${otp}
             </div>
           </div>
-          <p><b>Regards</b><br/><b>Stordial</b></p>
+          <p><b>Regards</b><br/><b>Hooblr</b></p>
         </div>
       </div>
     </div>
