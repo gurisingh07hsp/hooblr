@@ -145,21 +145,57 @@ router.get("/:id", optionalAuth, async (req, res) => {
 // @route   POST /api/jobs
 // @desc    Create a new job
 // @access  Private (Company only)
+// router.post("/", auth, authorize("user", "admin"), async (req, res) => {
+//   try {
+//     const jobData = {
+//       ...req.body,
+//     };
+
+//     const job = new Job(jobData);
+//     await job.save();
+
+//     const populatedJob = await Job.findById(job._id).populate(
+//       "company",
+//       "company.name company.logo company.location"
+//     );
+
+//     res.status(200).json({
+//       message: "Job created successfully",
+//       job: populatedJob,
+//     });
+//   } catch (error) {
+//     console.error("Create job error:", error);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// });
+
+
 router.post("/", auth, authorize("user", "admin"), async (req, res) => {
   try {
-    const jobData = {
-      ...req.body,
-    };
+    const jobData = { ...req.body };
+    const role = req.user.role; // from auth middleware
+
+    // ❌ Remove empty company string
+    if (jobData.company === "" || jobData.company === null) {
+      delete jobData.company;
+    }
+
+    // ✅ User must provide company
+    if (role === "user" && !jobData.company) {
+      return res.status(400).json({
+        message: "Company is required when user posts a job",
+      });
+    }
 
     const job = new Job(jobData);
     await job.save();
 
     const populatedJob = await Job.findById(job._id).populate(
       "company",
-      "company.name company.logo company.location"
+      "name logo location"
     );
 
-    res.status(200).json({
+    res.status(201).json({
       message: "Job created successfully",
       job: populatedJob,
     });
@@ -176,13 +212,8 @@ router.put(
   "/:id",
   auth,
   authorize("user", "admin"),
-  jobValidation,
   async (req, res) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
 
       const job = await Job.findById(req.params.id);
 
@@ -264,10 +295,6 @@ router.post(
   [],
   async (req, res) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
 
       const job = await Job.findById(req.params.id);
       if (!job) {

@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   const job = data.job;
 
   return {
-    title: `${job.title} - ${job.company.name}`,
+    title: `${job.title} - ${job && job?.company?.name}`,
     description: job.description,
     openGraph: {
       title: job.title,
@@ -40,8 +40,8 @@ export default async function JobDetailsPage({ params }: { params: { id: string 
     employmentType: job.type,
     hiringOrganization: {
       "@type": "Organization",
-      name: job.company.name,
-      sameAs: job.company.website || "",
+      name: job ? job?.company?.name : "",
+      sameAs: job.company?.website || "",
     },
     jobLocation: {
       "@type": "Place",

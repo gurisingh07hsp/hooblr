@@ -9,7 +9,7 @@ const jobSchema = new mongoose.Schema({
   company: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Company',
-    required: true
+    default: null,
   },
   description: {
     type: String,

@@ -54,7 +54,8 @@ const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 const JobDetailsClient = ({ job }: { job: Job }) => {
   const router = useRouter();
   const params = useParams();
-  const id = params?.id as string;
+  const id = params.id.toString().split('-').pop();
+
 
   const { user } = useUser();
   const [error, setError] = useState<string | null>(null);
@@ -116,7 +117,7 @@ const JobDetailsClient = ({ job }: { job: Job }) => {
         user?._id,
         user?.profile?.name,
         job?._id,
-        job.company.name,
+        job?.company?.name,
         text
       );
       setText("");
