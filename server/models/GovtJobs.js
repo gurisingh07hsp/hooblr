@@ -75,16 +75,4 @@ const govtjobSchema = new mongoose.Schema({
   },
 });
 
-govtjobSchema.pre("save", function (next) {
-  if (this.lastDateToApply) {
-    const expiry = new Date(this.lastDateToApply);
-    expiry.setDate(expiry.getDate() + 5);
-    this.expiryDate = expiry;
-  }
-  next();
-});
-
-govtjobSchema.index({ expiryDate: 1 }, { expireAfterSeconds: 0 });
-
-
 module.exports = mongoose.model('GovtJob', govtjobSchema); 
