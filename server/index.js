@@ -10,6 +10,7 @@ const authRoutes = require('./routes/auth');
 const jobRoutes = require('./routes/jobs');
 const govtjobRoutes = require('./routes/govtjobs');
 const careerjobRoutes = require('./routes/careerjobs');
+const examRoutes = require('./routes/exam')
 const companyRoutes = require('./routes/companies');
 const blogRoutes = require('./routes/blog');
 const userRoutes = require('./routes/users');
@@ -51,6 +52,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/govtjobs', govtjobRoutes);
 app.use('/api/careerjobs', careerjobRoutes);
+app.use('/api/exam', examRoutes)
 app.use('/api/companies', companyRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/users', userRoutes);

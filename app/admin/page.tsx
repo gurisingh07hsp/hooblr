@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Shield, LogOut, ArrowLeft, X, Save, Plus, Eye, Edit, Trash2, Building, Briefcase, Users, Settings, BarChart3, FileText, Menu, Search, BriefcaseBusiness } from 'lucide-react';
+import { Shield, LogOut, ArrowLeft, X, Save, Plus, Eye, Edit, Trash2, Building, Briefcase, Users, Settings, BarChart3, FileText, Menu, Search, BriefcaseBusiness, Clipboard } from 'lucide-react';
 import BlogPostEditor from '../../components/BlogPostEditor';
 import Footer from '@/components/Footer';
 import { useUser } from '@/context/UserContext';
@@ -141,6 +141,7 @@ export default function AdminPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [govtJobs, setGovtJobs] = useState<any[]>([]);
+  const [exams, setExams] = useState<any[]>([]);
   const [careerJobs, setCareerJobs] = useState<any[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -148,7 +149,7 @@ export default function AdminPage() {
   
   // Modal states
   const [modalState, setModalState] = useState({
-    type: null as 'company' | 'job' | 'govtjob' | 'careerjob' | 'blog' | 'user' | null,
+    type: null as 'company' | 'job' | 'govtjob' | 'careerjob' | 'exam' | 'blog' | 'user' | null,
     mode: null as 'create' | 'edit' | 'view' | null,
     isOpen: false,
     data: null as any
@@ -167,6 +168,7 @@ export default function AdminPage() {
     { id: 'jobs', label: 'Jobs', icon: BriefcaseBusiness },
     { id: 'govtjobs', label: 'Govt Jobs', icon: Briefcase},
     { id: 'careerjobs', label: 'Career Jobs', icon: Briefcase},
+    { id: 'exam-portal', label: 'Exam Portal', icon: Clipboard},
     { id: 'blog', label: 'Blog', icon: FileText },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'settings', label: 'Settings', icon: Settings },
@@ -189,6 +191,7 @@ export default function AdminPage() {
         fetchJobs(),
         fetchGovtJobs(),
         fetchCareerJobs(),
+        fetchExams(),
         fetchBlogPosts(),
         // fetchUsers()
       ]);
@@ -252,6 +255,16 @@ export default function AdminPage() {
     }
   };
 
+  const fetchExams = async() => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/exam/`);
+      const data = await response.data  ;
+      setExams(data.exams || []);
+    } catch (error) {
+      console.error('Error fetching exams:', error);
+    }
+  }
+
   const fetchBlogPosts = async () => {
     try {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/blog`, {withCredentials:true});
@@ -270,7 +283,7 @@ export default function AdminPage() {
     fetchBlogPosts();
   },[setBlogEditorState])
 
-  const openModal = (type: 'company' | 'job' | 'govtjob' | 'careerjob' | 'blog' | 'user', mode: 'create' | 'edit' | 'view', data?: any) => {
+  const openModal = (type: 'company' | 'job' | 'govtjob' | 'careerjob' | 'exam' | 'blog' | 'user', mode: 'create' | 'edit' | 'view', data?: any) => {
     setModalState({ type, mode, isOpen: true, data });
   };
 
@@ -341,6 +354,20 @@ export default function AdminPage() {
             closeModal();
           }
         }
+      } else if(type === 'exam'){
+        if(mode === 'create'){
+          const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/exam/`, data, {withCredentials: true});
+          if(response.status === 200){
+            fetchExams();
+            closeModal();
+          }
+        } else if(mode === 'edit'){
+          const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/exam/${data._id}`, data, {withCredentials: true});
+          if (response.status === 200) {
+            setExams(prev => prev.map(e => e._id === data._id ? response.data.job : e));
+            closeModal();
+          }
+        }
       }
       
       closeModal();
@@ -376,6 +403,11 @@ export default function AdminPage() {
         const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/careerjobs/${id}`, {withCredentials:true});
         if(response.status === 200){
           setCareerJobs(prev => prev.filter(j => j._id !== id));
+        }
+      } else if (type === 'exam') {
+        const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/exam/${id}`, {withCredentials:true});
+        if(response.status === 200){
+          setExams(prev => prev.filter(e => e._id !== id));
         }
       } else if (type === 'blog-post') {
          const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/blog/${id}`, {withCredentials:true});
@@ -910,36 +942,7 @@ export default function AdminPage() {
     );
   };
 
-
-
-   const GovtJobForm = ({ govtjob, onSave, onCancel }: { 
-    govtjob?: any; 
-    onSave: (data: any) => void; 
-    onCancel: () => void; 
-  }) => {
-    const [formData, setFormData] = useState({
-      title: govtjob?.title || '',
-      officialLink: govtjob?.officialLink || '',
-      applyLink: govtjob?.applyLink || '',
-      notificationLink: govtjob?.notificationLink || '',
-      state: govtjob?.state || 'All India',
-      location: govtjob?.location || '',
-      category: govtjob?.category || '',
-      eligibilityCriteria: govtjob?.eligibilityCriteria || '',
-      ageLimit: govtjob?.ageLimit || '',
-      totalPosts: govtjob?.totalPosts || '',
-      salary: govtjob?.salary || '',
-      applicationFees: govtjob?.applicationFees || '',
-      description: govtjob?.description || '',
-      selectionProcess: govtjob?.selectionProcess || '',
-      howToApply: govtjob?.howToApply || '',
-      startDateToApply: govtjob?.startDateToApply || '',
-      lastDateToApply: govtjob?.lastDateToApply || '',
-      seoTitle: govtjob?.seoTitle || '',
-      seoDescription: govtjob?.seoDescription || ''
-    });
-
-    const indianStates = [
+      const indianStates = [
   // States
   "Andhra Pradesh",
   "Arunachal Pradesh",
@@ -980,6 +983,35 @@ export default function AdminPage() {
   "Lakshadweep",
   "Puducherry"
 ];
+
+   const GovtJobForm = ({ govtjob, onSave, onCancel }: { 
+    govtjob?: any; 
+    onSave: (data: any) => void; 
+    onCancel: () => void; 
+  }) => {
+    const [formData, setFormData] = useState({
+      title: govtjob?.title || '',
+      officialLink: govtjob?.officialLink || '',
+      applyLink: govtjob?.applyLink || '',
+      notificationLink: govtjob?.notificationLink || '',
+      state: govtjob?.state || 'All India',
+      location: govtjob?.location || '',
+      category: govtjob?.category || '',
+      eligibilityCriteria: govtjob?.eligibilityCriteria || '',
+      ageLimit: govtjob?.ageLimit || '',
+      totalPosts: govtjob?.totalPosts || '',
+      salary: govtjob?.salary || '',
+      applicationFees: govtjob?.applicationFees || '',
+      description: govtjob?.description || '',
+      selectionProcess: govtjob?.selectionProcess || '',
+      howToApply: govtjob?.howToApply || '',
+      startDateToApply: govtjob?.startDateToApply || '',
+      lastDateToApply: govtjob?.lastDateToApply || '',
+      seoTitle: govtjob?.seoTitle || '',
+      seoDescription: govtjob?.seoDescription || ''
+    });
+
+
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
@@ -1221,6 +1253,227 @@ export default function AdminPage() {
       </form>
     );
   };
+
+  
+    const ExamForm = ({ exam, onSave, onCancel }: { 
+    exam?: any; 
+    onSave: (data: any) => void; 
+    onCancel: () => void; 
+  }) => {
+    const [formData, setFormData] = useState({
+      title: exam?.title || '',
+      officialSite: exam?.officialSite || '',
+      admitCardLink: exam?.admitCardLink || '',
+      resultLink: exam?.resultLink || '',
+      notificationLink: exam?.notificationLink || '',
+      state: exam?.state || 'All India',
+      vacancies: exam?.vacancies || '',
+      organization: exam?.organization || '',
+      status: exam?.status || '',
+      type: exam?.type || '',
+      slug: exam?.slug || '',
+      description: exam?.description || '',
+      examDate: exam?.examDate || '',
+      seoTitle: exam?.seoTitle || '',
+      seoDescription: exam?.seoDescription || ''
+    });
+
+
+
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      onSave({ ...exam, ...formData });
+    };
+    return (
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+            <input
+              type="text"
+              required
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Official Site *</label>
+            <input
+              type="url"
+              value={formData.officialSite}
+              onChange={(e) => setFormData({ ...formData, officialSite: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Admit Card Link</label>
+             <input
+              type="url"
+              value={formData.admitCardLink}
+              onChange={(e) => setFormData({ ...formData, admitCardLink: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Result Link</label>
+             <input
+              type="url"
+              value={formData.resultLink}
+              onChange={(e) => setFormData({ ...formData, resultLink: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Notification Link *</label>
+             <input
+              type="text"
+              value={formData.notificationLink}
+              onChange={(e) => setFormData({ ...formData, notificationLink: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
+            <select 
+              value={formData.state}
+              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option className='bg-white' value="All India">All India</option>
+              {indianStates.map((state)=>(
+                <option key={state} className='bg-white' value={state}>{state}</option>
+              ))}
+            </select>
+          </div>   
+
+           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Vacancies</label>
+            <input
+              type="text"
+              required
+              value={formData.vacancies}
+              onChange={(e) => setFormData({ ...formData, vacancies: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Organization</label>
+            <input
+              type="text"
+              required
+              value={formData.organization}
+              onChange={(e) => setFormData({ ...formData, organization: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+            <select 
+              value={formData.type}
+              required
+              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option className='bg-white' value="All India">Select Type</option>
+              {['Admit Card','Declared','Soon'].map((state)=>(
+                <option key={state} className='bg-white' value={state}>{state}</option>
+              ))}
+            </select>
+          </div> 
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Exam Date</label>
+              <input
+                type="Date"
+                value={formData.examDate}
+                onChange={(e) => setFormData({ ...formData, examDate: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select 
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option className='bg-white' value="All India">Select Status</option>
+              {['Released','Declared','Soon'].map((state)=>(
+                <option key={state} className='bg-white' value={state}>{state}</option>
+              ))}
+            </select>
+          </div> 
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Slug *</label>
+            <input
+              type="text"
+              required
+              value={formData.slug}
+              onChange={(e) => setFormData({ ...formData, slug: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+        </div>
+
+        {/* Text Areas */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">About Job *</label>
+            <div className="rounded-lg pb-10">
+              <TiptapEditor
+                value={formData.description}
+                onChange={(description: any) => setFormData({ ...formData, description: description })}
+              />
+
+            </div>
+          </div>
+        </div>
+
+
+        {/* SEO Settings */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">SEO Title</label>
+            <input
+              type="text"
+              value={formData.seoTitle}
+              onChange={(e) => setFormData({ ...formData, seoTitle: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">SEO Description</label>
+              <textarea
+                value={formData.seoDescription}
+                onChange={(e) => setFormData({ ...formData, seoDescription: e.target.value})}
+                className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+          </div>
+
+        <div className="flex justify-end space-x-3 pt-4">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          >
+            <Save className="w-4 h-4" />
+            <span>Save Exam</span>
+          </button>
+        </div>
+      </form>
+    );
+  };
+
+
    const CareerJobForm = ({ careerjob, onSave, onCancel }: { 
     careerjob?: any; 
     onSave: (data: any) => void; 
@@ -1600,6 +1853,38 @@ export default function AdminPage() {
         </div>
       )
     }
+    if (type === 'exam') {
+      return (
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{data.title}</h2>
+            <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+              <span>{data.state}</span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Exam Details</h3>
+              <div className="space-y-2 text-sm">
+                <div><span className="font-medium">Official Site:</span> {data.officialSite}</div>
+                <div><span className="font-medium">Admit Card Link:</span> {data.admitCardLink}</div>
+                <div><span className="font-medium">Result Link:</span> {data.resultLink}</div>
+                <div><span className="font-medium">Notification Link:</span> {data.notificationLink}</div>           
+                <div><span className="font-medium">Vacancies:</span> {data.vacancies}</div>
+                <div><span className="font-medium">Type:</span> {data.type}</div>
+                <div><span className="font-medium">Exam Date:</span> {new Date(data.examDate).toDateString()}</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Description</h3>
+            <div className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: data.description }} />
+          </div>
+        </div>
+      );
+    }
     if(type === "blog"){
       return (
             <div className="prose max-w-none">
@@ -1689,6 +1974,8 @@ export default function AdminPage() {
               <GovtJobForm govtjob={data} onSave={handleSave} onCancel={closeModal} />
             ) : type === 'careerjob' ? ( 
               <CareerJobForm careerjob={data} onSave={handleSave} onCancel={closeModal} />
+            ) : type === 'exam' ? (
+              <ExamForm exam={data} onSave={handleSave} onCancel={closeModal} />
             ) : (
               <div>Form for {type} not implemented</div>
             )}
@@ -2012,7 +2299,7 @@ export default function AdminPage() {
   );
 
   const renderGovtJobsManagement = () => (
-        <div className="space-y-6">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold text-gray-900">Govt Job Management</h2>
         <button
@@ -2211,6 +2498,100 @@ export default function AdminPage() {
           >
             {companies.length > 0 ? 'Post Job' : 'Create Company First'}
           </button>
+        </div>
+      )}
+    </div>
+  )
+  
+    const renderExamPortalManagement = () => (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-2xl font-bold text-gray-900">Exam Portal Management</h2>
+        <button
+          onClick={() => openModal('exam', 'create')}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Post Exam Information</span>
+        </button>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Search exams..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      {/* Jobs Table */}
+      <div className="bg-white w-[80vw] lg:w-full rounded-lg border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vacancies</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {exams
+                .filter(exam => 
+                  exam.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+                  (filterStatus === 'all' || exam.status === filterStatus)
+                )
+                .map((exam) => (
+                <tr key={exam._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">{exam.title.length > 50 ? exam.title.slice(0,50)+'...' : exam.title}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{exam.state}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{exam.type}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(exam.createdAt).toLocaleDateString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex items-center space-x-2">
+                      <button 
+                        onClick={() => openModal('exam', 'view', exam)}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => openModal('exam', 'edit', exam)}
+                        className="text-green-600 hover:text-green-900"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete('exam', exam._id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {exams.length === 0 && (
+        <div className="text-center py-12">
+          <Briefcase className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No exams found</h3>
         </div>
       )}
     </div>
@@ -2718,6 +3099,7 @@ export default function AdminPage() {
                     {activeTab === 'jobs' && renderJobsManagement()}
                     {activeTab === 'govtjobs' && renderGovtJobsManagement()}
                     {activeTab === 'careerjobs' && renderCareerJobsManagement()}
+                    {activeTab === 'exam-portal' && renderExamPortalManagement()}
                     {activeTab === 'blog' && renderBlogManagement()}
                     {activeTab === 'users' && renderUserManagement()}
                     {activeTab === 'settings' && renderSettings()}

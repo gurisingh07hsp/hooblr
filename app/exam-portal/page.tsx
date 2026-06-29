@@ -42,8 +42,8 @@ export default function ExamPortalLanding() {
                 <Sparkles className="w-3 h-3" />
                 <span>Exam Portal</span>
               </div>
-              <h1 className="text-3xl flex justify-center items-center md:text-4xl font-bold text-black mb-4">
-                <span className='lg:text-4xl text-3xl text-[#8A38EE]'>Exam</span> Updates & Results
+              <h1 className="text-2xl flex justify-center items-center md:text-4xl font-bold text-black mb-4">
+                <span className='lg:text-4xl text-2xl text-[#8A38EE]'>Exam</span> Updates & Results
               </h1>
               <p className="text-lg mb-6 text-black max-w-3xl mx-auto leading-relaxed">
                 Your one-stop destination for downloading admit cards and checking exam results
