@@ -1267,8 +1267,6 @@ export default function AdminPage() {
       resultLink: exam?.resultLink || '',
       notificationLink: exam?.notificationLink || '',
       state: exam?.state || 'All India',
-      vacancies: exam?.vacancies || '',
-      organization: exam?.organization || '',
       status: exam?.status || '',
       type: exam?.type || '',
       slug: exam?.slug || '',
@@ -1346,28 +1344,6 @@ export default function AdminPage() {
             </select>
           </div>   
 
-           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Vacancies</label>
-            <input
-              type="text"
-              required
-              value={formData.vacancies}
-              onChange={(e) => setFormData({ ...formData, vacancies: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Organization</label>
-            <input
-              type="text"
-              required
-              value={formData.organization}
-              onChange={(e) => setFormData({ ...formData, organization: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
             <select 
@@ -1376,7 +1352,7 @@ export default function AdminPage() {
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
               <option className='bg-white' value="All India">Select Type</option>
-              {['Admit Card','Declared','Soon'].map((state)=>(
+              {['Admit Card','Result'].map((state)=>(
                 <option key={state} className='bg-white' value={state}>{state}</option>
               ))}
             </select>
@@ -1871,7 +1847,6 @@ export default function AdminPage() {
                 <div><span className="font-medium">Admit Card Link:</span> {data.admitCardLink}</div>
                 <div><span className="font-medium">Result Link:</span> {data.resultLink}</div>
                 <div><span className="font-medium">Notification Link:</span> {data.notificationLink}</div>           
-                <div><span className="font-medium">Vacancies:</span> {data.vacancies}</div>
                 <div><span className="font-medium">Type:</span> {data.type}</div>
                 <div><span className="font-medium">Exam Date:</span> {new Date(data.examDate).toDateString()}</div>
               </div>
@@ -2539,7 +2514,7 @@ export default function AdminPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vacancies</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Posted</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>

@@ -12,58 +12,88 @@ router.get(
     query("limit").optional().isInt({ min: 1, max: 50 }),
     query("state").optional().isString(),
     query("search").optional().isString(),
+    // query("type")
+    //   .optional()
+    //   .isIn(["Admit Card", "Result"])
+    //   .withMessage("Type must be either 'Admit Card' or 'Result'"),
   ],
   async (req, res) => {
     try {
       const errors = validationResult(req);
+
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({
+          errors: errors.array(),
+        });
       }
 
       const {
         page = 1,
-        limit = 20,
+        limit,
         search,
         state,
+        type,
         sort = "createdAt",
         order = "desc",
       } = req.query;
 
+      // Build filter
       const filter = {};
 
-      //   if (state) filter.state = { $regex: location, $options: "i" };
-      if (search) filter.title = { $regex: search, $options: "i" };
-
-      if (state && state !== "All India") {
-        filter["state"] = state ? state : {};
+      if (search) {
+        filter.title = { $regex: search, $options: "i" };
       }
 
-  
+      if (state && state !== "All India") {
+        filter.state = state;
+      }
 
-      const sortObj = {};
-      sortObj[sort] = order === "desc" ? -1 : 1;
+      if (type) {
+        filter.type = type;
+      }
 
-      const skip = (page - 1) * limit;
+      // Sorting
+      const sortObj = {
+        [sort]: order === "desc" ? -1 : 1,
+      };
 
-      const exams = await ExamPost.find(filter)
-        .sort(sortObj)
-        .skip(skip)
-        .limit(parseInt(limit));
+      // Create query
+      let examQuery = ExamPost.find(filter).sort(sortObj);
 
+      // Apply pagination only if limit is provided
+      if (limit) {
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+        const skip = (pageNumber - 1) * limitNumber;
+
+        examQuery = examQuery.skip(skip).limit(limitNumber);
+      }
+
+      const exams = await examQuery;
       const total = await ExamPost.countDocuments(filter);
 
-      res.json({
+      const response = {
         exams,
-        pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
+      };
+
+      // Send pagination only when limit is provided
+      if (limit) {
+        response.pagination = {
+          page: Number(page),
+          limit: Number(limit),
           total,
-          pages: Math.ceil(total / limit),
-        },
-      });
+          pages: Math.ceil(total / Number(limit)),
+        };
+      } else {
+        response.total = total;
+      }
+
+      return res.status(200).json(response);
     } catch (error) {
       console.error("Get exams error:", error);
-      res.status(500).json({ error: "Server error" });
+      return res.status(500).json({
+        error: "Server error",
+      });
     }
   }
 );

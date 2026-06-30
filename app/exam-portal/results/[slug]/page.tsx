@@ -1,13 +1,18 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FileText, Download, Search, ArrowLeft, AlertCircle, Bell, ClipboardList, Sparkles, Calendar, MapPin, Clock, User, BookOpen, ShieldCheck, Info } from "lucide-react";
+import { Award, Download, Search, ArrowLeft, CheckCircle, Bell, ClipboardList, Sparkles, Trophy, TrendingUp, BarChart3, BookOpen, FileText, Info, Calendar } from "lucide-react";
 import Footer from "@/components/Footer";
-import axios from "axios";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useParams } from "next/navigation";
+import axios from "axios";
 
-export default function AdmitCardPage() {
+export default function ExamResultsPage() {
   const router = useRouter();
+  const [rollNumber, setRollNumber] = useState("");
+  const [dob, setDob] = useState("");
+
   const {slug} = useParams();
   const [loading, setLoading] = useState(true);
   const [exam, setExam] = useState<any>();
@@ -26,15 +31,8 @@ export default function AdmitCardPage() {
   },[]);
 
 
-  const importantLinks = [
-    { text: "Official Notification", icon: FileText },
-    { text: "Syllabus & Exam Pattern", icon: BookOpen },
-    { text: "Answer Key", icon: ClipboardList },
-    { text: "Previous Year Papers", icon: FileText },
-  ];
-
   const handleDownload = () => {
-    alert("Admit card downloaded successfully!");
+    alert("Result downloaded successfully!");
   };
 
   if(loading){
@@ -58,13 +56,13 @@ export default function AdmitCardPage() {
             <div className="text-center">
               <div className="inline-flex items-center space-x-2 bg-[#8A38EE] backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium mb-4">
                 <Sparkles className="w-3 h-3" />
-                <span>Latest Update</span>
+                <span>Result Declared</span>
               </div>
               <h1 className="text-3xl flex justify-center items-center md:text-4xl font-bold text-black mb-4">
-                <span className='lg:text-4xl text-3xl text-[#8A38EE]'>{exam?.title}</span>
+                <span className='lg:text-4xl text-3xl text-[#8A38EE]'>{exam.title}</span>
               </h1>
               <p className="text-lg mb-6 text-black max-w-3xl mx-auto leading-relaxed">
-                Download {exam.title} for the exam scheduled on {new Date(exam.examDate).toDateString()}. Check exam date, time, venue, and important instructions here.
+                Check {exam.title} Download scorecard, check cutoff marks, and final merit list here.
               </p>
             </div>
           </div>
@@ -78,7 +76,7 @@ export default function AdmitCardPage() {
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-purple-200 lg:p-6 p-3">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                   <Info className="w-6 h-6 text-[#8A38EE]" />
-                  Exam Overview
+                  Result Overview
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex items-start gap-3 border-b border-gray-100 pb-3 last:border-0">
@@ -86,10 +84,10 @@ export default function AdmitCardPage() {
                       <span className="text-gray-800 font-medium text-sm w-1/2">{exam.title}</span>
                     </div>
              
-                    <div className="flex items-start gap-3 border-b border-gray-100 pb-3 last:border-0">
+                    {/* <div className="flex items-start gap-3 border-b border-gray-100 pb-3 last:border-0">
                       <span className="text-gray-500 font-semibold text-sm w-1/2">Exam Date:</span>
                       <span className="text-gray-800 font-medium text-sm w-1/2">{new Date(exam.examDate).toDateString()}</span>
-                    </div>
+                    </div> */}
                     <div className="flex items-start gap-3 border-b border-gray-100 pb-3 last:border-0">
                       <span className="text-gray-500 font-semibold text-sm w-1/2">Admit Card Status:</span>
                       <span className="text-gray-800 font-medium text-sm w-1/2">{exam.status}</span>
@@ -101,22 +99,22 @@ export default function AdmitCardPage() {
                 </div>
               </div>
 
-              {/* Download Form */}
+              {/* Check Result Form */}
               {/* <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-purple-200 lg:p-6 p-3">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <Download className="w-6 h-6 text-[#8A38EE]" />
-                  Download Admit Card
+                  <Search className="w-6 h-6 text-[#8A38EE]" />
+                  Check Your Result
                 </h2>
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="regNumber" className="text-gray-700 font-bold">
-                      Registration Number
+                    <Label htmlFor="rollNumber" className="text-gray-700 font-bold">
+                      Roll Number / Registration Number
                     </Label>
                     <Input
-                      id="regNumber"
-                      placeholder="Enter your Registration Number"
-                      value={regNumber}
-                      onChange={(e) => setRegNumber(e.target.value)}
+                      id="rollNumber"
+                      placeholder="Enter your Roll Number"
+                      value={rollNumber}
+                      onChange={(e) => setRollNumber(e.target.value)}
                       className="h-12 text-base"
                     />
                   </div>
@@ -139,86 +137,77 @@ export default function AdmitCardPage() {
                     onClick={handleDownload}
                   >
                     <Search className="w-4 h-4 mr-2" />
-                    Search & Download
+                    Check Result
                   </button>
                 </div>
               </div> */}
 
-              {/* Steps to Download */}
+              {/* Steps to Check Result */}
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-purple-200 lg:p-6 p-3">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <FileText className="w-6 h-6 text-[#8A38EE]" />
-                  Download {exam.title}
+                  <ClipboardList className="w-6 h-6 text-[#8A38EE]" />
+                  Check {exam.title}
                 </h2>
-                {/* <ol className="space-y-4">
-                  {stepsToDownload.map((step, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span className="flex-shrink-0 w-8 h-8 bg-[#8A38EE] text-white rounded-full flex items-center justify-center font-bold text-sm">
-                        {index + 1}
-                      </span>
-                      <p className="text-gray-700 text-sm leading-relaxed">{step}</p>
-                    </li>
-                  ))}
-                </ol> */}
-                 <div className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: exam.description }} />
+               <div className="quill-content prose prose-sm sm:prose lg:prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: exam.description }} />
               </div>
 
-              {/* Your Admit Cards */}
+              {/* Your Results */}
               {/* <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <FileText className="w-6 h-6 text-[#8A38EE]" />
-                  Your Admit Cards
+                  <Award className="w-6 h-6 text-[#8A38EE]" />
+                  Your Results
                 </h2>
                 <div className="grid grid-cols-1 gap-6">
-                  {recentAdmitCards.map((card, index) => (
+                  {recentResults.map((result, index) => (
                     <div key={index} className="group bg-white/80 backdrop-blur-sm rounded-2xl border border-purple-200 lg:p-6 p-3 transition-all duration-300 transform hover:-translate-y-1">
-                      <div className="flex flex-col gap-4">
+                      <div className="flex flex-col gap-6">
                         <div className="flex items-start justify-between">
                           <div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#8A38EE] transition-colors">{card.examName}</h3>
-                            <p className="text-sm text-purple-600 font-semibold mb-2">{card.postName}</p>
+                            <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#8A38EE] transition-colors">{result.examName}</h3>
+                            <p className="text-sm text-purple-600 font-semibold mb-1">Roll Number: {result.rollNo}</p>
+                            <p className="text-xs text-gray-500">Result Date: {result.resultDate}</p>
                           </div>
-                          <div className="bg-gradient-to-r from-purple-100 to-indigo-100 text-[#8A38EE] px-3 py-1 rounded-full text-xs font-bold">
-                            Available
+                          <div className={`px-4 py-2 rounded-full font-bold text-sm ${
+                            result.status === "Qualified" 
+                              ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700' 
+                              : 'bg-red-100 text-red-700'
+                          }`}>
+                            {result.status}
                           </div>
                         </div>
                         
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="bg-purple-50 p-4 rounded-xl text-center">
+                            <p className="text-xs text-purple-600 font-semibold mb-1">Marks Obtained</p>
+                            <p className="text-3xl font-bold text-[#8A38EE]">{result.marks}</p>
+                            <p className="text-xs text-purple-600">out of {result.totalMarks}</p>
+                          </div>
+                          <div className="bg-purple-50 p-4 rounded-xl text-center">
+                            <p className="text-xs text-purple-600 font-semibold mb-1">Percentage</p>
+                            <p className="text-3xl font-bold text-[#8A38EE]">
+                              {((result.marks / result.totalMarks) * 100).toFixed(1)}%
+                            </p>
+                          </div>
+                          <div className="bg-purple-50 p-4 rounded-xl text-center">
+                            <p className="text-xs text-purple-600 font-semibold mb-1">Percentile</p>
+                            <p className="text-3xl font-bold text-[#8A38EE]">{result.percentile}%</p>
+                          </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="flex items-start gap-3">
-                            <User className="w-4 h-4 text-[#8A38EE] flex-shrink-0 mt-0.5" />
+                            <Trophy className="w-4 h-4 text-[#8A38EE] flex-shrink-0 mt-0.5" />
                             <div>
-                              <p className="text-xs text-gray-500">Registration No</p>
-                              <p className="text-sm font-semibold text-gray-800">{card.regNo}</p>
+                              <p className="text-xs text-gray-500">Category Rank</p>
+                              <p className="text-sm font-semibold text-gray-800">#{result.rank}</p>
                             </div>
                           </div>
                           <div className="flex items-start gap-3">
-                            <ClipboardList className="w-4 h-4 text-[#8A38EE] flex-shrink-0 mt-0.5" />
+                            <BarChart3 className="w-4 h-4 text-[#8A38EE] flex-shrink-0 mt-0.5" />
                             <div>
-                              <p className="text-xs text-gray-500">Roll Number</p>
-                              <p className="text-sm font-semibold text-gray-800">{card.rollNo}</p>
+                              <p className="text-xs text-gray-500">Category Cut Off</p>
+                              <p className="text-sm font-semibold text-gray-800">{result.cutoff} ({result.category})</p>
                             </div>
-                          </div>
-                          <div className="flex items-start gap-3">
-                            <Calendar className="w-4 h-4 text-[#8A38EE] flex-shrink-0 mt-0.5" />
-                            <div>
-                              <p className="text-xs text-gray-500">Exam Date</p>
-                              <p className="text-sm font-semibold text-gray-800">{card.examDate}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-3">
-                            <Clock className="w-4 h-4 text-[#8A38EE] flex-shrink-0 mt-0.5" />
-                            <div>
-                              <p className="text-xs text-gray-500">Exam Time</p>
-                              <p className="text-sm font-semibold text-gray-800">{card.examTime}</p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-start gap-3">
-                          <MapPin className="w-4 h-4 text-[#8A38EE] flex-shrink-0 mt-0.5" />
-                          <div>
-                            <p className="text-xs text-gray-500">Exam Venue</p>
-                            <p className="text-sm font-semibold text-gray-800">{card.venue}</p>
                           </div>
                         </div>
 
@@ -228,7 +217,7 @@ export default function AdmitCardPage() {
                             className="bg-[#8A38EE] text-white px-4 py-2 rounded-lg transition-all duration-300 font-semibold flex items-center transform hover:-translate-y-1 text-sm"
                           >
                             <Download className="w-4 h-4 mr-2" />
-                            Download
+                            Download Score Card
                           </button>
                         </div>
                       </div>
@@ -237,52 +226,62 @@ export default function AdmitCardPage() {
                 </div>
               </div> */}
 
-              {/* Documents Required */}
+              {/* Cut Off Marks */}
               {/* <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-purple-200 lg:p-6 p-3">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <ShieldCheck className="w-6 h-6 text-[#8A38EE]" />
-                  Documents Required on Exam Day
+                  <TrendingUp className="w-6 h-6 text-[#8A38EE]" />
+                  Punjab Police Constable Cut Off 2026
                 </h2>
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {documentsRequired.map((doc, index) => (
-                    <li key={index} className="flex items-center gap-2 text-gray-700 text-sm">
-                      <span className="w-2 h-2 bg-[#8A38EE] rounded-full flex-shrink-0"></span>
-                      {doc}
-                    </li>
-                  ))}
-                </ul>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-b border-purple-200">
+                        <th className="pb-4 px-4 text-sm font-bold text-gray-900">Category</th>
+                        <th className="pb-4 px-4 text-sm font-bold text-gray-900">Cut Off Marks (Out of 200)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cutoffMarks.map((item, index) => (
+                        <tr key={index} className="border-b border-gray-100 last:border-0">
+                          <td className="py-3 px-4 text-sm font-semibold text-gray-700">{item.category}</td>
+                          <td className="py-3 px-4 text-sm font-medium text-gray-800">{item.cutoff}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div> */}
 
-              {/* Important Instructions */}
-              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-r-lg">
+              {/* Key Highlights */}
+              <div className="bg-green-50 border-l-4 border-green-500 p-6 rounded-r-lg">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="font-bold text-yellow-800 mb-4 text-lg">Important Instructions for Candidates</h4>
-                    <ul className="text-yellow-800 space-y-3 text-sm">
+                    <h4 className="font-bold text-green-800 mb-4 text-lg">Important Information About Result</h4>
+                    <ul className="text-green-800 space-y-3 text-sm">
                       <li className="flex items-start gap-2">
-                        <span className="text-yellow-600 font-bold">•</span>
-                        <span>Download your admit card at least 3 days before the exam to avoid last-minute issues</span>
+                        <span className="text-green-600 font-bold">•</span>
+                        <span>The Punjab Police Constable Result 2026 has been declared online at the official website</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-yellow-600 font-bold">•</span>
-                        <span>Reach the exam venue 1 hour 30 minutes before the reporting time mentioned on your admit card</span>
+                        <span className="text-green-600 font-bold">•</span>
+                        <span>Candidates can check their result using their Roll Number or Registration Number and Date of Birth</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-yellow-600 font-bold">•</span>
-                        <span>No electronic devices (mobile phones, calculators, smart watches) are allowed inside the exam hall</span>
+                        <span className="text-green-600 font-bold">•</span>
+                        <span>The result PDF contains details like marks obtained, percentile, rank, and qualification status</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-yellow-600 font-bold">•</span>
-                        <span>Candidates must follow all COVID-19 safety guidelines issued by the authorities</span>
+                        <span className="text-green-600 font-bold">•</span>
+                        <span>Shortlisted candidates will be called for Physical Measurement Test (PMT) and Physical Efficiency Test (PET)</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-yellow-600 font-bold">•</span>
-                        <span>Verify all details on your admit card (name, photo, signature, exam date, venue) and contact authorities in case of any discrepancy</span>
+                        <span className="text-green-600 font-bold">•</span>
+                        <span>Final selection will be based on written test, PET/PMT, and document verification</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-yellow-600 font-bold">•</span>
-                        <span>Candidates without a valid admit card and photo ID proof will not be allowed to enter the examination hall</span>
+                        <span className="text-green-600 font-bold">•</span>
+                        <span>Keep your scorecard safe for all future stages of the recruitment process</span>
                       </li>
                     </ul>
                   </div>
@@ -300,16 +299,29 @@ export default function AdmitCardPage() {
                     Quick Actions
                   </h3>
                   <button
-                    onClick={()=> router.push(exam.admitCardLink)}
+                    onClick={()=> router.push(exam.resultLink)}
                     className="w-full bg-[#8A38EE] text-white px-4 py-3 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center transform hover:-translate-y-1 text-sm mb-4"
                   >
                     <Download className="w-4 h-4 mr-2" />
-                    Download Admit Card
+                    Download Result
                   </button>
                   {/* <p className="text-xs text-gray-500 text-center">
                     Last Updated: June 28, 2026
                   </p> */}
                 </div>
+
+                {/* Top Achiever */}
+                {/* <div className="bg-gradient-to-br from-purple-600 to-indigo-700 text-white rounded-2xl p-6 shadow-lg">
+                  <Trophy className="w-10 h-10 mb-3" />
+                  <h3 className="text-xl font-bold mb-2">Top Achiever</h3>
+                  <p className="text-purple-100 text-sm mb-4">
+                    Congratulations on qualifying!
+                  </p>
+                  <div className="bg-white bg-opacity-10 rounded-xl p-3">
+                    <p className="text-xs text-purple-100">Your Percentile</p>
+                    <p className="text-3xl font-bold">94.2%</p>
+                  </div>
+                </div> */}
 
                 {/* Important Links */}
                 {/* <div className="bg-white/80 backdrop-blur-sm rounded-2xl border p-6">
@@ -358,10 +370,9 @@ export default function AdmitCardPage() {
                     Help & Support
                   </h3>
                   <ul className="space-y-3 text-sm text-gray-600">
-                    {/* <li className="hover:text-[#8A38EE] cursor-pointer transition-colors">Forgot Registration Number?</li> */}
+                    <li className="hover:text-[#8A38EE] cursor-pointer transition-colors">Result Discrepancy?</li>
                     <li className="hover:text-[#8A38EE] cursor-pointer transition-colors">Contact Helpdesk</li>
                     <li className="hover:text-[#8A38EE] cursor-pointer transition-colors">FAQs</li>
-                    <li className="hover:text-[#8A38EE] cursor-pointer transition-colors">Report Discrepancy</li>
                   </ul>
                 </div>
               </div>

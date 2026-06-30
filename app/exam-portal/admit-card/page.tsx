@@ -13,28 +13,22 @@ const AdmitCardListPage = () => {
   }, []);
 
   const fetchExams = async () => {
-    // setLoading(true);
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/exam`);
+    const params: Record<string, any> = {};
+
+    params.type = 'Admit Card';
+    // params.limit = ;
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/exam`,{params});
       const data = await response.data.exams;
 
       setTimeout(() => {
         setExams(data);
-        // setLoading(false);
       }, 500);
     } catch (error) {
       console.error("Error fetching jobs:", error);
-      // setLoading(false);
     }
   };
 
-
-    const notifications = [
-    { title: "UPSC Civil Services Admit Card 2024 Released", date: "June 28, 2024", type: "Admit Card" },
-    { title: "SSC CGL Tier 1 Results Declared", date: "June 25, 2024", type: "Result" },
-    { title: "IBPS PO Admit Card Available Soon", date: "June 20, 2024", type: "Admit Card" },
-    { title: "RRB NTPC Results to be Announced", date: "June 18, 2024", type: "Result" },
-  ];
   return (
     <div>
           <div className="max-w-7xl mx-auto mt-24">
@@ -51,7 +45,7 @@ const AdmitCardListPage = () => {
                     <div className='flex gap-2'>
                       <div>
                         <div className="flex items-center space-x-2 mb-1">
-                          <span className={`bg-gradient-to-r ${exam.admitCardLink ? "from-purple-100 to-indigo-100 text-purple-800" : "from-blue-100 to-indigo-100 text-blue-800"} text-xs font-bold px-2.5 py-1 rounded-full`}>
+                          <span className={`bg-gradient-to-r ${exam.type == 'Admit Card' ? "from-purple-100 to-indigo-100 text-purple-800" : "from-blue-100 to-indigo-100 text-blue-800"} text-xs font-bold px-2.5 py-1 rounded-full`}>
                             {exam.admitCardLink ? 'Admit Card' : 'Result'}
                           </span>
                         </div>

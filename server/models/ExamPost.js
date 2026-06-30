@@ -23,12 +23,6 @@ const examSchema = new mongoose.Schema({
     type: String,
     required: true, // e.g., Gujrat
   },
-  vacancies:{
-    type: String,
-  },
-  organization: {
-    type: String
-  },
   status:{
     type: String
   },
