@@ -6,6 +6,7 @@ import { useUser } from "@/context/UserContext";
 import axios from "axios";
 import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getToken } from "@/hooks/getToken";
 
 interface CompanyProfileData {
   _id?: string;
@@ -90,20 +91,29 @@ const CompanyProfile = () => {
     const file = e.target.files[0];
     if (!file) return;
 
+    const token = await getToken();
+
+    if(profileData.logo){
+      const images = [profileData.logo];
+      await axios.delete(`/api/images/delete`, { data: { images, token }, withCredentials: true });
+    }
     const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "hooblr");
+    // formData.append("file", file);
+    // formData.append("upload_preset", "hooblr");
 
-    const res = await fetch(
-      "https://api.cloudinary.com/v1_1/dtjobqhxb/image/upload",
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+    // const res = await fetch(
+    //   "https://api.cloudinary.com/v1_1/dtjobqhxb/image/upload",
+    //   {
+    //     method: "POST",
+    //     body: formData,
+    //   }
+    // );
 
-    const data = await res.json();
-    setProfileData((prev) => ({ ...prev, logo: data.secure_url }));
+    // const data = await res.json();
+    formData.append("images",file);
+    formData.append("token", token);
+    const data = await axios.post(`/api/images/upload`, formData, {withCredentials: true});
+    setProfileData((prev) => ({ ...prev, logo: data.data.images[0] }));
     setLoading(false);
   };
 
@@ -155,7 +165,7 @@ const CompanyProfile = () => {
     }
   };
 
-  const handleDeleteCompnay = async (id: string) => {
+  const handleDeleteCompnay = async (id: string, logo: string) => {
     if (
       !confirm(
         "Are you sure you want to delete this company? This action cannot be undo."
@@ -169,6 +179,11 @@ const CompanyProfile = () => {
         { withCredentials: true }
       );
       if (response.status == 200) {
+        const token = await getToken();
+        if(logo){
+          const images = [logo];
+          await axios.delete(`/api/images/delete`, { data: { images, token }, withCredentials: true });
+        }
         setMessage(response.data.message);
       }
     } catch (error) {
@@ -456,7 +471,7 @@ const CompanyProfile = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDeleteCompnay(company._id);
+                              handleDeleteCompnay(company._id, company.logo || '');
                             }}
                             className="p-1 text-gray-400 hover:text-red-600 transition-colors"
                           >

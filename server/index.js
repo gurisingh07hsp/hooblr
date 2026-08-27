@@ -15,9 +15,10 @@ const companyRoutes = require('./routes/companies');
 const blogRoutes = require('./routes/blog');
 const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
+const getToken = require('./routes/getToken')
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Security middleware
 app.use(helmet());
@@ -57,6 +58,7 @@ app.use('/api/companies', companyRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/get-token', getToken)
 
 // Health check endpoint
 app.get('/', (req, res) => {

@@ -15,6 +15,7 @@ const TiptapEditor = dynamic(() => import('@/components/TipTapEditor'), {
   loading: () => <p>Loading editor...</p>
 });
 import { categories } from '@/types/utils';
+import { getToken } from '@/hooks/getToken';
 
 // Enhanced interfaces
 interface Company {
@@ -385,8 +386,15 @@ export default function AdminPage() {
       setLoading(true);
       
       if (type === 'company') {
+
         const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/companies/${id}`, {withCredentials:true});
         if (response.status === 200) {
+           const token = await getToken();
+           const companylogo = companies.find((company)=> company._id == id)?.logo;
+          if(companylogo){
+            const images = [companylogo];
+            await axios.delete(`/api/images/delete`, { data: { images, token }, withCredentials: true });
+          }
           fetchCompanies();
         }
       } else if (type === 'job') {
@@ -462,18 +470,23 @@ export default function AdminPage() {
     setLoading(true);
     const file = e.target.files[0];
     if (!file) return;
+    const token = await getToken();
+    if(formData.logo){
+      const images = [formData.logo];
+      await axios.delete(`/api/images/delete`, { data: { images, token }, withCredentials: true });
+    }
+    const formdata = new FormData();
+    // formData.append("file", file);
+    // formData.append("upload_preset", "hooblr");
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "hooblr");
-
-    const res = await fetch("https://api.cloudinary.com/v1_1/dtjobqhxb/image/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await res.json();
-    setFormData(prev => ({ ...prev, logo: data.secure_url }));
+    // const res = await fetch("https://api.cloudinary.com/v1_1/dtjobqhxb/image/upload", {
+    //   method: "POST",
+    //   body: formData,
+    // });
+    formdata.append("images",file);
+    formdata.append("token", token);
+    const data = await axios.post(`/api/images/upload`, formdata, {withCredentials: true});
+    setFormData(prev => ({ ...prev, logo: data.data.images[0] }));
     setLoading(false);
   };
 
