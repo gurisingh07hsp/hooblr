@@ -329,16 +329,15 @@ export default function AdminPage() {
       } else if(type === 'govtjob'){
         if(mode === 'create'){
           data = {...data, slug: data.title.toLowerCase().replace(/\s+/g, '-')};
-          console.log("Govt job data after slug : ", data);
            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/govtjobs/`, data, {withCredentials: true});
           if(response.status === 200){
             fetchGovtJobs();
             closeModal();
           }
         } else if(mode === 'edit'){
+          data = {...data, slug: data.title.toLowerCase().replace(/\s+/g, '-')}; 
           const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/govtjobs/${data._id}`, data, {withCredentials: true});
           if (response.status === 200) {
-            console.log("run jjeijfejifj");
             setGovtJobs(prev => prev.map(j => j._id === data._id ? response.data.job : j));
             closeModal();
           }
