@@ -4,11 +4,16 @@ const govtjobSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    trim: true, // e.g., "SSC CGL 2025 Notification"
+    trim: true,
+  },
+  slug: {
+    type: String,
+    required: true,
+    unique: true
   },
   officialLink: {
     type: String,
-    required: true, // Link to official website
+    required: true,
   },
   applyLink: {
     type: String,

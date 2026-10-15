@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 interface GovtJob {
   _id: string;
   title: string;
+  slug: string;
   officialLink: string;
   applyLink: string;
   notificationLink: string;
@@ -359,7 +360,7 @@ const GovtJobsPage = () => {
                         <button
                           onClick={() =>
                             router.push(
-                              `/govtjobs/${job.title.replace(/\s+/g, "-")}`
+                              `/govtjobs/${job.slug}`
                             )
                           }
                           className="lg:px-4 px-2 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"

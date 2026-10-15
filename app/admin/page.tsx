@@ -328,6 +328,8 @@ export default function AdminPage() {
         }
       } else if(type === 'govtjob'){
         if(mode === 'create'){
+          data = {...data, slug: data.title.toLowerCase().replace(/\s+/g, '-')};
+          console.log("Govt job data after slug : ", data);
            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/govtjobs/`, data, {withCredentials: true});
           if(response.status === 200){
             fetchGovtJobs();
@@ -1004,6 +1006,7 @@ export default function AdminPage() {
   }) => {
     const [formData, setFormData] = useState({
       title: govtjob?.title || '',
+      slug: govtjob?.slug || '',
       officialLink: govtjob?.officialLink || '',
       applyLink: govtjob?.applyLink || '',
       notificationLink: govtjob?.notificationLink || '',

@@ -78,10 +78,10 @@ router.get(
   }
 );
 
-router.get("/:title", async (req, res) => {
+router.get("/:slug", async (req, res) => {
   try {
-    const title = req.params.title;
-    const job = await GovtJob.findOne({ title });
+    const slug = req.params.slug;
+    const job = await GovtJob.findOne({ slug });
 
     if (!job) {
       return res.status(404).json({ error: "Job not found" });

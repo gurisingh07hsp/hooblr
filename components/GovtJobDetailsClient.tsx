@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import Footer from "@/components/Footer";
 import axios from "axios";
-import { DisplayContent } from "./TipTapEditor";
 
 interface GovtJob {
   _id: string;
@@ -97,32 +96,32 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
           <div className="bg-white/80 rounded-xl shadow-lg border border-purple-200 p-4 mb-8">
             <div className="flex border-b pb-4">
               <div className="ms-2">
-                <p className="font-bold text-lg">{job.title}</p>
+                <p className="font-bold text-lg">{job?.title}</p>
               </div>
             </div>
             <div className="mb-4">
               <div className="mt-3 flex gap-3 text-gray-700">
                 <span className="flex items-center">
                   <Building2 className="w-4 h-4 mr-2 text-purple-500" />
-                  {job.category}
+                  {job?.category}
                 </span>
               </div>
               <span className="flex items-center text-gray-500 mt-2">
                 <IndianRupee className="w-4 h-4 mr-2 text-purple-500" />
-                {job.salary}
+                {job?.salary}
               </span>
               <span className="flex items-center text-gray-500 mt-2">
                 <MapPin className="w-4 h-4 mr-2 text-purple-500" />
-                {job.state}
+                {job?.state}
               </span>
               <span className="flex items-center text-gray-500 mt-2">
                 <User className="w-4 h-4 mr-2 text-purple-500" />{" "}
-                {job.totalPosts} Posts
+                {job?.totalPosts} Posts
               </span>
             </div>
             <div className="flex flex-wrap items-center gap-4">
               <a
-                href={job.applyLink}
+                href={job?.applyLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`bg-purple-600 flex justify-center items-center gap-1 text-white px-5 py-2 rounded-lg cursor-pointer`}
@@ -131,7 +130,7 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
                 <SquareArrowOutUpRight className="w-4 h-4" />
               </a>
               <a
-                href={job.officialLink}
+                href={job?.officialLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`bg-purple-600 flex justify-center items-center gap-1 text-white px-5 py-2 rounded-lg cursor-pointer`}
@@ -140,7 +139,7 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
                 <SquareArrowOutUpRight className="w-4 h-4" />
               </a>
               <a
-                href={job.notificationLink}
+                href={job?.notificationLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`bg-purple-600 flex justify-center gap-1 items-center text-white px-5 py-2 rounded-lg cursor-pointer`}
@@ -153,7 +152,7 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
 
           <div className="flex lg:flex-row flex-col-reverse gap-6">
             <div className="space-y-6 w-full">
-              {job.description && (
+              {job?.description && (
                 <section className="bg-white/80 rounded-xl shadow border border-purple-200 p-6">
                   <h2 className="text-xl font-semibold mb-3">
                     About Job
@@ -166,7 +165,7 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
                   />
                 </section>
               )}
-              {job.eligibilityCriteria && (
+              {job?.eligibilityCriteria && (
                 <section className="bg-white/80 rounded-xl shadow border border-purple-200 p-6">
                   <h2 className="text-xl font-semibold mb-3">
                     Eligibility Criteria
@@ -174,13 +173,13 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
                   <div
                     className="quill-content prose prose-sm sm:prose lg:prose-lg w-full max-w-full"
                     dangerouslySetInnerHTML={{
-                      __html: job.eligibilityCriteria,
+                      __html: job?.eligibilityCriteria,
                     }}
                   />
                 </section>
               )}
 
-              {job.selectionProcess && (
+              {job?.selectionProcess && (
                 <section className="bg-white/80 rounded-xl shadow border border-purple-200 p-6">
                   <h2 className="text-xl font-semibold mb-3">
                     Selection Process
@@ -188,56 +187,56 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
                   <div
                     className="quill-content prose prose-sm sm:prose lg:prose-lg w-full max-w-full"
                     dangerouslySetInnerHTML={{
-                      __html: job.selectionProcess,
+                      __html: job?.selectionProcess,
                     }}
                   />
                 </section>
               )}
 
-              {job.howToApply && (
+              {job?.howToApply && (
                 <section className="bg-white/80 rounded-xl shadow border border-purple-200 p-6">
                   <h2 className="text-xl font-semibold mb-3">How to Apply</h2>
                   <div
                     className="quill-content prose prose-sm sm:prose lg:prose-lg w-full max-w-full"
                     dangerouslySetInnerHTML={{
-                      __html: job.howToApply,
+                      __html: job?.howToApply,
                     }}
                   />
                 </section>
               )}
-              {similarJobs.length > 1 && (
+              {similarJobs?.length > 1 && (
               <div className="bg-white rounded-2xl border p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Similar Jobs</h2>
                 <div className="space-y-4 max-h-72 overflow-auto">
                   {similarJobs?.map((sjob) => (
-                    <div key={sjob._id} className={`${sjob._id == job._id && 'hidden'} border border-gray-200 rounded-xl p-6`}>
+                    <div key={sjob._id} className={`${sjob?._id == job?._id && 'hidden'} border border-gray-200 rounded-xl p-6`}>
                       <div className="flex lg:flex-row flex-col items-start justify-between">
                         <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2">{sjob.title}</h3>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">{sjob?.title}</h3>
                           <div className="flex lg:flex-row flex-col gap-2 lg:items-center text-sm text-gray-600 mb-3">
                             <div className="flex items-center">
                               <MapPin className="w-4 h-4 mr-1" />
-                              {sjob.state}
+                              {sjob?.state}
                             </div>
                             <div className="flex items-center">
                                <User className="w-4 h-4 mr-2 text-purple-500" />
-                              {sjob.totalPosts} Posts
+                              {sjob?.totalPosts} Posts
                             </div>
                             <div className="flex items-center">
                               <IndianRupee className="w-4 h-4 mr-1" />
-                              {sjob.salary}
+                              {sjob?.salary}
                             </div>
                           </div>
                           <div className="flex items-center text-xs text-gray-500">
                             <Calendar className="w-3 h-3 mr-1" />
-                            Posted {sjob.createdAt ? new Date(sjob.createdAt).toLocaleDateString("en-US", {
+                            Posted {sjob?.createdAt ? new Date(sjob?.createdAt).toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
                             year: "numeric"
                           }) : "just now"}
                           </div>
                         </div>
-                        <button onClick={()=> router.push(`/govtjobs/${sjob.title}`)} className="bg-[#9333E9] mt-3 lg:mt-0 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium">
+                        <button onClick={()=> router.push(`/govtjobs/${sjob?.title}`)} className="bg-[#9333E9] mt-3 lg:mt-0 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium">
                           Apply Now
                         </button>
                       </div>
@@ -252,16 +251,16 @@ const GovtJobDetailsClient = ({ job }: { job: GovtJob }) => {
                 <h3 className="text-lg font-semibold mb-3">Details</h3>
                 <ul className="text-gray-700 space-y-2">
                   <li>
-                    <b>Age Limit:</b> {job.ageLimit}
+                    <b>Age Limit:</b> {job?.ageLimit}
                   </li>
                   <li>
-                    <b>Application Fees:</b> {job.applicationFees}
+                    <b>Application Fees:</b> {job?.applicationFees}
                   </li>
                   <li>
-                    <b>Start Date:</b> {formatDate(job.startDateToApply)}
+                    <b>Start Date:</b> {formatDate(job?.startDateToApply)}
                   </li>
                   <li>
-                    <b>Last Date:</b> {formatDate(job.lastDateToApply)}
+                    <b>Last Date:</b> {formatDate(job?.lastDateToApply)}
                   </li>
                 </ul>
               </div>

@@ -6,10 +6,11 @@ import GovtJobDetailsClient from "@/components/GovtJobDetailsClient";
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-    const title = (
-    Array.isArray(params?.slug) ? params.slug[0] : params?.slug
-  )?.replace(/-/g, " ");
-  const res = await fetch(`${API_BASE}/api/govtjobs/${title}`, { cache: "no-store" });
+  //   const title = (
+  //   Array.isArray(params?.slug) ? params.slug[0] : params?.slug
+  // )?.replace(/-/g, " ");
+  console.log("Params in generateMetadata: ", params.slug);
+  const res = await fetch(`${API_BASE}/api/govtjobs/${params.slug}`, { cache: "no-store" });
   const data = await res.json();
   const job = data.job;
 
@@ -28,11 +29,11 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 export default async function GovtJobDetailsPage({ params }: { params: { slug: string } }) {
 
-  const title = (
-    Array.isArray(params?.slug) ? params.slug[0] : params?.slug
-  )?.replace(/-/g, " ");
+  // const title = (
+  //   Array.isArray(params?.slug) ? params.slug[0] : params?.slug
+  // )?.replace(/-/g, " ");
  
-  const res = await fetch(`${API_BASE}/api/govtjobs/${title}`, { cache: "no-store" });
+  const res = await fetch(`${API_BASE}/api/govtjobs/${params.slug}`, { cache: "no-store" });
   const data = await res.json();
   const job = data.job;
 
