@@ -16,6 +16,7 @@ const blogRoutes = require('./routes/blog');
 const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
 const getToken = require('./routes/getToken')
+const GovtJob = require('./models/GovtJobs');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -45,7 +46,17 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI)
-.then(() => console.log('Connected to MongoDB'))
+.then(async () => {
+  console.log('Connected to MongoDB');
+  try {
+    await GovtJob.collection.dropIndex('expiryDate_1');
+    console.log('Removed govt job auto-delete index');
+  } catch (err) {
+    if (err.code !== 27 && err.codeName !== 'IndexNotFound') {
+      console.error('Could not remove govt job expiry index:', err.message);
+    }
+  }
+})
 .catch(err => console.error('MongoDB connection error:', err));
 
 // Routes
